@@ -17,35 +17,33 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PizzaServiceImplTest {
 
-    @InjectMocks
-    PizzaServiceImpl pizzaService;
+  @InjectMocks PizzaServiceImpl pizzaService;
 
-    @Mock
-    PizzaRepository pizzaRepository;
+  @Mock PizzaRepository pizzaRepository;
 
-    @Test
-    void givenAListOfPizzasShouldReturnSuccessfully() {
+  @Test
+  void givenAListOfPizzasShouldReturnSuccessfully() {
 
-        var firstPizza =
-                Pizza.builder().id(1L).name("Margherita").description("Margherita").version(0).build();
-        var secondPizza =
-                Pizza.builder().id(1L).name("Marinara").description("Marinara").version(0).build();
+    var firstPizza =
+        Pizza.builder().id(1L).name("Margherita").description("Margherita").version(0).build();
+    var secondPizza =
+        Pizza.builder().id(1L).name("Marinara").description("Marinara").version(0).build();
 
-        var input = List.of("Margherita", "Marinara");
+    var input = List.of("Margherita", "Marinara");
 
-        when(pizzaRepository.findByNameIn(input)).thenReturn(List.of(firstPizza, secondPizza));
+    when(pizzaRepository.findByNameIn(input)).thenReturn(List.of(firstPizza, secondPizza));
 
-        var actual = pizzaService.getPizzas(input);
-        assertThat(actual).isNotEmpty().hasSize(2);
-    }
+    var actual = pizzaService.getPizzas(input);
+    assertThat(actual).isNotEmpty().hasSize(2);
+  }
 
-    @Test
-    void givenANotExistingPizzaShouldRaiseAnExecption() {
-        var input = List.of("Gourmet");
-        when(pizzaRepository.findByNameIn(input)).thenReturn(List.of());
+  @Test
+  void givenANotExistingPizzaShouldRaiseAnExecption() {
+    var input = List.of("Gourmet");
+    when(pizzaRepository.findByNameIn(input)).thenReturn(List.of());
 
-        assertThatThrownBy(() -> pizzaService.getPizzas(input))
-                .isExactlyInstanceOf(PizzaOrderException.class)
-                .hasMessageContaining("Some pizzas not found");
-    }
+    assertThatThrownBy(() -> pizzaService.getPizzas(input))
+        .isExactlyInstanceOf(PizzaOrderException.class)
+        .hasMessageContaining("Some pizzas not found");
+  }
 }
