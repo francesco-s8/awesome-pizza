@@ -1,10 +1,10 @@
 package it.s8.awesomepizza.service.impl;
 
-import it.s8.awesomepizza.OrderStatus;
 import it.s8.awesomepizza.dto.OrderDto;
 import it.s8.awesomepizza.dto.OrderRequest;
 import it.s8.awesomepizza.dto.PizzaOrderDto;
 import it.s8.awesomepizza.entity.PizzaOrder;
+import it.s8.awesomepizza.enums.OrderStatus;
 import it.s8.awesomepizza.service.OrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;

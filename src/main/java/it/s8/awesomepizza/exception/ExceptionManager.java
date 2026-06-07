@@ -12,31 +12,39 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionManager {
 
-    @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<Void> handleDataAccessException(DataAccessException ex) {
+  @ExceptionHandler(DataAccessException.class)
+  public ResponseEntity<Void> handleDataAccessException(DataAccessException ex) {
 
-        log.info("DataAccessException occurred ", ex);
-        return ResponseEntity.internalServerError().build();
-    }
+    log.info("DataAccessException occurred ", ex);
+    return ResponseEntity.internalServerError().build();
+  }
 
-    @ExceptionHandler(PizzaOrderException.class)
-    public ResponseEntity<Void> handlePizzaOrderException(PizzaOrderException ex) {
+  @ExceptionHandler(PizzaOrderException.class)
+  public ResponseEntity<Void> handlePizzaOrderException(PizzaOrderException ex) {
 
-        log.info("PizzaOrderException occurred ", ex);
-        return ResponseEntity.internalServerError().build();
-    }
+    log.info("PizzaOrderException occurred ", ex);
+    return ResponseEntity.internalServerError().build();
+  }
 
-    @ExceptionHandler(AmqpException.class)
-    public ResponseEntity<Void> handleAmqpException(AmqpException ex) {
+  @ExceptionHandler(PizzaOrderAlreadyDeliveredException.class)
+  public ResponseEntity<String> handlePizzaOrderAlreadyDeliveredException(
+      PizzaOrderAlreadyDeliveredException ex) {
 
-        log.info("AmqpException occurred ", ex);
-        return ResponseEntity.internalServerError().build();
-    }
+    log.info("PizzaOrderAlreadyDeliveredException occurred ", ex);
+    return ResponseEntity.ok().body(ex.getMessage());
+  }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> orderNotFound(EntityNotFoundException entityNotFoundException) {
+  @ExceptionHandler(AmqpException.class)
+  public ResponseEntity<Void> handleAmqpException(AmqpException ex) {
 
-        log.info("EntityNotFoundException occurred ", entityNotFoundException);
-        return ResponseEntity.notFound().build();
-    }
+    log.info("AmqpException occurred ", ex);
+    return ResponseEntity.internalServerError().build();
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  public ResponseEntity<Void> orderNotFound(EntityNotFoundException entityNotFoundException) {
+
+    log.info("EntityNotFoundException occurred ", entityNotFoundException);
+    return ResponseEntity.notFound().build();
+  }
 }
