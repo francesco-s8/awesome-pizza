@@ -1,17 +1,16 @@
 package it.s8.awesomepizza.service.impl;
 
-import it.s8.awesomepizza.OrderStatus;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import it.s8.awesomepizza.enums.OrderStatus;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-import java.util.List;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class PizzaQueueServiceImplTest {
