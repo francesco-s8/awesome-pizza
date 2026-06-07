@@ -1,9 +1,9 @@
 package it.s8.awesomepizza.controller;
 
-import it.s8.awesomepizza.OrderStatus;
 import it.s8.awesomepizza.dto.OrderDto;
 import it.s8.awesomepizza.dto.OrderRequest;
-import it.s8.awesomepizza.exception.PizzaOrderException;
+import it.s8.awesomepizza.enums.OrderStatus;
+import it.s8.awesomepizza.exception.PizzaOrderAlreadyDeliveredException;
 import it.s8.awesomepizza.service.OrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class PizzaOrderController {
 
         var orderFound = pizzaOrderService.getOrderStatus(orderId);
         if ((OrderStatus.READY.name().equals(orderFound.getOrderStatus()))) {
-            throw new PizzaOrderException("Order already delivered");
+      throw new PizzaOrderAlreadyDeliveredException("Order " + orderId + " is already delivered");
         }
 
         return ResponseEntity.ok(orderFound.getOrderStatus());

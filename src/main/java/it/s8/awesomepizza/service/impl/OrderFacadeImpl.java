@@ -17,34 +17,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class OrderFacadeImpl implements OrderFacade {
 
-    final PizzaService pizzaService;
-    final PizzaQueueService pizzaQueueService;
-    final PizzaOrderService pizzaOrderService;
+  final PizzaService pizzaService;
+  final PizzaQueueService pizzaQueueService;
+  final PizzaOrderService pizzaOrderService;
 
-    public OrderFacadeImpl(
-            PizzaService pizzaService,
-            PizzaQueueService pizzaQueueService,
-            PizzaOrderService pizzaOrderService) {
+  public OrderFacadeImpl(
+      PizzaService pizzaService,
+      PizzaQueueService pizzaQueueService,
+      PizzaOrderService pizzaOrderService) {
 
-        this.pizzaService = pizzaService;
-        this.pizzaQueueService = pizzaQueueService;
-        this.pizzaOrderService = pizzaOrderService;
-    }
+    this.pizzaService = pizzaService;
+    this.pizzaQueueService = pizzaQueueService;
+    this.pizzaOrderService = pizzaOrderService;
+  }
 
-    @Override
-    @Transactional
-    public OrderDto processOrder(OrderRequest orderRequest) {
-        var pizzas = pizzaService.getPizzas(orderRequest.pizzas());
-        new PizzaOrderDto(orderRequest.user(), pizzas, OrderStatus.IN_PROCESS.name());
-        var pizzaOrderEntity =
-                PizzaOrder.builder()
-                        .username(orderRequest.user())
-                        .pizzas(pizzas)
-                        .orderStatus(OrderStatus.IN_PROCESS.name())
-                        .build();
-        var entity = pizzaOrderService.saveOrder(pizzaOrderEntity);
-        log.info("Order {} saved to database", entity);
-        pizzaQueueService.sendOrder(entity.getId());
-        return new OrderDto(entity.getId());
-    }
+  @Override
+  @Transactional
+  public OrderDto processOrder(OrderRequest orderRequest) {
+    var pizzas = pizzaService.getPizzas(orderRequest.pizzas());
+    new PizzaOrderDto(orderRequest.user(), pizzas, OrderStatus.IN_PROCESS.name());
+    var pizzaOrderEntity =
+        PizzaOrder.builder()
+            .username(orderRequest.user())
+            .pizzas(pizzas)
+            .orderStatus(OrderStatus.IN_PROCESS.name())
+            .build();
+    var entity = pizzaOrderService.saveOrder(pizzaOrderEntity);
+    log.info("Order {} saved to database", entity);
+    pizzaQueueService.sendOrder(entity.getId());
+    return new OrderDto(entity.getId());
+  }
 }
