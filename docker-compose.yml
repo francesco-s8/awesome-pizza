@@ -10,15 +10,15 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
-      - "D:/compose/rabbitmq:/var/lib/rabbitmq"
-      - "D:/compose/rabbitmq:/var/log/rabbitmq"
+      - "${VOLUME_PATH}/rabbitmq:/var/lib/rabbitmq"
+      - "${VOLUME_PATH}/rabbitmq:/var/log/rabbitmq"
   postgres:
     image: postgres:18.3
     container_name: postgresql-18.3
     ports:
       - "5432:5432"
     volumes:
-      - "D:/compose/postgresql:/var/lib/postgresql/18/docker"
+      - "${VOLUME_PATH}/postgresql:/var/lib/postgresql/18/docker"
 
     environment:
       - POSTGRES_PASSWORD=s8

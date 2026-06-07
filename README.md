@@ -27,10 +27,17 @@ url : http://localhost:8080/api/awesome-pizza/order/{orderId}
 
 given an orderId,
 
-ritorna una stringa che rappresenta lo stato dell'ordine evaso
+returns:
 
 - 404 order not found
-- 500 if error occurs
+- 500 if error occurs (at application level)
+- 500 with message "Order {{orderId}} is already delivered" if the order status is READY
+
+PS:
+
+docker-compose volume will write under VOLUME_PATH variable defined in .env file so you should change according to your
+needs or OS
+
 
 
 
