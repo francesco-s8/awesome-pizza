@@ -1,17 +1,15 @@
 package it.s8.awesomepizza.entity;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
-
-import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
 @Table(name = "pizza")
 public class Pizza extends EntityInfo {

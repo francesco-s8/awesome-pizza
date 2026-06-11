@@ -2,7 +2,7 @@ package it.s8.awesomepizza.service.impl;
 
 import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.enums.OrderStatus;
-import it.s8.awesomepizza.exception.PizzaOrderException;
+import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.repository.PizzaOrderRepository;
 import it.s8.awesomepizza.service.PizzaQueueService;
 import java.io.IOException;
@@ -48,7 +48,8 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
       var order =
           pizzaOrderRepository
               .findById(pizzaOrder)
-              .orElseThrow(() -> new PizzaOrderException("Order not found with ID: " + pizzaOrder));
+              .orElseThrow(
+                  () -> new AwesomePizzaException("Order not found with ID: " + pizzaOrder));
       order.setOrderStatus(OrderStatus.READY.name());
       pizzaOrderRepository.save(order);
       channel.basicAck(tag, false);

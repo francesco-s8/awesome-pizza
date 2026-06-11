@@ -5,6 +5,7 @@ import it.s8.awesomepizza.dto.OrderRequest;
 import it.s8.awesomepizza.dto.PizzaOrderDto;
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.enums.OrderStatus;
+import it.s8.awesomepizza.exception.PizzaOrderAlreadyDeliveredException;
 import it.s8.awesomepizza.service.OrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
@@ -46,5 +47,14 @@ public class OrderFacadeImpl implements OrderFacade {
     log.info("Order {} saved to database", entity);
     pizzaQueueService.sendOrder(entity.getId());
     return new OrderDto(entity.getId());
+  }
+
+  @Override
+  public PizzaOrder retrieveOrderStatus(Long orderId) {
+    var order = pizzaOrderService.getOrderStatus(orderId);
+    if (OrderStatus.READY.name().equals(order.getOrderStatus())) {
+      throw new PizzaOrderAlreadyDeliveredException("Order " + orderId + " is already delivered");
+    }
+    return order;
   }
 }

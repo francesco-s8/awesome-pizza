@@ -19,10 +19,10 @@ public class ExceptionManager {
     return ResponseEntity.internalServerError().build();
   }
 
-  @ExceptionHandler(PizzaOrderException.class)
-  public ResponseEntity<Void> handlePizzaOrderException(PizzaOrderException ex) {
+  @ExceptionHandler(AwesomePizzaException.class)
+  public ResponseEntity<Void> handlePizzaOrderException(AwesomePizzaException ex) {
 
-    log.info("PizzaOrderException occurred ", ex);
+    log.info("AwesomePizzaException occurred ", ex);
     return ResponseEntity.internalServerError().build();
   }
 
