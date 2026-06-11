@@ -24,6 +24,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class OrderFacadeImplTest {
 
+  public static final String IN_PROCESS = "IN_PROCESS";
+  public static final String SOME_PIZZAS_NOT_FOUND = "Some pizzas not found";
+  public static final String MARGHERITA_PIZZA = "Margherita";
+  public static final String READY = "READY";
   @InjectMocks OrderFacadeImpl orderFacade;
 
   @Mock PizzaService pizzaService;
@@ -34,7 +38,12 @@ class OrderFacadeImplTest {
   void givenAValidOrderRequestShouldReturnTheOrderId() {
 
     var pizza =
-        Pizza.builder().id(1L).name("Margherita").description("Margherita").version(0).build();
+        Pizza.builder()
+            .id(1L)
+            .name(MARGHERITA_PIZZA)
+            .description(MARGHERITA_PIZZA)
+            .version(0)
+            .build();
 
     when(pizzaService.getPizzas(any())).thenReturn(List.of(pizza));
     doNothing().when(pizzaQueueService).sendOrder(anyLong());
@@ -52,27 +61,27 @@ class OrderFacadeImplTest {
 
     var specialPizza = List.of("Special pizza");
     when(pizzaService.getPizzas(specialPizza))
-        .thenThrow(new AwesomePizzaException("Some pizzas not found"));
+        .thenThrow(new AwesomePizzaException(SOME_PIZZAS_NOT_FOUND));
     assertThatThrownBy(() -> orderFacade.processOrder(new OrderRequest("test", specialPizza)))
-        .hasMessageContaining("Some pizzas not found");
+        .hasMessageContaining(SOME_PIZZAS_NOT_FOUND);
   }
 
   @Test
   void givenAValidOrderIdShouldReturnTheOrderStatus() {
 
     when(pizzaOrderService.getOrderStatus(anyLong()))
-        .thenReturn(PizzaOrder.builder().orderStatus("IN_PROCESS").build());
+        .thenReturn(PizzaOrder.builder().orderStatus(IN_PROCESS).build());
 
     var actual = orderFacade.retrieveOrderStatus(1L);
     assertThat(actual).isNotNull();
-    assertThat(actual).isEqualTo("IN_PROCESS");
+    assertThat(actual).isEqualTo(IN_PROCESS);
   }
 
   @Test
   void givenAReadyOrderShouldThrowException() {
 
     when(pizzaOrderService.getOrderStatus(anyLong()))
-        .thenReturn(PizzaOrder.builder().orderStatus("READY").build());
+        .thenReturn(PizzaOrder.builder().orderStatus(READY).build());
 
     assertThatThrownBy(() -> orderFacade.retrieveOrderStatus(1L))
         .isExactlyInstanceOf(PizzaOrderAlreadyDeliveredException.class)
