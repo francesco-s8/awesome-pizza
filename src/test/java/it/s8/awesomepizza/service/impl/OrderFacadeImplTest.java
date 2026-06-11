@@ -73,8 +73,7 @@ class OrderFacadeImplTest {
         .thenReturn(PizzaOrder.builder().orderStatus(IN_PROCESS).build());
 
     var actual = orderFacade.retrieveOrderStatus(1L);
-    assertThat(actual).isNotNull();
-    assertThat(actual).isEqualTo(IN_PROCESS);
+    assertThat(actual).isNotNull().isEqualTo(IN_PROCESS);
   }
 
   @Test
