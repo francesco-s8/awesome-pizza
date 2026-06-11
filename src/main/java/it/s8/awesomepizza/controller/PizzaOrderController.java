@@ -29,9 +29,7 @@ public class PizzaOrderController {
   public ResponseEntity<String> checkOrderStatus(@PathVariable Long orderId) {
     log.info("Checking status for order ID: {}", orderId);
 
-    var orderFound = orderFacade.retrieveOrderStatus(orderId);
-
-
-    return ResponseEntity.ok(orderFound.getOrderStatus());
+    var orderStatus = orderFacade.retrieveOrderStatus(orderId);
+    return ResponseEntity.ok(orderStatus);
   }
 }

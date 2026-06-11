@@ -50,11 +50,11 @@ public class OrderFacadeImpl implements OrderFacade {
   }
 
   @Override
-  public PizzaOrder retrieveOrderStatus(Long orderId) {
+  public String retrieveOrderStatus(Long orderId) {
     var order = pizzaOrderService.getOrderStatus(orderId);
     if (OrderStatus.READY.name().equals(order.getOrderStatus())) {
       throw new PizzaOrderAlreadyDeliveredException("Order " + orderId + " is already delivered");
     }
-    return order;
+    return order.getOrderStatus();
   }
 }
