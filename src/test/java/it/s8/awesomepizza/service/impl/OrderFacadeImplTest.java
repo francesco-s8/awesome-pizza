@@ -65,7 +65,7 @@ class OrderFacadeImplTest {
 
     var actual = orderFacade.retrieveOrderStatus(1L);
     assertThat(actual).isNotNull();
-    assertThat(actual.getOrderStatus()).isEqualTo("IN_PROCESS");
+    assertThat(actual).isEqualTo("IN_PROCESS");
   }
 
   @Test
