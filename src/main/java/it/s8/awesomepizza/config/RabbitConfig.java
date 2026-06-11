@@ -12,53 +12,42 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @EnableRabbit
 @Configuration
 public class RabbitConfig {
 
-    @Bean
-    public Queue orders() {
-        return QueueBuilder.durable("orders")
-                .quorum()
-                .singleActiveConsumer()
-                .deadLetterExchange("**")
-                .deadLetterRoutingKey("dl")
-                .build();
-    }
+  @Bean
+  public Queue orders() {
+    return QueueBuilder.durable("orders")
+        .quorum()
+        .singleActiveConsumer()
+        .deadLetterExchange("**")
+        .deadLetterRoutingKey("dl")
+        .build();
+  }
 
+  @Bean
+  public CachingConnectionFactory connectionFactory() {
+    var connectionFactory = new CachingConnectionFactory("localhost");
+    connectionFactory.setUsername("guest");
+    connectionFactory.setPassword("guest");
+    return connectionFactory;
+  }
 
-    @Bean
-    public CachingConnectionFactory connectionFactory() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
-        connectionFactory.setUsername("guest");
-        connectionFactory.setPassword("guest");
-        return connectionFactory;
-    }
+  @Bean
+  public MessageConverter jsonMessageConverter() {
+    return new JacksonJsonMessageConverter(new JsonMapper());
+  }
 
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new JacksonJsonMessageConverter(new JsonMapper());
-    }
+  @Bean
+  public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    var rabbitTemplate = new RabbitTemplate(connectionFactory);
+    rabbitTemplate.setMessageConverter(jsonMessageConverter());
+    return rabbitTemplate;
+  }
 
-    @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        var rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        return rabbitTemplate;
-    }
-
-    @Bean
-    Queue deadLetterQueue() {
-        return QueueBuilder.durable("dl").quorum().build();
-    }
-
-    private Map<String, Object> setCommonQueueArgs() {
-        final Map<String, Object> args = new HashMap<>();
-        args.put("x-dead-letter-exchange", "");
-        args.put("x-dead-letter-routing-key", "dl");
-        return args;
-    }
+  @Bean
+  Queue deadLetterQueue() {
+    return QueueBuilder.durable("dl").quorum().build();
+  }
 }
