@@ -3,10 +3,13 @@
 ## Prerequisites
 
 - Java 25
-- Docker desktop or Rancher Desktop installed
-- Postmam/Insomnia/CUrl to simulate API calls
-- Maven to build the project
-- For brevity all credentials are clearly visible in the code, so no need to set up any environment variable
+- Docker desktop or Rancher Desktop installed or equivalent 
+- Postmam/Insomnia/Curl to simulate API calls
+- Maven to build the project/run tests
+
+## Disclaimer
+
+  For brevity all credentials are clearly visible in the code, so no need to set up any environment variable
 
 ### Endpoint
 
