@@ -10,7 +10,7 @@
     </parent>
     <groupId>it.s8</groupId>
     <artifactId>awesomepizza</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <properties>
         <java.version>25</java.version>
     </properties>
