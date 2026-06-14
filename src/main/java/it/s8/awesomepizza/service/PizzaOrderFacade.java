@@ -3,7 +3,7 @@ package it.s8.awesomepizza.service;
 import it.s8.awesomepizza.dto.OrderDto;
 import it.s8.awesomepizza.dto.OrderRequest;
 
-public interface OrderFacade {
+public interface PizzaOrderFacade {
 
   OrderDto processOrder(OrderRequest orderRequest);
 

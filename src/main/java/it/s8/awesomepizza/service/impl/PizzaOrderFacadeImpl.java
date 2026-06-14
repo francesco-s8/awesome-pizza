@@ -6,7 +6,7 @@ import it.s8.awesomepizza.dto.PizzaOrderDto;
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.enums.OrderStatus;
 import it.s8.awesomepizza.exception.PizzaOrderAlreadyDeliveredException;
-import it.s8.awesomepizza.service.OrderFacade;
+import it.s8.awesomepizza.service.PizzaOrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
 import it.s8.awesomepizza.service.PizzaService;
@@ -16,13 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
-public class OrderFacadeImpl implements OrderFacade {
+public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
 
   final PizzaService pizzaService;
   final PizzaQueueService pizzaQueueService;
   final PizzaOrderService pizzaOrderService;
 
-  public OrderFacadeImpl(
+  public PizzaOrderFacadeImpl(
       PizzaService pizzaService,
       PizzaQueueService pizzaQueueService,
       PizzaOrderService pizzaOrderService) {

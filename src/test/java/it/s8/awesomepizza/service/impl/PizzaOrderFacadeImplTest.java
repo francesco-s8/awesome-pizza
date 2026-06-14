@@ -22,13 +22,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class OrderFacadeImplTest {
+class PizzaOrderFacadeImplTest {
 
   public static final String IN_PROCESS = "IN_PROCESS";
   public static final String SOME_PIZZAS_NOT_FOUND = "Some pizzas not found";
   public static final String MARGHERITA_PIZZA = "Margherita";
   public static final String READY = "READY";
-  @InjectMocks OrderFacadeImpl orderFacade;
+  @InjectMocks PizzaOrderFacadeImpl orderFacade;
 
   @Mock PizzaService pizzaService;
   @Mock PizzaQueueService pizzaQueueService;
