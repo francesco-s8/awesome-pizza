@@ -3,7 +3,6 @@ package it.s8.awesomepizza.config;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
@@ -24,14 +23,6 @@ public class RabbitConfig {
         .deadLetterExchange("**")
         .deadLetterRoutingKey("dl")
         .build();
-  }
-
-  @Bean
-  public CachingConnectionFactory connectionFactory() {
-    var connectionFactory = new CachingConnectionFactory("localhost");
-    connectionFactory.setUsername("guest");
-    connectionFactory.setPassword("guest");
-    return connectionFactory;
   }
 
   @Bean
