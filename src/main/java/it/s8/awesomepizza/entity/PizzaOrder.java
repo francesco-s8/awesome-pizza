@@ -1,10 +1,9 @@
 package it.s8.awesomepizza.entity;
 
 import jakarta.persistence.*;
+import java.util.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
-
-import java.util.*;
 
 @Entity
 @Getter
@@ -18,7 +17,7 @@ public class PizzaOrder extends EntityInfo {
     @Id
     @Column(name = "pizza_order_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "pizza_order_seq", sequenceName = "pizza_order_seq", allocationSize = 1)
+    @SequenceGenerator(name = "pizza_order_seq", sequenceName = "pizza_order_seq")
     private Long id;
 
     @Column(name = "username", nullable = false)
