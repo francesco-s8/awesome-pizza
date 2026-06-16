@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import it.s8.awesomepizza.enums.OrderStatus;
 import it.s8.awesomepizza.exception.PizzaOrderAlreadyDeliveredException;
 import it.s8.awesomepizza.service.impl.PizzaOrderFacadeImpl;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,7 +27,7 @@ class PizzaOrderControllerTest {
   @Test
   void givenAValidOrderIdShouldReturnTheCurrentOrderStatus() throws Exception {
 
-    when(pizzaOrderFacade.retrieveOrderStatus(anyLong())).thenReturn("IN_PROCESS");
+    when(pizzaOrderFacade.retrieveOrderStatus(anyLong())).thenReturn(OrderStatus.IN_PROCESS.name());
 
     var actual =
         mockMvc
@@ -35,7 +36,7 @@ class PizzaOrderControllerTest {
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
-    assertThat(actual.getResponse().getContentAsString()).isEqualTo("IN_PROCESS");
+    assertThat(actual.getResponse().getContentAsString()).isEqualTo(OrderStatus.IN_PROCESS.name());
   }
 
   @Test
