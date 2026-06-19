@@ -1,13 +1,13 @@
 package it.s8.awesomepizza.service.impl;
 
 import com.rabbitmq.client.Channel;
-import it.s8.awesomepizza.enums.OrderStatus;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.repository.PizzaOrderRepository;
 import it.s8.awesomepizza.service.PizzaQueueService;
 import java.io.IOException;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
+import org.openapitools.model.PizzaOrderStatus;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -50,7 +50,7 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
               .findById(pizzaOrder)
               .orElseThrow(
                   () -> new AwesomePizzaException("Order not found with ID: " + pizzaOrder));
-      order.setOrderStatus(OrderStatus.READY.name());
+      order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
       pizzaOrderRepository.save(order);
       channel.basicAck(tag, false);
       log.info("Order {} is ready", pizzaOrder);

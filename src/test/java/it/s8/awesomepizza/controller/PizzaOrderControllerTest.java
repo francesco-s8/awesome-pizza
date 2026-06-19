@@ -5,11 +5,11 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import it.s8.awesomepizza.enums.OrderStatus;
-import it.s8.awesomepizza.exception.PizzaOrderAlreadyDeliveredException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import it.s8.awesomepizza.service.impl.PizzaOrderFacadeImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.PizzaOrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -22,37 +22,50 @@ class PizzaOrderControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
+  private final JsonMapper jsonMapper = new JsonMapper();
+
   @MockitoBean PizzaOrderFacadeImpl pizzaOrderFacade;
 
   @Test
   void givenAValidOrderIdShouldReturnTheCurrentOrderStatus() throws Exception {
 
-    when(pizzaOrderFacade.retrieveOrderStatus(anyLong())).thenReturn(OrderStatus.IN_PROCESS.name());
+    when(pizzaOrderFacade.retrieveOrderStatus(anyLong()))
+        .thenReturn(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
 
     var actual =
         mockMvc
             .perform(
-                MockMvcRequestBuilders.get("/api/awesome-pizza/order/1")
+                MockMvcRequestBuilders.get("/api/awesome-pizza/orders/1")
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
-    assertThat(actual.getResponse().getContentAsString()).isEqualTo(OrderStatus.IN_PROCESS.name());
+    assertThat(actual.getResponse().getContentAsString())
+        .isEqualTo(
+            jsonMapper.writeValueAsString(
+                PizzaOrderStatus.builder()
+                    .orderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS)
+                    .build()));
   }
 
   @Test
   void givenAnInvalidOrderIdShouldThrowAPizzaOrderAlreadyDeliveredException() throws Exception {
 
     when(pizzaOrderFacade.retrieveOrderStatus(anyLong()))
-        .thenThrow(new PizzaOrderAlreadyDeliveredException("Order 1 is already delivered"));
+        .thenReturn(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue());
 
     var actual =
         mockMvc
             .perform(
-                MockMvcRequestBuilders.get("/api/awesome-pizza/order/1")
+                MockMvcRequestBuilders.get("/api/awesome-pizza/orders/10")
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
-    assertThat(actual.getResponse().getContentAsString()).isEqualTo("Order 1 is already delivered");
+    assertThat(actual.getResponse().getContentAsString())
+        .isEqualTo(
+            jsonMapper.writeValueAsString(
+                PizzaOrderStatus.builder()
+                    .orderStatus(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED)
+                    .build()));
   }
 
   @Test

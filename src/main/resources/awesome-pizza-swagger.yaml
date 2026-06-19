@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: Analisi Ricerca Riferimenti Normativi
+  version: "1.0"
+  description: "Available operations on the Analisi Ricerca Riferimenti Normativi service endpoint"
+servers:
+  - url: http://localhost:8080/api
+tags:
+  - name: order
+    description: Everything about pizza orders
+paths:
+  /api/awesome-pizza/orders:
+    post:
+      tags:
+        - order
+      summary: Process a pizza order
+      description: Process a pizza order. The request contains the details of the order, including the list of documents to be analyzed and the callback URL to send the response to. The response will contain the request id for the analysis to be used in this service's subsequent operations.
+      operationId: newOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PizzaOrderRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaOrderResponse'
+        '500':
+          description: Internal error
+  /api/awesome-pizza/orders/{orderId}:
+    get:
+      tags:
+        - order
+      summary: Return the order status
+      description: Returns the status of a specific pizza order.
+      operationId: getOrderStatus
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            type: integer
+            format: int64
+          description: The unique identifier for the pizza order
+          example: '1'
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PizzaOrderStatus'
+        '404':
+          description: No order found
+        '500':
+          description: Internal error
+components:
+  schemas:
+    PizzaOrderStatus:
+      type: object
+      properties:
+        orderStatus:
+          type: string
+          enum:
+            - 'IN_PROCESS'
+            - 'READY_FOR_DELIVERY'
+            - 'ALREADY DELIVERED'
+          description: The status of the pizza order
+          example: 'IN_PROCESS'
+    PizzaOrderRequest:
+      type: object
+      properties:
+        user:
+          type: string
+          description: The name of the user placing the order
+          example: "John Doe"
+        pizzas:
+          type: array
+          description: A list of pizzas to be ordered
+          items:
+            type: string
+            description: The name of the pizza
+            example: "Margherita"
+    PizzaOrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          format: int64
+          description: The unique identifier for the pizza order
+          example: 1

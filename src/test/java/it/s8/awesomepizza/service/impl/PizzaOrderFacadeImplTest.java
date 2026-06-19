@@ -6,11 +6,9 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import it.s8.awesomepizza.dto.OrderRequest;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
-import it.s8.awesomepizza.exception.PizzaOrderAlreadyDeliveredException;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
 import it.s8.awesomepizza.service.PizzaService;
@@ -20,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.openapitools.model.PizzaOrderRequest;
 
 @ExtendWith(MockitoExtension.class)
 class PizzaOrderFacadeImplTest {
@@ -49,9 +48,10 @@ class PizzaOrderFacadeImplTest {
     doNothing().when(pizzaQueueService).sendOrder(anyLong());
 
     when(pizzaOrderService.saveOrder(any()))
-        .thenReturn(PizzaOrder.builder().pizzas(List.of(pizza)).id(1L).build());
+        .thenReturn(PizzaOrder.builder().pizzaList(List.of(pizza)).id(1L).build());
 
-    var actual = orderFacade.processOrder(new OrderRequest("test", List.of(anyString())));
+    var request = PizzaOrderRequest.builder().user("test").pizzas(List.of(anyString())).build();
+    var actual = orderFacade.processOrder(request);
     assertThat(actual).isNotNull();
     assertThat(actual.orderId()).isEqualTo(1L);
   }
@@ -60,9 +60,10 @@ class PizzaOrderFacadeImplTest {
   void givenANotAvailablePizzaShouldThrowException() {
 
     var specialPizza = List.of("Special pizza");
+    var request = PizzaOrderRequest.builder().user("test").pizzas(specialPizza).build();
     when(pizzaService.getPizzas(specialPizza))
         .thenThrow(new AwesomePizzaException(SOME_PIZZAS_NOT_FOUND));
-    assertThatThrownBy(() -> orderFacade.processOrder(new OrderRequest("test", specialPizza)))
+    assertThatThrownBy(() -> orderFacade.processOrder(request))
         .hasMessageContaining(SOME_PIZZAS_NOT_FOUND);
   }
 
@@ -74,16 +75,5 @@ class PizzaOrderFacadeImplTest {
 
     var actual = orderFacade.retrieveOrderStatus(1L);
     assertThat(actual).isNotNull().isEqualTo(IN_PROCESS);
-  }
-
-  @Test
-  void givenAReadyOrderShouldThrowException() {
-
-    when(pizzaOrderService.getOrderStatus(anyLong()))
-        .thenReturn(PizzaOrder.builder().orderStatus(READY).build());
-
-    assertThatThrownBy(() -> orderFacade.retrieveOrderStatus(1L))
-        .isExactlyInstanceOf(PizzaOrderAlreadyDeliveredException.class)
-        .hasMessageContaining("Order 1 is already delivered");
   }
 }

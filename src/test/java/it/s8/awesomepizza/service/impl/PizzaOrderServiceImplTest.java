@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import it.s8.awesomepizza.entity.PizzaOrder;
-import it.s8.awesomepizza.enums.OrderStatus;
 import it.s8.awesomepizza.repository.PizzaOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.openapitools.model.PizzaOrderStatus;
 
 @ExtendWith(MockitoExtension.class)
 class PizzaOrderServiceImplTest {
@@ -29,8 +29,8 @@ class PizzaOrderServiceImplTest {
 
     var order =
         PizzaOrder.builder()
-            .pizzas(List.of())
-            .orderStatus(OrderStatus.IN_PROCESS.name())
+            .pizzaList(List.of())
+            .orderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue())
             .username("test")
             .build();
 

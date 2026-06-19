@@ -15,36 +15,28 @@ public class ExceptionManager {
   @ExceptionHandler(DataAccessException.class)
   public ResponseEntity<Void> handleDataAccessException(DataAccessException ex) {
 
-    log.info("DataAccessException occurred ", ex);
+    log.error("DataAccessException occurred ", ex);
     return ResponseEntity.internalServerError().build();
   }
 
   @ExceptionHandler(AwesomePizzaException.class)
   public ResponseEntity<Void> handlePizzaOrderException(AwesomePizzaException ex) {
 
-    log.info("AwesomePizzaException occurred ", ex);
+    log.error("AwesomePizzaException occurred ", ex);
     return ResponseEntity.internalServerError().build();
-  }
-
-  @ExceptionHandler(PizzaOrderAlreadyDeliveredException.class)
-  public ResponseEntity<String> handlePizzaOrderAlreadyDeliveredException(
-      PizzaOrderAlreadyDeliveredException ex) {
-
-    log.info("PizzaOrderAlreadyDeliveredException occurred ", ex);
-    return ResponseEntity.ok().body(ex.getMessage());
   }
 
   @ExceptionHandler(AmqpException.class)
   public ResponseEntity<Void> handleAmqpException(AmqpException ex) {
 
-    log.info("AmqpException occurred ", ex);
+    log.error("AmqpException occurred ", ex);
     return ResponseEntity.internalServerError().build();
   }
 
   @ExceptionHandler(EntityNotFoundException.class)
   public ResponseEntity<Void> orderNotFound(EntityNotFoundException entityNotFoundException) {
 
-    log.info("EntityNotFoundException occurred ", entityNotFoundException);
+    log.warn("EntityNotFoundException occurred ", entityNotFoundException);
     return ResponseEntity.notFound().build();
   }
 }

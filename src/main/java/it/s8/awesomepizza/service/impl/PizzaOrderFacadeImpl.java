@@ -1,16 +1,18 @@
 package it.s8.awesomepizza.service.impl;
 
 import it.s8.awesomepizza.dto.OrderDto;
-import it.s8.awesomepizza.dto.OrderRequest;
 import it.s8.awesomepizza.dto.PizzaOrderDto;
+import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
-import it.s8.awesomepizza.enums.OrderStatus;
-import it.s8.awesomepizza.exception.PizzaOrderAlreadyDeliveredException;
 import it.s8.awesomepizza.service.PizzaOrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
 import it.s8.awesomepizza.service.PizzaService;
+import java.time.Instant;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.openapitools.model.PizzaOrderRequest;
+import org.openapitools.model.PizzaOrderStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +36,15 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
 
   @Override
   @Transactional
-  public OrderDto processOrder(OrderRequest orderRequest) {
-    var pizzas = pizzaService.getPizzas(orderRequest.pizzas());
-    new PizzaOrderDto(orderRequest.user(), pizzas, OrderStatus.IN_PROCESS.name());
+  public OrderDto processOrder(PizzaOrderRequest orderRequest) {
+    List<Pizza> pizzas = pizzaService.getPizzas(orderRequest.getPizzas());
+    new PizzaOrderDto(
+        orderRequest.getUser(), pizzas, PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
     var pizzaOrderEntity =
         PizzaOrder.builder()
-            .username(orderRequest.user())
-            .pizzas(pizzas)
-            .orderStatus(OrderStatus.IN_PROCESS.name())
+            .username(orderRequest.getUser())
+            .pizzaList(pizzas)
+            .orderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue())
             .build();
     var entity = pizzaOrderService.saveOrder(pizzaOrderEntity);
     log.info("Order {} saved to database", entity);
@@ -52,8 +55,12 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
   @Override
   public String retrieveOrderStatus(Long orderId) {
     var order = pizzaOrderService.getOrderStatus(orderId);
-    if (OrderStatus.READY.name().equals(order.getOrderStatus())) {
-      throw new PizzaOrderAlreadyDeliveredException("Order " + orderId + " is already delivered");
+    // Silly condition to manage already delivered order
+    if (PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY
+            .getValue()
+            .equals(order.getOrderStatus())
+        && order.getModifiedAt().isAfter(Instant.ofEpochSecond(20L))) {
+      return PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue();
     }
     return order.getOrderStatus();
   }

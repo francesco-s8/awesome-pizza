@@ -1,16 +1,16 @@
 package it.s8.awesomepizza.controller;
 
-import it.s8.awesomepizza.dto.OrderDto;
-import it.s8.awesomepizza.dto.OrderRequest;
 import it.s8.awesomepizza.service.PizzaOrderFacade;
 import lombok.extern.slf4j.Slf4j;
+import org.openapitools.model.PizzaOrderRequest;
+import org.openapitools.model.PizzaOrderResponse;
+import org.openapitools.model.PizzaOrderStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/awesome-pizza")
-public class PizzaOrderController {
+public class PizzaOrderController implements OrderApi {
 
   final PizzaOrderFacade pizzaOrderFacade;
 
@@ -18,18 +18,19 @@ public class PizzaOrderController {
     this.pizzaOrderFacade = pizzaOrderFacade;
   }
 
-  @PostMapping("/order")
-  public ResponseEntity<OrderDto> orderPizza(@RequestBody OrderRequest orderRequest) {
-
-    log.info("Received pizza order {}", orderRequest);
-    return ResponseEntity.ok(pizzaOrderFacade.processOrder(orderRequest));
+  @Override
+  public ResponseEntity<PizzaOrderStatus> _getOrderStatus(Long orderId) {
+    var orderStatus = pizzaOrderFacade.retrieveOrderStatus(orderId);
+    return ResponseEntity.ok(
+        PizzaOrderStatus.builder()
+            .orderStatus(PizzaOrderStatus.OrderStatusEnum.fromValue(orderStatus))
+            .build());
   }
 
-  @GetMapping("/order/{orderId}")
-  public ResponseEntity<String> checkOrderStatus(@PathVariable Long orderId) {
-    log.info("Checking status for order ID: {}", orderId);
-
-    var orderStatus = pizzaOrderFacade.retrieveOrderStatus(orderId);
-    return ResponseEntity.ok(orderStatus);
+  @Override
+  public ResponseEntity<PizzaOrderResponse> _newOrder(PizzaOrderRequest pizzaOrderRequest) {
+    log.info("Received pizza order {}", pizzaOrderRequest);
+    var order = pizzaOrderFacade.processOrder(pizzaOrderRequest);
+    return ResponseEntity.ok(PizzaOrderResponse.builder().orderId(order.orderId()).build());
   }
 }
