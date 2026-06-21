@@ -28,7 +28,7 @@ public class PizzaOrder extends EntityInfo {
 
   @Builder.Default
   @ManyToMany(
-      fetch = FetchType.EAGER,
+      fetch = FetchType.LAZY,
       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   @JoinTable(
       name = "pizza_order_items",
