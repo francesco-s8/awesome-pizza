@@ -19,7 +19,7 @@ public class PizzaOrderServiceImpl implements PizzaOrderService {
   }
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true)
   public PizzaOrder getOrderStatus(Long orderId) {
     var orderFound =
         pizzaOrderRepository
