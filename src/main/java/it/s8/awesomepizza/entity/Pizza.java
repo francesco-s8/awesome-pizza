@@ -35,12 +35,12 @@ public class Pizza extends EntityInfo {
     if (this == o) return true;
     if (o == null) return false;
     Class<?> oEffectiveClass =
-        o instanceof HibernateProxy
-            ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+        o instanceof HibernateProxy hibernateproxy
+            ? hibernateproxy.getHibernateLazyInitializer().getPersistentClass()
             : o.getClass();
     Class<?> thisEffectiveClass =
-        this instanceof HibernateProxy
-            ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+        this instanceof HibernateProxy hibernateproxy
+            ? hibernateproxy.getHibernateLazyInitializer().getPersistentClass()
             : this.getClass();
     if (thisEffectiveClass != oEffectiveClass) return false;
     Pizza pizza = (Pizza) o;
@@ -49,9 +49,7 @@ public class Pizza extends EntityInfo {
 
   @Override
   public final int hashCode() {
-    return this instanceof HibernateProxy
-        ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
-        : getClass().hashCode();
+    return Objects.hashCode(getId());
   }
 
   @Override
