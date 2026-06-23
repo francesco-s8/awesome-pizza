@@ -11,6 +11,22 @@
 
 For brevity all credentials are clearly visible in the code, so no need to set up any environment variable
 
+### Execute app
+
+Run command "docker compose up" or via your IDE plugin,from the root of docker-compose.yml to start all docker images.
+If you want to start only postgresql and rabbitmq as image and the application from your favorite IDE, just start it
+with the env variable setup with the following data:
+
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=awesome_pizza
+      - POSTGRES_USER=s8
+      - POSTGRES_PASS=s8
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+
 ### Endpoints
 
 See [awesome-pizza-swagger.yaml](src/main/resources/awesome-pizza-swagger.yaml)
