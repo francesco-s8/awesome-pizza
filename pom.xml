@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>it.s8</groupId>
-    <artifactId>awesomepizza</artifactId>
+    <artifactId>awesome-pizza</artifactId>
     <version>1.0.0</version>
     <properties>
         <java.version>25</java.version>

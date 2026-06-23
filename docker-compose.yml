@@ -35,9 +35,14 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+      - rabbitmq
     environment:
-      POSTGRES_USER: s8
-      POSTGRES_PASSWORD: s8
-      POSTGRES_DB: awesome_pizza
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=awesome_pizza
+      - POSTGRES_USER=s8
+      - POSTGRES_PASS=s8
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
