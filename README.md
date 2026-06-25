@@ -31,10 +31,10 @@ with the env variable setup with the following data:
 
 See [awesome-pizza-swagger.yaml](src/main/resources/awesome-pizza-swagger.yaml)
 
-### PS:
+### Docker:
 
-docker-compose volume will write under VOLUME_PATH variable defined in .env file so you should change according to your
-needs or OS
+docker-compose volumes will be written under VOLUME_PATH see [env](.env)
+You can change the value according to your needs.
 
 
 

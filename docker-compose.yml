@@ -18,13 +18,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "${VOLUME_PATH}/postgresql:/var/lib/postgresql/18/docker"
+      - "${VOLUME_PATH}/pg-data:/var/lib/postgresql/18/docker"
 
     environment:
       - POSTGRES_PASSWORD=s8
       - POSTGRES_USER=s8
       - POSTGRES_DB=awesome_pizza
-      - PG_DATA /var/lib/postgresql/18/docker
 
   awesome-pizza:
     container_name: awesome-pizza
