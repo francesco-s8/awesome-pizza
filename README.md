@@ -17,15 +17,17 @@ Run command "docker compose up" or via your IDE plugin,from the root of docker-c
 If you want to start only postgresql and rabbitmq as image and the application from your favorite IDE, just start it
 with the env variable setup with the following data:
 
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST=localhost
       - POSTGRES_PORT=5432
       - POSTGRES_DB=awesome_pizza
       - POSTGRES_USER=s8
       - POSTGRES_PASS=s8
-      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_HOST=localhost
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=guest
       - RABBITMQ_PASS=guest
+
+or launch spring application with local profile
 
 ### Endpoints
 

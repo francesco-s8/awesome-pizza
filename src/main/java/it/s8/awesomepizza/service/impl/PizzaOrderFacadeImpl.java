@@ -56,10 +56,11 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
   public String retrieveOrderStatus(Long orderId) {
     var order = pizzaOrderService.getOrderStatus(orderId);
     // Silly condition to manage already delivered order
+    log.info("Order is {}",order);
     if (PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY
             .getValue()
             .equals(order.getOrderStatus())
-        && order.getModifiedAt().isAfter(Instant.ofEpochSecond(20L))) {
+        && order.getModifiedAt().plusSeconds(60L).isBefore(Instant.now())) {
       return PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue();
     }
     return order.getOrderStatus();
