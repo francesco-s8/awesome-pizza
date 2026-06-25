@@ -45,3 +45,6 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=guest
       - RABBITMQ_PASS=guest
+    volumes:
+      - "${VOLUME_PATH}/spring-logs:/app/logs"
+    entrypoint: ["java","-Dlogging.file.name=/app/logs/spring.log","-jar","/app/target/awesome-pizza-1.0.0.jar","-XX:+UseG1GC"]
