@@ -4,7 +4,7 @@ info:
   version: "1.0"
   description: "Available operations on the Analisi Ricerca Riferimenti Normativi service endpoint"
 servers:
-  - url: http://localhost:8080/
+  - url: http://localhost:8080
 tags:
   - name: order
     description: Everything about pizza orders
