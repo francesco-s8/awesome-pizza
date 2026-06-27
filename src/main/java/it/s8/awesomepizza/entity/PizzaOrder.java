@@ -17,7 +17,7 @@ public class PizzaOrder extends EntityInfo {
   @Id
   @Column(name = "pizza_order_id")
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  @SequenceGenerator(name = "pizza_order_seq", sequenceName = "pizza_order_seq")
+  @SequenceGenerator(name = "pizza_order_seq", sequenceName = "pizza_order_seq",allocationSize = 1)
   private Long id;
 
   @Column(name = "username", nullable = false)
