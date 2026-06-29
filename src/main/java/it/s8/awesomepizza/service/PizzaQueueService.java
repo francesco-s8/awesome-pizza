@@ -1,11 +1,10 @@
 package it.s8.awesomepizza.service;
 
 import com.rabbitmq.client.Channel;
+import java.io.IOException;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
-
-import java.io.IOException;
 
 public interface PizzaQueueService {
 
