@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import it.s8.awesomepizza.config.JpaConfig;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +35,12 @@ class PizzaOrderRepositoryTest {
                     Pizza.builder()
                         .name("Margherita")
                         .description("'La classica con pomodoro, mozzarella e basilico'")
-                        .price(7.00F)
+                        .price(BigDecimal.valueOf(10))
                         .build(),
                     Pizza.builder()
                         .name("Marinara")
                         .description("'Pomodoro, aglio e origano'")
-                        .price(5.00F)
+                        .price(BigDecimal.valueOf(4))
                         .build()))
             .build();
 

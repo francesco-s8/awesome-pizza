@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.Objects;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -27,7 +28,7 @@ public class Pizza extends EntityInfo {
   private String description;
 
   @Column(name = "price")
-  private Float price;
+  private BigDecimal price;
 
   @Version
   @Column(name = "version")

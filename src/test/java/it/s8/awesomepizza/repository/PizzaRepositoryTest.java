@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import it.s8.awesomepizza.config.JpaConfig;
 import it.s8.awesomepizza.entity.Pizza;
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,12 +27,12 @@ class PizzaRepositoryTest {
             Pizza.builder()
                 .name("Margherita")
                 .description("'La classica con pomodoro, mozzarella e basilico'")
-                .price(7.00F)
+                .price(BigDecimal.valueOf(7.00F))
                 .build(),
             Pizza.builder()
                 .name("Marinara")
                 .description("'Pomodoro, aglio e origano'")
-                .price(5.00F)
+                .price(BigDecimal.valueOf(5.00F))
                 .build());
   }
 

@@ -131,6 +131,6 @@ components:
           example: "A classic Italian pizza with tomato sauce and mozzarella"
         price:
           type: number
-          format: float
-          description: The price of the pizza
-          example: 5.00 €
+          format: decimal
+          description: The price of the pizza with 2 decimal places
+          example: 5.50 €

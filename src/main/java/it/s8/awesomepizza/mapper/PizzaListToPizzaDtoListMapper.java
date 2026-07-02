@@ -1,17 +1,13 @@
 package it.s8.awesomepizza.mapper;
 
 import it.s8.awesomepizza.entity.Pizza;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.openapitools.model.PizzaDto;
-import org.openapitools.model.PizzaMenu;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PizzaListToPizzaDtoListMapper implements Function<List<Pizza>, List<PizzaDto>> {
-
-  List<PizzaMenu> pizzaDtoList = new ArrayList<>();
 
 
   @Override

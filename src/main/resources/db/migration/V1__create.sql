@@ -18,7 +18,7 @@ CREATE TABLE pizza
     pizza_order_id int8         NULL,
     description    varchar(255) NULL,
     "name"         varchar(255) NULL,
-    "price"        float4      NULL,
+    "price"        NUMERIC(10, 2) NULL,
     "version"      INTEGER      DEFAULT 0,
     "created_at"   TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "modified_at"  TIMESTAMP(6) NULL,
