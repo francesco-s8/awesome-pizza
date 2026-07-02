@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Analisi Ricerca Riferimenti Normativi
+  title: Awesome pizza order
   version: "1.0"
-  description: "Available operations on the Analisi Ricerca Riferimenti Normativi service endpoint"
+  description: "Available operations on the Awesome pizza order service endpoint"
 servers:
   - url: http://localhost:8080
 tags:
@@ -59,6 +59,22 @@ paths:
           description: No order found
         '500':
           description: Internal error
+  /api/awesome-pizza/menu:
+    get:
+      tags:
+        - menu
+      summary: Return the menu of available pizzas
+      description: Returns the list of all available pizzas.
+      operationId: getMenu
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/PizzaMenu'
+        '500':
+          description: Application error
 components:
   schemas:
     PizzaOrderStatus:
@@ -75,7 +91,7 @@ components:
     PizzaOrderRequest:
       type: object
       properties:
-        user:
+        customerName:
           type: string
           description: The name of the user placing the order
           example: "John Doe"
@@ -94,3 +110,27 @@ components:
           format: int64
           description: The unique identifier for the pizza order
           example: 1
+    PizzaMenu:
+      type: object
+      properties:
+        menu:
+          type: array
+          description: A list of available pizzas
+          items:
+            $ref: '#/components/schemas/PizzaDto'
+    PizzaDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the pizza
+          example: "Margherita"
+        description:
+          type: string
+          description: A brief description of the pizza
+          example: "A classic Italian pizza with tomato sauce and mozzarella"
+        price:
+          type: number
+          format: float
+          description: The price of the pizza
+          example: 5.00 €

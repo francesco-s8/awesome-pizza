@@ -24,4 +24,14 @@ public class PizzaServiceImpl implements PizzaService {
     }
     return pizzas;
   }
+
+  @Override
+  public List<Pizza> getAvailablePizzas() {
+    var pizzas= pizzaRepository.findAll();
+    if(pizzas.isEmpty()){
+      throw new AwesomePizzaException("No pizzas available");
+    }
+    return pizzas;
+
+  }
 }

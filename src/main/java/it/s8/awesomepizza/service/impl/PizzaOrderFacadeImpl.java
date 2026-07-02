@@ -4,6 +4,7 @@ import it.s8.awesomepizza.dto.OrderDto;
 import it.s8.awesomepizza.dto.PizzaOrderDto;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
+import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.service.PizzaOrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
@@ -23,15 +24,18 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
   final PizzaService pizzaService;
   final PizzaQueueService pizzaQueueService;
   final PizzaOrderService pizzaOrderService;
+  final PizzaListToPizzaDtoListMapper pizzaListToPIzzaDtoListMapper;
 
   public PizzaOrderFacadeImpl(
       PizzaService pizzaService,
       PizzaQueueService pizzaQueueService,
-      PizzaOrderService pizzaOrderService) {
+      PizzaOrderService pizzaOrderService,
+      PizzaListToPizzaDtoListMapper pizzaListToPIzzaDtoListMapper) {
 
     this.pizzaService = pizzaService;
     this.pizzaQueueService = pizzaQueueService;
     this.pizzaOrderService = pizzaOrderService;
+    this.pizzaListToPIzzaDtoListMapper = pizzaListToPIzzaDtoListMapper;
   }
 
   @Override
@@ -39,10 +43,12 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
   public OrderDto processOrder(PizzaOrderRequest orderRequest) {
     List<Pizza> pizzas = pizzaService.getPizzas(orderRequest.getPizzas());
     new PizzaOrderDto(
-        orderRequest.getUser(), pizzas, PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
+        orderRequest.getCustomerName(),
+        pizzas,
+        PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
     var pizzaOrderEntity =
         PizzaOrder.builder()
-            .username(orderRequest.getUser())
+            .username(orderRequest.getCustomerName())
             .pizzaList(pizzas)
             .orderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue())
             .build();
@@ -56,7 +62,7 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
   public String retrieveOrderStatus(Long orderId) {
     var order = pizzaOrderService.getOrderStatus(orderId);
     // Silly condition to manage already delivered order
-    log.info("Order is {}",order);
+    log.info("Order is {}", order);
     if (PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY
             .getValue()
             .equals(order.getOrderStatus())

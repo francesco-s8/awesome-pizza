@@ -50,7 +50,7 @@ class PizzaOrderFacadeImplTest {
     when(pizzaOrderService.saveOrder(any()))
         .thenReturn(PizzaOrder.builder().pizzaList(List.of(pizza)).id(1L).build());
 
-    var request = PizzaOrderRequest.builder().user("test").pizzas(List.of(anyString())).build();
+    var request = PizzaOrderRequest.builder().customerName("test").pizzas(List.of(anyString())).build();
     var actual = orderFacade.processOrder(request);
     assertThat(actual).isNotNull();
     assertThat(actual.orderId()).isEqualTo(1L);
@@ -60,7 +60,7 @@ class PizzaOrderFacadeImplTest {
   void givenANotAvailablePizzaShouldThrowException() {
 
     var specialPizza = List.of("Special pizza");
-    var request = PizzaOrderRequest.builder().user("test").pizzas(specialPizza).build();
+    var request = PizzaOrderRequest.builder().customerName("test").pizzas(specialPizza).build();
     when(pizzaService.getPizzas(specialPizza))
         .thenThrow(new AwesomePizzaException(SOME_PIZZAS_NOT_FOUND));
     assertThatThrownBy(() -> orderFacade.processOrder(request))

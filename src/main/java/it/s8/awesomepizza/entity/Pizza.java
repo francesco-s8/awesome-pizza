@@ -17,7 +17,7 @@ public class Pizza extends EntityInfo {
   @Id
   @Column(name = "pizza_id")
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  @SequenceGenerator(name = "pizza_id_seq", sequenceName = "pizza_id_seq",allocationSize = 1)
+  @SequenceGenerator(name = "pizza_id_seq", sequenceName = "pizza_id_seq", allocationSize = 1)
   private Long id;
 
   @Column(name = "name")
@@ -25,6 +25,9 @@ public class Pizza extends EntityInfo {
 
   @Column(name = "description")
   private String description;
+
+  @Column(name = "price")
+  private Float price;
 
   @Version
   @Column(name = "version")

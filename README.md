@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Java 25
-- Docker desktop or Rancher Desktop installed or equivalent
+- Docker desktop,Rancher Desktop installed or equivalent
 - Postmam/Insomnia/Curl to simulate API calls
 - Maven to build the project/run tests
 
@@ -31,7 +31,7 @@ or launch spring application with local profile
 
 ### Endpoints
 
-See [awesome-pizza-swagger.yaml](src/main/resources/awesome-pizza-swagger.yaml)
+See [awesome-pizza-swagger.yaml](src/main/resources/swagger/awesome-pizza.yaml)
 
 ### Docker:
 

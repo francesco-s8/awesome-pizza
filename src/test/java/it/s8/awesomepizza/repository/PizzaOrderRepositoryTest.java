@@ -34,10 +34,12 @@ class PizzaOrderRepositoryTest {
                     Pizza.builder()
                         .name("Margherita")
                         .description("'La classica con pomodoro, mozzarella e basilico'")
+                        .price(7.00F)
                         .build(),
                     Pizza.builder()
                         .name("Marinara")
                         .description("'Pomodoro, aglio e origano'")
+                        .price(5.00F)
                         .build()))
             .build();
 
