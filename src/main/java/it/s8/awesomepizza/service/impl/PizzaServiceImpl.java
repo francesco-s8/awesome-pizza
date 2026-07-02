@@ -5,8 +5,10 @@ import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import it.s8.awesomepizza.service.PizzaService;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class PizzaServiceImpl implements PizzaService {
 
@@ -27,11 +29,10 @@ public class PizzaServiceImpl implements PizzaService {
 
   @Override
   public List<Pizza> getAvailablePizzas() {
-    var pizzas= pizzaRepository.findAll();
-    if(pizzas.isEmpty()){
-      throw new AwesomePizzaException("No pizzas available");
+    var pizzas = pizzaRepository.findAll();
+    if ((pizzas.isEmpty())) {
+      log.warn("Pizza list is empty");
     }
     return pizzas;
-
   }
 }
