@@ -1,4 +1,4 @@
-FROM maven:3.9.11-amazoncorretto-25-alpine AS builder
+FROM maven:3.9.16-amazoncorretto-25-alpine AS builder
 COPY . /app
 WORKDIR /app
 RUN --mount=type=cache,target=/root/.m2 mvn -f /app/pom.xml clean package --errors
