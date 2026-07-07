@@ -33,8 +33,11 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
