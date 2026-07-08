@@ -93,6 +93,8 @@ components:
       properties:
         customerName:
           type: string
+          minLength: 1
+          nullable: false
           description: The name of the user placing the order
           example: "John Doe"
         pizzas:
@@ -102,6 +104,9 @@ components:
             type: string
             description: The name of the pizza
             example: "Margherita"
+      required:
+        - customerName
+        - pizzas
     PizzaOrderResponse:
       type: object
       properties:
