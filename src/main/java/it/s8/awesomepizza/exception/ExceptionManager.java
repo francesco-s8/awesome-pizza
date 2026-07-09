@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -20,10 +21,10 @@ public class ExceptionManager {
   }
 
   @ExceptionHandler(AwesomePizzaException.class)
-  public ResponseEntity<Void> handlePizzaOrderException(AwesomePizzaException ex) {
+  public ResponseEntity<String> handlePizzaOrderException(AwesomePizzaException ex) {
 
     log.error("AwesomePizzaException occurred ", ex);
-    return ResponseEntity.internalServerError().build();
+    return ResponseEntity.internalServerError().body(ex.getMessage());
   }
 
   @ExceptionHandler(AmqpException.class)
@@ -38,5 +39,12 @@ public class ExceptionManager {
 
     log.warn("EntityNotFoundException occurred ", entityNotFoundException);
     return ResponseEntity.notFound().build();
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<String> badInputRequest(MethodArgumentNotValidException ex) {
+    log.warn("Bad input request ", ex);
+    ex.getBindingResult().getAllErrors().forEach(error -> log.warn("Validation error: {}", error));
+    return ResponseEntity.badRequest().body("Check the request body, some fields are not valid");
   }
 }
