@@ -29,7 +29,7 @@ services:
       - POSTGRES_USER=s8
       - POSTGRES_DB=awesome_pizza
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U s8"]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
