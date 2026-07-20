@@ -37,7 +37,7 @@ public class PizzaOrderServiceImpl implements PizzaOrderService {
   public PizzaOrder saveOrder(PizzaOrder pizzaOrder) {
 
     var order = pizzaOrderRepository.save(pizzaOrder);
-    log.info("Order {} saved with id {}", order.getUsername(), order.getId());
+    log.info("Order from customer {} saved with id {}", order.getUsername(), order.getId());
     return order;
   }
 }

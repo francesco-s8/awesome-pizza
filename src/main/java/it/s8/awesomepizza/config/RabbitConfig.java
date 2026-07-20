@@ -15,13 +15,15 @@ import tools.jackson.databind.json.JsonMapper;
 @Configuration
 public class RabbitConfig {
 
+  private static final String DEAD_LETTER_QUEUE = "dl";
+  private static final String ORDERS_QUEUE = "orders";
+
   @Bean
   public Queue orders() {
-    return QueueBuilder.durable("orders")
+    return QueueBuilder.durable(ORDERS_QUEUE)
         .quorum()
-        .singleActiveConsumer()
         .deadLetterExchange("**")
-        .deadLetterRoutingKey("dl")
+        .deadLetterRoutingKey(DEAD_LETTER_QUEUE)
         .build();
   }
 
@@ -39,6 +41,6 @@ public class RabbitConfig {
 
   @Bean
   Queue deadLetterQueue() {
-    return QueueBuilder.durable("dl").quorum().build();
+    return QueueBuilder.durable(DEAD_LETTER_QUEUE).quorum().build();
   }
 }

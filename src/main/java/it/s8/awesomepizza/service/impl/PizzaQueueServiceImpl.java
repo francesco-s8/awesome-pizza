@@ -14,8 +14,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -31,15 +29,14 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
   }
 
   @Override
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void sendOrder(Long orderId) throws AmqpException {
 
     rabbitTemplate.convertAndSend("orders", orderId);
     log.info("Order {} sent to queue", orderId);
   }
 
-  @RabbitListener(ackMode = "MANUAL", queues = "orders", exclusive = true)
   @Override
+  @RabbitListener(ackMode = "MANUAL", queues = "orders")
   public void processOrder(
       Long pizzaOrder, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag)
       throws InterruptedException, IOException {
