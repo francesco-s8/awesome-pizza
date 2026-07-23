@@ -4,6 +4,7 @@ import it.s8.awesomepizza.dto.OrderDto;
 import it.s8.awesomepizza.dto.PizzaOrderDto;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
+import it.s8.awesomepizza.event.OrderCreatedEvent;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.service.PizzaOrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
@@ -14,6 +15,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaOrderRequest;
 import org.openapitools.model.PizzaOrderStatus;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,17 +27,20 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
   final PizzaQueueService pizzaQueueService;
   final PizzaOrderService pizzaOrderService;
   final PizzaListToPizzaDtoListMapper pizzaListToPIzzaDtoListMapper;
+  final ApplicationContext applicationContext;
 
   public PizzaOrderFacadeImpl(
       PizzaService pizzaService,
       PizzaQueueService pizzaQueueService,
       PizzaOrderService pizzaOrderService,
-      PizzaListToPizzaDtoListMapper pizzaListToPIzzaDtoListMapper) {
+      PizzaListToPizzaDtoListMapper pizzaListToPIzzaDtoListMapper,
+      ApplicationContext applicationContext) {
 
     this.pizzaService = pizzaService;
     this.pizzaQueueService = pizzaQueueService;
     this.pizzaOrderService = pizzaOrderService;
     this.pizzaListToPIzzaDtoListMapper = pizzaListToPIzzaDtoListMapper;
+    this.applicationContext = applicationContext;
   }
 
   @Override
@@ -54,7 +59,7 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
             .build();
     var entity = pizzaOrderService.saveOrder(pizzaOrderEntity);
     log.info("Order {} saved to database", entity);
-    pizzaQueueService.sendOrder(entity.getId());
+    applicationContext.publishEvent(new OrderCreatedEvent(this, entity.getId()));
     return new OrderDto(entity.getId());
   }
 

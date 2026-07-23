@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.service.impl;
 
 import com.rabbitmq.client.Channel;
+import it.s8.awesomepizza.event.OrderCreatedEvent;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.repository.PizzaOrderRepository;
 import it.s8.awesomepizza.service.PizzaQueueService;
@@ -14,6 +15,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -29,6 +31,7 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
   }
 
   @Override
+  @TransactionalEventListener
   public void sendOrder(Long orderId) throws AmqpException {
 
     rabbitTemplate.convertAndSend("orders", orderId);
@@ -58,5 +61,11 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
       channel.basicNack(tag, false, false);
       log.error("Error processing order {}", pizzaOrder, e);
     }
+  }
+
+  @TransactionalEventListener
+  public void onOrderCreated(OrderCreatedEvent event) throws AmqpException {
+    log.info("Order {} created event received, sending to queue", event.getOrderId());
+    sendOrder(event.getOrderId());
   }
 }
