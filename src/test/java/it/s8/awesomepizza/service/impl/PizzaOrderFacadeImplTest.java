@@ -10,7 +10,6 @@ import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.service.PizzaOrderService;
-import it.s8.awesomepizza.service.PizzaQueueService;
 import it.s8.awesomepizza.service.PizzaService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.PizzaOrderRequest;
+import org.springframework.context.ApplicationContext;
 
 @ExtendWith(MockitoExtension.class)
 class PizzaOrderFacadeImplTest {
@@ -26,12 +26,11 @@ class PizzaOrderFacadeImplTest {
   public static final String IN_PROCESS = "IN_PROCESS";
   public static final String SOME_PIZZAS_NOT_FOUND = "Some pizzas not found";
   public static final String MARGHERITA_PIZZA = "Margherita";
-  public static final String READY = "READY";
   @InjectMocks PizzaOrderFacadeImpl orderFacade;
 
   @Mock PizzaService pizzaService;
-  @Mock PizzaQueueService pizzaQueueService;
   @Mock PizzaOrderService pizzaOrderService;
+  @Mock ApplicationContext applicationContext;
 
   @Test
   void givenAValidOrderRequestShouldReturnTheOrderId() {
@@ -45,12 +44,13 @@ class PizzaOrderFacadeImplTest {
             .build();
 
     when(pizzaService.getPizzas(any())).thenReturn(List.of(pizza));
-    doNothing().when(pizzaQueueService).sendOrder(anyLong());
+    doNothing().when(applicationContext).publishEvent(any());
 
     when(pizzaOrderService.saveOrder(any()))
         .thenReturn(PizzaOrder.builder().pizzaList(List.of(pizza)).id(1L).build());
 
-    var request = PizzaOrderRequest.builder().customerName("test").pizzas(List.of(anyString())).build();
+    var request =
+        PizzaOrderRequest.builder().customerName("test").pizzas(List.of(anyString())).build();
     var actual = orderFacade.processOrder(request);
     assertThat(actual).isNotNull();
     assertThat(actual.orderId()).isEqualTo(1L);
