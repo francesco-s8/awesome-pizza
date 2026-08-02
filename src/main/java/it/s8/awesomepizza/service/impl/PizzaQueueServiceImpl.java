@@ -45,22 +45,37 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
       throws InterruptedException, IOException {
 
     log.info("Order {} will be finished", pizzaOrder);
-    try {
-      log.info("Simulating pizza preparation for order ID: {}", pizzaOrder);
-      Thread.sleep(Duration.ofSeconds(10).toMillis());
-      var order =
-          pizzaOrderRepository
-              .findById(pizzaOrder)
-              .orElseThrow(
-                  () -> new AwesomePizzaException("Order not found with ID: " + pizzaOrder));
-      order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
-      pizzaOrderRepository.save(order);
-      channel.basicAck(tag, false);
-      log.info("Order {} is ready", pizzaOrder);
-    } catch (RuntimeException e) {
-      channel.basicNack(tag, false, false);
-      log.error("Error processing order {}", pizzaOrder, e);
-    }
+    Thread.ofVirtual()
+        .start(
+            () -> {
+              try {
+                log.info("Simulating pizza preparation for order ID: {}", pizzaOrder);
+                Thread.sleep(Duration.ofSeconds(10).toMillis());
+                var order =
+                    pizzaOrderRepository
+                        .findById(pizzaOrder)
+                        .orElseThrow(
+                            () ->
+                                new AwesomePizzaException(
+                                    "Order not found with ID: " + pizzaOrder));
+                order.setOrderStatus(
+                    PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
+                pizzaOrderRepository.save(order);
+                channel.basicAck(tag, false);
+                log.info("Order {} is ready", pizzaOrder);
+              } catch (RuntimeException | IOException e) {
+                try {
+                  channel.basicNack(tag, false, false);
+                  log.error("Error nacking order {}", pizzaOrder);
+                } catch (IOException nackError) {
+                  log.error("Error nacking order {}", pizzaOrder, nackError);
+                }
+                log.error("Error processing order {}", pizzaOrder, e);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Order processing thread interrupted for {}", pizzaOrder, e);
+              }
+            });
   }
 
   @TransactionalEventListener
