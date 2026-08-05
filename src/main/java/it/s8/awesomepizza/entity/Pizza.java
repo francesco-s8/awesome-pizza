@@ -35,7 +35,7 @@ public class Pizza extends EntityInfo {
   private Integer version;
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null) return false;
     Class<?> oEffectiveClass =
@@ -52,7 +52,7 @@ public class Pizza extends EntityInfo {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hashCode(getId());
   }
 

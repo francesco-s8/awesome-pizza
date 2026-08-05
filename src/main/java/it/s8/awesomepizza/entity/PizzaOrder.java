@@ -17,7 +17,7 @@ public class PizzaOrder extends EntityInfo {
   @Id
   @Column(name = "pizza_order_id")
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  @SequenceGenerator(name = "pizza_order_seq", sequenceName = "pizza_order_seq",allocationSize = 1)
+  @SequenceGenerator(name = "pizza_order_seq", sequenceName = "pizza_order_seq", allocationSize = 1)
   private Long id;
 
   @Column(name = "username", nullable = false)
@@ -41,7 +41,7 @@ public class PizzaOrder extends EntityInfo {
   private Integer version;
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null) return false;
     Class<?> oEffectiveClass =
@@ -58,7 +58,7 @@ public class PizzaOrder extends EntityInfo {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hashCode(getId());
   }
 
