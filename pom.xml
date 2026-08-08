@@ -13,7 +13,7 @@
     <version>1.0.0</version>
     <properties>
         <java.version>25</java.version>
-        <openapi-generator-maven-plugin.version>7.23.0</openapi-generator-maven-plugin.version>
+        <openapi-generator-maven-plugin.version>7.24.0</openapi-generator-maven-plugin.version>
         <swagger-openapiv3.version>2.2.52</swagger-openapiv3.version>
     </properties>
     <dependencyManagement>

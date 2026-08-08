@@ -72,7 +72,7 @@ paths:
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/PizzaMenu'
+                $ref: '#/components/schemas/PizzaMenu'
         '500':
           description: Application error
 components:
@@ -137,6 +137,5 @@ components:
           example: "A classic Italian pizza with tomato sauce and mozzarella"
         price:
           type: number
-          format: decimal
           description: The price of the pizza with 2 decimal places
           example: 5.50 €
