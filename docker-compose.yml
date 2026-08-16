@@ -18,8 +18,8 @@ services:
       timeout: 5s
       retries: 5
   postgres:
-    image: postgres:18.3
-    container_name: postgresql-18.3
+    image: postgres:18-alpine3.24
+    container_name: postgresql-18
     ports:
       - "5432:5432"
     volumes:
