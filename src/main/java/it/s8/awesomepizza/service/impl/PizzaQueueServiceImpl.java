@@ -41,8 +41,7 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
   @Override
   @RabbitListener(ackMode = "MANUAL", queues = "orders")
   public void processOrder(
-      Long pizzaOrder, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag)
-      throws InterruptedException, IOException {
+      Long pizzaOrder, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) {
 
     log.info("Order {} will be finished", pizzaOrder);
     Thread.ofVirtual()
