@@ -11,7 +11,10 @@
 
 For brevity all credentials are clearly visible in the code, so no need to set up any environment variable
 
-### Execute app
+## Database population
+
+If you wanna add more pizza(s) just modify [this sql file](src/main/resources/db/migration/V2__add_pizzas.sql) and add entries according to the schema.
+## Execute app
 
 Run command "docker compose up" or via your IDE plugin,from the root of docker-compose.yml to start all docker images.
 If you want to start only postgresql and rabbitmq as image and the application from your favorite IDE, just start it
