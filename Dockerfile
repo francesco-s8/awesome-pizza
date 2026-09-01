@@ -6,4 +6,4 @@ RUN --mount=type=cache,target=/root/.m2 mvn -f /app/pom.xml clean package -Dskip
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 COPY --from=builder /app/target/awesome-pizza-1.0.0.jar /app/awesome-pizza.jar
-ENTRYPOINT ["java","-jar","/app/awesome-pizza.jar","-XX:+UseZGC"]
+ENTRYPOINT ["java","-jar","/app/awesome-pizza.jar","-XX:+UseZGC","-XX:+UseCompactObjectHeaders","-XX:+UseStringDeduplication","-XX:+UseCompressedOops","-XX:+UseCompressedClassPointers"]
