@@ -38,7 +38,7 @@ class PizzaServiceImplTest {
   }
 
   @Test
-  void givenANotExistingPizzaShouldRaiseAnExecption() {
+  void givenANotExistingPizzaShouldRaiseAnException() {
     var input = List.of("Gourmet");
     when(pizzaRepository.findByNameIn(input)).thenReturn(List.of());
 

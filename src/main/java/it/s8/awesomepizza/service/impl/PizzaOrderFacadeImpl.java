@@ -71,8 +71,10 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
     if (PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY
             .getValue()
             .equals(order.getOrderStatus())
-        && order.getModifiedAt().plusSeconds(60L).isBefore(Instant.now())) {
-      return PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue();
+        && order.getModifiedAt().plusSeconds(45L).isBefore(Instant.now())) {
+      order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue());
+      pizzaOrderService.saveOrder(order);
+      return order.getOrderStatus();
     }
     return order.getOrderStatus();
   }
