@@ -13,8 +13,9 @@
     <version>1.0.0</version>
     <properties>
         <java.version>25</java.version>
-        <openapi-generator-maven-plugin.version>7.24.0</openapi-generator-maven-plugin.version>
-        <swagger-openapiv3.version>2.2.53</swagger-openapiv3.version>
+        <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
+        <swagger-openapiv3.version>2.2.54</swagger-openapiv3.version>
+        <lombok.version>1.18.48</lombok.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -87,11 +88,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -118,6 +114,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-data-jpa-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
