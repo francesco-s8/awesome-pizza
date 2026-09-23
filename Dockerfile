@@ -1,7 +1,7 @@
 FROM maven:3.9.16-amazoncorretto-25-alpine AS builder
 COPY . /app
 WORKDIR /app
-RUN --mount=type=cache,target=/root/.m2 mvn -f /app/pom.xml -T 1C clean package -DskipTests --errors
+RUN --mount=type=cache,target=/root/.m2 mvn -f /app/pom.xml -T 2C clean package -DskipTests --errors
 
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
