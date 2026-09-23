@@ -15,6 +15,8 @@
         <java.version>25</java.version>
         <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
         <swagger-openapiv3.version>2.2.54</swagger-openapiv3.version>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.48</lombok.version>
     </properties>
     <dependencyManagement>
@@ -149,6 +151,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <parallel>all</parallel>
+                    <threadCount>4</threadCount>
                     <dependenciesToScan>
                         <dependency>org.junit.jupiter</dependency>
                     </dependenciesToScan>
