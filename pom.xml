@@ -173,6 +173,7 @@
                             <generatorName>spring</generatorName>
                             <library>spring-boot</library>
                             <configOptions>
+                                <generateJsonSetterNullsAnnotations>false</generateJsonSetterNullsAnnotations>
                                 <generateBuilders>true</generateBuilders>
                                 <apiDocs>true</apiDocs>
                                 <openApiNullable>false</openApiNullable>
