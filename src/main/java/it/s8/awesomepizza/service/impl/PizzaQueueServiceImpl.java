@@ -14,11 +14,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
-@Component
+@Service
 public class PizzaQueueServiceImpl implements PizzaQueueService {
 
   final RabbitTemplate rabbitTemplate;
@@ -30,13 +30,12 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
     this.pizzaOrderRepository = pizzaOrderRepository;
   }
 
-  @Override
-  @TransactionalEventListener
-  public void sendOrder(Long orderId) throws AmqpException {
-
-    rabbitTemplate.convertAndSend("orders", orderId);
-    log.info("Order {} sent to queue", orderId);
-  }
+//  @Override
+//  public void sendOrder(Long orderId) throws AmqpException {
+//
+//    rabbitTemplate.convertAndSend("orders", orderId);
+//    log.info("Order {} sent to queue", orderId);
+//  }
 
   @Override
   @RabbitListener(ackMode = "MANUAL", queues = "orders")
@@ -78,8 +77,9 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
   }
 
   @TransactionalEventListener
+  @Override
   public void onOrderCreated(OrderCreatedEvent event) throws AmqpException {
     log.info("Order {} created event received, sending to queue", event.getOrderId());
-    sendOrder(event.getOrderId());
+    rabbitTemplate.convertAndSend("orders", event.getOrderId());
   }
 }
