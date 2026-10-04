@@ -177,6 +177,7 @@
                             <generatorName>spring</generatorName>
                             <library>spring-boot</library>
                             <configOptions>
+                                <generateJsonIncludeAnnotations>true</generateJsonIncludeAnnotations>
                                 <generateJsonSetterNullsAnnotations>false</generateJsonSetterNullsAnnotations>
                                 <generateBuilders>true</generateBuilders>
                                 <apiDocs>true</apiDocs>
