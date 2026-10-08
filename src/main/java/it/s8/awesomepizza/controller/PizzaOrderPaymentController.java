@@ -2,8 +2,8 @@ package it.s8.awesomepizza.controller;
 
 import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import lombok.extern.slf4j.Slf4j;
-import org.openapitools.model.PizzaOrderPaid;
-import org.openapitools.model.PizzaOrderToPay;
+import org.openapitools.model.PizzaOrderPaymentInfo;
+import org.openapitools.model.PizzaOrderTotalToPay;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,14 +18,14 @@ public class PizzaOrderPaymentController implements PaymentApi {
   }
 
   @Override
-  public ResponseEntity<PizzaOrderToPay> _calculateOrderTotal(Long orderId) {
+  public ResponseEntity<PizzaOrderTotalToPay> _calculateOrderTotal(Long orderId) {
     var orderTotalPrice = pizzaOrderPaymentFacade.calculateOrderTotal(orderId);
     log.info("Calculated total price for order {} is : {}", orderId, orderTotalPrice);
     return ResponseEntity.ok(orderTotalPrice);
   }
 
   @Override
-  public ResponseEntity<Void> _markOrderAsPaid(Long orderId, PizzaOrderPaid pizzaOrderPaid) {
+  public ResponseEntity<Void> _markOrderAsPaid(Long orderId, PizzaOrderPaymentInfo pizzaOrderPaid) {
     pizzaOrderPaymentFacade.processPayment(orderId, pizzaOrderPaid);
     return ResponseEntity.noContent().build();
   }

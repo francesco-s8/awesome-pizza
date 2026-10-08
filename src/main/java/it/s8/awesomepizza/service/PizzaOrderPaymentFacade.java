@@ -2,12 +2,12 @@ package it.s8.awesomepizza.service;
 
 import it.s8.awesomepizza.exception.OrderNotReadyException;
 import jakarta.persistence.EntityNotFoundException;
-import org.openapitools.model.PizzaOrderPaid;
-import org.openapitools.model.PizzaOrderToPay;
+import org.openapitools.model.PizzaOrderPaymentInfo;
+import org.openapitools.model.PizzaOrderTotalToPay;
 
 public interface PizzaOrderPaymentFacade {
 
-  PizzaOrderToPay calculateOrderTotal(Long orderId) throws EntityNotFoundException;
+  PizzaOrderTotalToPay calculateOrderTotal(Long orderId) throws EntityNotFoundException;
 
-  void processPayment(Long orderId, PizzaOrderPaid pizzaOrderPaid) throws EntityNotFoundException, OrderNotReadyException;
+  void processPayment(Long orderId, PizzaOrderPaymentInfo pizzaOrderPaid) throws EntityNotFoundException, OrderNotReadyException;
 }

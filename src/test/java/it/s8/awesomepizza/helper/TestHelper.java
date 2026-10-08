@@ -7,15 +7,15 @@ import java.util.List;
 
 public class TestHelper {
 
-
-    public static PizzaOrder getOrder() {
-      return PizzaOrder.builder()
-          .username("alice")
-          .pizzaList(
-              List.of(
-                  Pizza.builder().name("Margherita").price(new BigDecimal("10.00")).build(),
-                  Pizza.builder().name("Capricciosa").price(new BigDecimal("11.50")).build(),
-                  Pizza.builder().name("Marinara").price(new BigDecimal("7.50")).build()))
-          .build();
-    }
+  public static PizzaOrder getOrder() {
+    return PizzaOrder.builder()
+        .id(1L)
+        .username("alice")
+        .pizzaList(
+            List.of(
+                Pizza.builder().name("Margherita").price(new BigDecimal("10.00")).build(),
+                Pizza.builder().name("Capricciosa").price(new BigDecimal("11.50")).build(),
+                Pizza.builder().name("Marinara").price(new BigDecimal("7.50")).build()))
+        .build();
+  }
 }

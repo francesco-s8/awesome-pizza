@@ -8,9 +8,9 @@ import it.s8.awesomepizza.utils.PizzaOrderUtils;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.Objects;
-import org.openapitools.model.PizzaOrderPaid;
+import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
-import org.openapitools.model.PizzaOrderToPay;
+import org.openapitools.model.PizzaOrderTotalToPay;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,20 +23,21 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
   }
 
   @Override
-  public PizzaOrderToPay calculateOrderTotal(Long orderId) throws EntityNotFoundException {
+  public PizzaOrderTotalToPay calculateOrderTotal(Long orderId) throws EntityNotFoundException {
     var order = pizzaOrderService.getOrder(orderId);
     if (!Objects.equals(
         order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue())) {
       throw new AwesomePizzaException("Order " + orderId + " is not ready for delivery");
     }
-    return PizzaOrderToPay.builder()
+    return PizzaOrderTotalToPay.builder()
         .name(order.getUsername())
+        .order(order.getId())
         .total(PizzaOrderUtils.getTotalAsString(PizzaOrderUtils.getTotal(order).longValue()))
         .build();
   }
 
   @Override
-  public void processPayment(Long orderId, PizzaOrderPaid pizzaOrderPaid)
+  public void processPayment(Long orderId, PizzaOrderPaymentInfo pizzaOrderPaid)
       throws EntityNotFoundException, OrderNotReadyException {
     var order = pizzaOrderService.getOrder(orderId);
     if (Objects.equals(
