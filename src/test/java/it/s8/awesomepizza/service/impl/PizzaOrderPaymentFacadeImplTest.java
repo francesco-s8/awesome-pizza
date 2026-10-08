@@ -1,17 +1,11 @@
 package it.s8.awesomepizza.service.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.exception.OrderNotReadyException;
 import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +14,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
