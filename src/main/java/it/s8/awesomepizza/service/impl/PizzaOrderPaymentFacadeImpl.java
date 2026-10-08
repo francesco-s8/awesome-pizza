@@ -6,13 +6,16 @@ import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.utils.PizzaOrderUtils;
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
 import org.openapitools.model.PizzaOrderTotalToPay;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
 
@@ -25,14 +28,26 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
   @Override
   public PizzaOrderTotalToPay calculateOrderTotal(Long orderId) throws EntityNotFoundException {
     var order = pizzaOrderService.getOrder(orderId);
-    if (!Objects.equals(
-        order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue())) {
-      throw new AwesomePizzaException("Order " + orderId + " is not ready for delivery");
+    if (Objects.isNull(order.getTotal())
+        && !Objects.equals(
+            order.getOrderStatus(),
+            PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue())) {
+      throw new AwesomePizzaException("Order " + orderId + " is not ready for payment");
     }
+    if (Objects.equals(
+        order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())) {
+      log.info("Order {} is ready to be paid", orderId);
+      throw new AwesomePizzaException("Order " + orderId + " is already marked as TO_BE_PAID");
+    }
+    var total = PizzaOrderUtils.getTotal(order).longValue();
+    order.setTotal(BigDecimal.valueOf(total));
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
+    pizzaOrderService.saveOrder(order);
+
     return PizzaOrderTotalToPay.builder()
         .name(order.getUsername())
         .order(order.getId())
-        .total(PizzaOrderUtils.getTotalAsString(PizzaOrderUtils.getTotal(order).longValue()))
+        .total(PizzaOrderUtils.getTotalAsString(total))
         .build();
   }
 
@@ -41,7 +56,7 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
       throws EntityNotFoundException, OrderNotReadyException {
     var order = pizzaOrderService.getOrder(orderId);
     if (Objects.equals(
-        order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue())) {
+        order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())) {
 
       order.setPaid(true);
       order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID.getValue());

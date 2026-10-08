@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import it.s8.awesomepizza.entity.PizzaOrder;
+import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.exception.OrderNotReadyException;
 import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.service.PizzaOrderService;
@@ -18,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.PizzaOrderPaymentInfo;
+import org.openapitools.model.PizzaOrderStatus;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -36,7 +38,7 @@ class PizzaOrderPaymentFacadeImplTest {
   void givenOrderWithMultiplePizzasShouldCalculateTotalCentsIgnoringNullPrices() {
     var order = TestHelper.getOrder();
 
-    order.setOrderStatus("READY_FOR_DELIVERY");
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
 
     var actual = paymentFacade.calculateOrderTotal(order.getId());
@@ -44,6 +46,17 @@ class PizzaOrderPaymentFacadeImplTest {
     assertThat(actual.getName()).isEqualTo("alice");
     assertThat(actual.getTotal())
         .isEqualTo(NumberFormat.getCurrencyInstance().format(2900 / 100.0));
+  }
+
+  @Test
+  void givenOrderNotReadyForDeliveryShouldThrowException() {
+    var order = TestHelper.getOrder();
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
+    when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
+
+    assertThatThrownBy(() -> paymentFacade.calculateOrderTotal(1L))
+        .isInstanceOf(AwesomePizzaException.class)
+        .hasMessageContaining("is not ready for payment");
   }
 
   @Test
@@ -60,7 +73,7 @@ class PizzaOrderPaymentFacadeImplTest {
   void givenAValidPaymentInfoShouldInvokeSaveOrderMethodOnce() {
 
     var order = TestHelper.getOrder();
-    order.setOrderStatus("READY_FOR_DELIVERY");
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
     order.setTotal(BigDecimal.ONE);
     printOrder(order);
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);

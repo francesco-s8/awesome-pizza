@@ -142,6 +142,7 @@ components:
           enum:
             - 'IN_PROCESS'
             - 'READY_FOR_DELIVERY'
+            - 'TO_BE_PAID'
             - 'PAID'
             - 'ALREADY DELIVERED'
           description: The status of the pizza order
