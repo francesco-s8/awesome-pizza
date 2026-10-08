@@ -75,6 +75,62 @@ paths:
                 $ref: '#/components/schemas/PizzaMenu'
         '500':
           description: Application error
+    post:
+      tags:
+        - menu
+      summary: Add a new pizza to the menu
+      description: Adds a new pizza to the menu.
+      operationId: addPizzaToMenu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PizzaDto'
+        required: true
+      responses:
+        '201':
+          description: Pizza added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaDto'
+        '400':
+          description: Invalid pizza data
+        '500':
+          description: Internal error
+  /api/awesome-pizza/menu/{pizzaId}:
+    put:
+      tags:
+        - menu
+      summary: Update an existing pizza in the menu
+      description: Updates the details of an existing pizza in the menu.
+      operationId: updatePizzaInMenu
+      parameters:
+        - in: path
+          name: pizzaId
+          schema:
+            type: integer
+            format: int64
+          description: The unique identifier for the pizza
+          example: 1
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PizzaDto'
+        required: true
+      responses:
+        '200':
+          description: Pizza updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaDto'
+        '404':
+          description: Pizza not found
+        '500':
+          description: Internal error
 
   /api/awesome-pizza/orders/{orderId}/total:
     get:
@@ -226,11 +282,6 @@ components:
     PizzaOrderPaymentInfo:
       type: object
       properties:
-        total:
-          type: number
-          description: "The amount to pay"
-          examples:
-            - "10,00"
         paymentMethod:
           type: string
           enum:
@@ -243,4 +294,3 @@ components:
             - 'CASH'
       required:
         - paymentMethod
-        - total

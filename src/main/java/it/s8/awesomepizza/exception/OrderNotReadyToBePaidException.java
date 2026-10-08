@@ -3,5 +3,5 @@ package it.s8.awesomepizza.exception;
 import lombok.experimental.StandardException;
 
 @StandardException
-public class OrderNotReadyException extends RuntimeException {
+public class OrderNotReadyToBePaidException extends RuntimeException {
 }

@@ -15,7 +15,6 @@ CREATE TABLE pizza_order
 CREATE TABLE pizza
 (
     pizza_id       int8         NOT NULL,
-    pizza_order_id int8         NULL,
     description    varchar(255) NULL,
     "name"         varchar(255) NULL,
     "price"        NUMERIC(10, 2) NULL,
@@ -23,8 +22,7 @@ CREATE TABLE pizza
     "created_at"   TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "modified_at"  TIMESTAMP(6) NULL,
 
-    CONSTRAINT pizza_pkey PRIMARY KEY (pizza_id),
-    CONSTRAINT pizza_order_fk FOREIGN KEY (pizza_order_id) REFERENCES pizza_order (pizza_order_id)
+    CONSTRAINT pizza_pkey PRIMARY KEY (pizza_id)
 );
 
 CREATE TABLE pizza_order_items

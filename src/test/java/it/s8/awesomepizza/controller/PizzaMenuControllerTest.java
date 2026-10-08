@@ -1,15 +1,10 @@
 package it.s8.awesomepizza.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.service.PizzaService;
-import java.math.BigDecimal;
-import java.util.List;
+import it.s8.awesomepizza.validator.PizzaInfoValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.PizzaDto;
@@ -20,6 +15,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PizzaMenuController.class)
 class PizzaMenuControllerTest {
@@ -35,6 +37,9 @@ class PizzaMenuControllerTest {
   @MockitoBean PizzaService pizzaService;
 
   @MockitoBean PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper;
+
+  @MockitoBean PizzaInfoValidator pizzaInfoValidator;
+
 
   @BeforeEach
   void setupStubs() {

@@ -2,7 +2,7 @@ package it.s8.awesomepizza.service.impl;
 
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
-import it.s8.awesomepizza.exception.OrderNotReadyException;
+import it.s8.awesomepizza.exception.OrderNotReadyToBePaidException;
 import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import jakarta.persistence.EntityNotFoundException;
@@ -99,7 +99,7 @@ class PizzaOrderPaymentFacadeImplTest {
             .paymentMethod(PizzaOrderPaymentInfo.PaymentMethodEnum.CREDIT_CARD)
             .build();
     assertThatThrownBy(() -> paymentFacade.processPayment(1L, pizzaOrderPaymentInfo))
-        .isExactlyInstanceOf(OrderNotReadyException.class)
-        .hasMessageContaining("is not ready for delivery, cannot process payment");
+        .isExactlyInstanceOf(OrderNotReadyToBePaidException.class)
+        .hasMessageContaining(" is not ready to be paid, cannot process payment");
   }
 }

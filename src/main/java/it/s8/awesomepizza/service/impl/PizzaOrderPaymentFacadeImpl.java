@@ -1,19 +1,20 @@
 package it.s8.awesomepizza.service.impl;
 
 import it.s8.awesomepizza.exception.AwesomePizzaException;
-import it.s8.awesomepizza.exception.OrderNotReadyException;
+import it.s8.awesomepizza.exception.OrderNotReadyToBePaidException;
 import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.utils.PizzaOrderUtils;
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
 import org.openapitools.model.PizzaOrderTotalToPay;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -53,10 +54,11 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
 
   @Override
   public void processPayment(Long orderId, PizzaOrderPaymentInfo pizzaOrderPaid)
-      throws EntityNotFoundException, OrderNotReadyException {
+      throws EntityNotFoundException, OrderNotReadyToBePaidException {
     var order = pizzaOrderService.getOrder(orderId);
-    if (Objects.equals(
-        order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())) {
+    if (order.getTotal() != null
+        && Objects.equals(
+            order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())) {
 
       order.setPaid(true);
       order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID.getValue());
@@ -65,7 +67,7 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
       pizzaOrderService.saveOrder(order);
       return;
     }
-    throw new OrderNotReadyException(
-        "Order " + orderId + " is not ready for delivery, cannot process payment");
+    throw new OrderNotReadyToBePaidException(
+        "Order " + orderId + " is not ready to be paid, cannot process payment");
   }
 }
