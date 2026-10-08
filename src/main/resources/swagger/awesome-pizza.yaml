@@ -131,7 +131,32 @@ paths:
           description: Pizza not found
         '500':
           description: Internal error
-
+    get:
+      tags:
+        - menu
+      summary: Get details of a specific pizza from the menu
+      description: Returns the details of a specific pizza from the menu.
+      operationId: pizzaDetails
+      parameters:
+        - in: path
+          name: pizzaId
+          schema:
+            type: integer
+            format: int64
+          description: The unique identifier for the pizza
+          example: 1
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaDto'
+        '404':
+          description: Pizza not found
+        '500':
+          description: Internal error
   /api/awesome-pizza/orders/{orderId}/total:
     get:
       tags:

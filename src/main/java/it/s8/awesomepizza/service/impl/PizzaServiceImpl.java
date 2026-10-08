@@ -5,11 +5,10 @@ import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import it.s8.awesomepizza.service.PizzaService;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaDto;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -28,6 +27,13 @@ public class PizzaServiceImpl implements PizzaService {
       throw new AwesomePizzaException("Some pizzas not found");
     }
     return pizzas;
+  }
+
+  @Override
+  public Pizza getPizzaDetails(Long pizzaId) {
+    return pizzaRepository
+        .findById(pizzaId)
+        .orElseThrow(() -> new EntityNotFoundException("Pizza not found id " + pizzaId));
   }
 
   @Override

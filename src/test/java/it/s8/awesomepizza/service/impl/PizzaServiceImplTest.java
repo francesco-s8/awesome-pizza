@@ -1,8 +1,17 @@
 package it.s8.awesomepizza.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.repository.PizzaRepository;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,14 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.PizzaDto;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class PizzaServiceImplTest {
 
@@ -102,5 +104,24 @@ class PizzaServiceImplTest {
 
     var actual = pizzaService.updatePizza(1L, pizzaInfo);
     assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.valueOf(10L));
+  }
+
+  @Test
+  void givenAValidPizzaIdShouldReturnThePizzaDetails() {
+
+    var pizza =
+        Pizza.builder()
+            .id(1L)
+            .name("Margherita")
+            .description("Margherita")
+            .price(BigDecimal.ONE)
+            .build();
+    when(pizzaRepository.findById(any())).thenReturn(Optional.of(pizza));
+
+    var actual = pizzaService.getPizzaDetails(1L);
+    log.info("Actual pizza details: {}", actual);
+    assertThat(actual).isNotNull().extracting("name").isEqualTo("Margherita");
+
+    assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.ONE);
   }
 }

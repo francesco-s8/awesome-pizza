@@ -13,6 +13,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "pizza_order")
@@ -51,6 +52,7 @@ public class PizzaOrder extends EntityInfo {
       name = "pizza_order_items",
       joinColumns = @JoinColumn(name = "pizza_order_id"),
       inverseJoinColumns = @JoinColumn(name = "pizza_id"))
+  @ToString.Exclude
   private List<Pizza> pizzaList = new LinkedList<>();
 
   @Version
@@ -77,29 +79,5 @@ public class PizzaOrder extends EntityInfo {
   @Override
   public int hashCode() {
     return Objects.hashCode(getId());
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName()
-        + "("
-        + "id = "
-        + getId()
-        + ", "
-        + "username = "
-        + getUsername()
-        + ", "
-        + "orderStatus = "
-        + getOrderStatus()
-        + ", "
-        + "createdAt = "
-        + getCreatedAt()
-        + ", "
-        + "modifiedAt = "
-        + getModifiedAt()
-        + ", "
-        + "version = "
-        + getVersion()
-        + ")";
   }
 }

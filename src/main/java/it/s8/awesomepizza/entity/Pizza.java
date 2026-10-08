@@ -14,6 +14,7 @@ import org.hibernate.proxy.HibernateProxy;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @Table(name = "pizza")
 public class Pizza extends EntityInfo {
 
@@ -60,27 +61,5 @@ public class Pizza extends EntityInfo {
     return Objects.hashCode(getId());
   }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName()
-        + "("
-        + "id = "
-        + getId()
-        + ", "
-        + "name = "
-        + getName()
-        + ", "
-        + "description = "
-        + getDescription()
-        + ", "
-        + "version = "
-        + getVersion()
-        + ", "
-        + "createdAt = "
-        + getCreatedAt()
-        + ", "
-        + "modifiedAt = "
-        + getModifiedAt()
-        + ")";
-  }
+
 }
