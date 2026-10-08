@@ -98,7 +98,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PizzaOrderToPay'
+                $ref: '#/components/schemas/PizzaOrderTotalToPay'
         '404':
           description: No order found
         '500':
@@ -123,7 +123,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PizzaOrderPaid'
+              $ref: '#/components/schemas/PizzaOrderPaymentInfo'
         required: true
       responses:
         '200':
@@ -205,9 +205,15 @@ components:
           description: The price of the pizza with 2 decimal places
           examples:
             - 5.5
-    PizzaOrderToPay:
+    PizzaOrderTotalToPay:
       type: object
       properties:
+        order:
+          type: integer
+          format: int64
+          description: The unique identifier for the pizza order
+          examples:
+            - 1
         name:
           type: string
           description: The name of the guy who ordered
@@ -216,7 +222,7 @@ components:
           description: The total cost of the pizza order
           examples:
             - "15.50 €"
-    PizzaOrderPaid:
+    PizzaOrderPaymentInfo:
       type: object
       properties:
         total:
