@@ -142,6 +142,7 @@ components:
           enum:
             - 'IN_PROCESS'
             - 'READY_FOR_DELIVERY'
+            - 'PAID'
             - 'ALREADY DELIVERED'
           description: The status of the pizza order
           examples:
@@ -229,6 +230,10 @@ components:
             - 'CASH'
             - 'CREDIT_CARD'
             - 'DEBIT_CARD'
+
           description: The payment method used for the pizza order
           examples:
             - 'CASH'
+      required:
+        - paymentMethod
+        - total

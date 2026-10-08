@@ -67,9 +67,7 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
     var order = pizzaOrderService.getOrder(orderId);
     // Silly condition to manage already delivered order
     log.info("Order is {}", order);
-    if (PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY
-            .getValue()
-            .equals(order.getOrderStatus())
+    if (PizzaOrderStatus.OrderStatusEnum.PAID.getValue().equals(order.getOrderStatus())
         && Boolean.TRUE.equals(order.getPaid())) {
       order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue());
       pizzaOrderService.saveOrder(order);

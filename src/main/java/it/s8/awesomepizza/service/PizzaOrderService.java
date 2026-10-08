@@ -7,4 +7,6 @@ public interface PizzaOrderService {
     PizzaOrder getOrder(Long orderId);
 
     PizzaOrder saveOrder(PizzaOrder pizzaOrder);
+
+    void prepareOrder(Long pizzaOrderId);
 }

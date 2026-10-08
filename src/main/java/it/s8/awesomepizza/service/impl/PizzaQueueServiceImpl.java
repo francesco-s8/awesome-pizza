@@ -2,13 +2,11 @@ package it.s8.awesomepizza.service.impl;
 
 import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.event.OrderCreatedEvent;
-import it.s8.awesomepizza.exception.AwesomePizzaException;
-import it.s8.awesomepizza.repository.PizzaOrderRepository;
+import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
 import java.io.IOException;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
-import org.openapitools.model.PizzaOrderStatus;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,20 +20,12 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class PizzaQueueServiceImpl implements PizzaQueueService {
 
   final RabbitTemplate rabbitTemplate;
-  final PizzaOrderRepository pizzaOrderRepository;
+  final PizzaOrderService pizzaOrderService;
 
-  public PizzaQueueServiceImpl(
-      RabbitTemplate rabbitTemplate, PizzaOrderRepository pizzaOrderRepository) {
+  public PizzaQueueServiceImpl(RabbitTemplate rabbitTemplate, PizzaOrderService pizzaOrderService) {
     this.rabbitTemplate = rabbitTemplate;
-    this.pizzaOrderRepository = pizzaOrderRepository;
+    this.pizzaOrderService = pizzaOrderService;
   }
-
-//  @Override
-//  public void sendOrder(Long orderId) throws AmqpException {
-//
-//    rabbitTemplate.convertAndSend("orders", orderId);
-//    log.info("Order {} sent to queue", orderId);
-//  }
 
   @Override
   @RabbitListener(ackMode = "MANUAL", queues = "orders")
@@ -49,16 +39,7 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
               try {
                 log.info("Simulating pizza preparation for order ID: {}", pizzaOrder);
                 Thread.sleep(Duration.ofSeconds(10).toMillis());
-                var order =
-                    pizzaOrderRepository
-                        .findById(pizzaOrder)
-                        .orElseThrow(
-                            () ->
-                                new AwesomePizzaException(
-                                    "Order not found with ID: " + pizzaOrder));
-                order.setOrderStatus(
-                    PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
-                pizzaOrderRepository.save(order);
+                pizzaOrderService.prepareOrder(pizzaOrder);
                 channel.basicAck(tag, false);
                 log.info("Order {} is ready", pizzaOrder);
               } catch (RuntimeException | IOException e) {

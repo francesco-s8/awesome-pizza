@@ -47,4 +47,10 @@ public class ExceptionManager {
     ex.getBindingResult().getAllErrors().forEach(error -> log.warn("Validation error: {}", error));
     return ResponseEntity.badRequest().body("Check the request body, some fields are not valid");
   }
+
+  @ExceptionHandler(OrderNotReadyException.class)
+  public ResponseEntity<String> handleOrderNotReadyException(OrderNotReadyException ex) {
+    log.warn("OrderNotReadyException occurred ", ex);
+    return ResponseEntity.status(422).body(ex.getMessage());
+  }
 }

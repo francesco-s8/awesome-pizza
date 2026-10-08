@@ -4,7 +4,6 @@ import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaOrderPaid;
 import org.openapitools.model.PizzaOrderToPay;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +26,7 @@ public class PizzaOrderPaymentController implements PaymentApi {
 
   @Override
   public ResponseEntity<Void> _markOrderAsPaid(Long orderId, PizzaOrderPaid pizzaOrderPaid) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    pizzaOrderPaymentFacade.processPayment(orderId, pizzaOrderPaid);
+    return ResponseEntity.noContent().build();
   }
 }

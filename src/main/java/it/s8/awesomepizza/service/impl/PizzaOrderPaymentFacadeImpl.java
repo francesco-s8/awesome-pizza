@@ -1,12 +1,15 @@
 package it.s8.awesomepizza.service.impl;
 
-import it.s8.awesomepizza.CurrencyUtils;
-import it.s8.awesomepizza.entity.Pizza;
+import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.exception.OrderNotReadyException;
 import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
+import it.s8.awesomepizza.utils.PizzaOrderUtils;
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.Objects;
+import org.openapitools.model.PizzaOrderPaid;
+import org.openapitools.model.PizzaOrderStatus;
 import org.openapitools.model.PizzaOrderToPay;
 import org.springframework.stereotype.Component;
 
@@ -22,17 +25,31 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
   @Override
   public PizzaOrderToPay calculateOrderTotal(Long orderId) throws EntityNotFoundException {
     var order = pizzaOrderService.getOrder(orderId);
-    var total =
-        order.getPizzaList().stream()
-            .map(Pizza::getPrice)
-            .filter(java.util.Objects::nonNull)
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
-            .setScale(2, RoundingMode.HALF_UP)
-            .movePointRight(2)
-            .longValue();
+    if (!Objects.equals(
+        order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue())) {
+      throw new AwesomePizzaException("Order " + orderId + " is not ready for delivery");
+    }
     return PizzaOrderToPay.builder()
         .name(order.getUsername())
-        .total(CurrencyUtils.getTotalAsString(total))
+        .total(PizzaOrderUtils.getTotalAsString(PizzaOrderUtils.getTotal(order).longValue()))
         .build();
+  }
+
+  @Override
+  public void processPayment(Long orderId, PizzaOrderPaid pizzaOrderPaid)
+      throws EntityNotFoundException, OrderNotReadyException {
+    var order = pizzaOrderService.getOrder(orderId);
+    if (Objects.equals(
+        order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue())) {
+
+      order.setPaid(true);
+      order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID.getValue());
+      order.setPaymentMethod(pizzaOrderPaid.getPaymentMethod().getValue());
+      order.setPaymentDate(Instant.now());
+      pizzaOrderService.saveOrder(order);
+      return;
+    }
+    throw new OrderNotReadyException(
+        "Order " + orderId + " is not ready for delivery, cannot process payment");
   }
 }
