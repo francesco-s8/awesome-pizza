@@ -31,7 +31,7 @@ paths:
                 $ref: '#/components/schemas/PizzaOrderResponse'
         '500':
           description: Internal error
-  /api/awesome-pizza/orders/{orderId}:
+  /api/awesome-pizza/orders/{orderId}/status:
     get:
       tags:
         - order
@@ -45,7 +45,7 @@ paths:
             type: integer
             format: int64
           description: The unique identifier for the pizza order
-          example: '1'
+          example: 1
           required: true
       responses:
         '200':
@@ -75,6 +75,63 @@ paths:
                 $ref: '#/components/schemas/PizzaMenu'
         '500':
           description: Application error
+
+  /api/awesome-pizza/orders/{orderId}/total:
+    get:
+      tags:
+        - payment
+      summary: Calculate the total for a pizza order
+      description: Calculates the total cost for a specific pizza order.
+      operationId: calculateOrderTotal
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            type: integer
+            format: int64
+          description: The unique identifier for the pizza order
+          example: 1
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaOrderToPay'
+        '404':
+          description: No order found
+        '500':
+          description: Internal error
+  /api/awesome-pizza/orders/{orderId}/payment:
+    put:
+      tags:
+        - payment
+      summary: Mark an order as paid
+      description: Marks a specific pizza order as paid.
+      operationId: markOrderAsPaid
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            type: integer
+            format: int64
+          description: The unique identifier for the pizza order
+          example: 1
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PizzaOrderPaid'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: No order found
+        '500':
+          description: Internal error
 components:
   schemas:
     PizzaOrderStatus:
@@ -87,16 +144,18 @@ components:
             - 'READY_FOR_DELIVERY'
             - 'ALREADY DELIVERED'
           description: The status of the pizza order
-          example: 'IN_PROCESS'
+          examples:
+            - 'IN_PROCESS'
     PizzaOrderRequest:
       type: object
       properties:
         customerName:
           type: string
-          minLength: 1
+          minLength: 4
           nullable: false
           description: The name of the user placing the order
-          example: "John Doe"
+          examples:
+            - "John Doe"
         pizzas:
           type: array
           minItems: 1
@@ -104,10 +163,12 @@ components:
           items:
             type: string
             description: The name of the pizza
-            example: "Margherita"
+            examples:
+              - "Margherita"
       required:
         - customerName
         - pizzas
+
     PizzaOrderResponse:
       type: object
       properties:
@@ -115,7 +176,8 @@ components:
           type: integer
           format: int64
           description: The unique identifier for the pizza order
-          example: 1
+          examples:
+            - 1
     PizzaMenu:
       type: object
       properties:
@@ -130,12 +192,43 @@ components:
         name:
           type: string
           description: The name of the pizza
-          example: "Margherita"
+          examples:
+            - "Margherita"
         description:
           type: string
           description: A brief description of the pizza
-          example: "A classic Italian pizza with tomato sauce and mozzarella"
+          examples:
+            - "A classic Italian pizza with tomato sauce and mozzarella"
         price:
           type: number
           description: The price of the pizza with 2 decimal places
-          example: 5.50 €
+          examples:
+            - 5.5
+    PizzaOrderToPay:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the guy who ordered
+        total:
+          type: string
+          description: The total cost of the pizza order
+          examples:
+            - "15.50 €"
+    PizzaOrderPaid:
+      type: object
+      properties:
+        total:
+          type: number
+          description: "The amount to pay"
+          examples:
+            - "10,00"
+        paymentMethod:
+          type: string
+          enum:
+            - 'CASH'
+            - 'CREDIT_CARD'
+            - 'DEBIT_CARD'
+          description: The payment method used for the pizza order
+          examples:
+            - 'CASH'

@@ -43,7 +43,7 @@ class PizzaOrderControllerTest {
     var actual =
         mockMvc
             .perform(
-                MockMvcRequestBuilders.get("/api/awesome-pizza/orders/1")
+                MockMvcRequestBuilders.get("/api/awesome-pizza/orders/1/status")
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -64,7 +64,7 @@ class PizzaOrderControllerTest {
     var actual =
         mockMvc
             .perform(
-                MockMvcRequestBuilders.get("/api/awesome-pizza/orders/10")
+                MockMvcRequestBuilders.get("/api/awesome-pizza/orders/10/status")
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
@@ -197,7 +197,7 @@ class PizzaOrderControllerTest {
   void whenOrderIdIsInvalidFormatShouldReturn400() throws Exception {
     mockMvc
         .perform(
-            MockMvcRequestBuilders.get("/api/awesome-pizza/orders/invalid-id")
+            MockMvcRequestBuilders.get("/api/awesome-pizza/orders/invalid-id/status")
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest());
   }

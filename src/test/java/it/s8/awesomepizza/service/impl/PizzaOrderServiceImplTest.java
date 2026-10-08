@@ -35,7 +35,7 @@ class PizzaOrderServiceImplTest {
             .build();
 
     when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
-    var actual = orderService.getOrderStatus(anyLong());
+    var actual = orderService.getOrder(anyLong());
 
     assertThat(actual).isNotNull();
     assertThat(actual.getId()).isEqualTo(order.getId());
@@ -45,7 +45,7 @@ class PizzaOrderServiceImplTest {
   void givenAnInvalidOrderIdShouldThrowException() {
 
     when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.empty());
-    assertThatThrownBy(() -> orderService.getOrderStatus(2L))
+    assertThatThrownBy(() -> orderService.getOrder(2L))
         .isExactlyInstanceOf(EntityNotFoundException.class)
         .hasMessageContaining("not found");
   }

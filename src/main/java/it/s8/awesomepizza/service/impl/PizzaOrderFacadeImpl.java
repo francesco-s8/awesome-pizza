@@ -10,7 +10,6 @@ import it.s8.awesomepizza.service.PizzaOrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
 import it.s8.awesomepizza.service.PizzaService;
-import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaOrderRequest;
@@ -65,13 +64,13 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
 
   @Override
   public String retrieveOrderStatus(Long orderId) {
-    var order = pizzaOrderService.getOrderStatus(orderId);
+    var order = pizzaOrderService.getOrder(orderId);
     // Silly condition to manage already delivered order
     log.info("Order is {}", order);
     if (PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY
             .getValue()
             .equals(order.getOrderStatus())
-        && order.getModifiedAt().plusSeconds(45L).isBefore(Instant.now())) {
+        && Boolean.TRUE.equals(order.getPaid())) {
       order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue());
       pizzaOrderService.saveOrder(order);
       return order.getOrderStatus();

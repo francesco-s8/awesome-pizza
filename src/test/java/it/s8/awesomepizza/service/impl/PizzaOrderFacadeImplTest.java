@@ -70,7 +70,7 @@ class PizzaOrderFacadeImplTest {
   @Test
   void givenAValidOrderIdShouldReturnTheOrderStatus() {
 
-    when(pizzaOrderService.getOrderStatus(anyLong()))
+    when(pizzaOrderService.getOrder(anyLong()))
         .thenReturn(PizzaOrder.builder().orderStatus(IN_PROCESS).build());
 
     var actual = orderFacade.retrieveOrderStatus(1L);

@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.Objects;
 import lombok.*;
@@ -27,6 +28,7 @@ public class Pizza extends EntityInfo {
   @Column(name = "description")
   private String description;
 
+  @Positive
   @Column(name = "price")
   private BigDecimal price;
 

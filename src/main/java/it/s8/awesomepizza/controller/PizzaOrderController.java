@@ -6,7 +6,7 @@ import org.openapitools.model.PizzaOrderRequest;
 import org.openapitools.model.PizzaOrderResponse;
 import org.openapitools.model.PizzaOrderStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController

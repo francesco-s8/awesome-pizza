@@ -1,7 +1,10 @@
 package it.s8.awesomepizza.entity;
 
 import jakarta.persistence.*;
-import java.util.*;
+import java.time.Instant;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -25,6 +28,15 @@ public class PizzaOrder extends EntityInfo {
 
   @Column(name = "order_status")
   private String orderStatus;
+
+  @Column(name = "paid")
+  private Boolean paid;
+
+  @Column(name = "payment_method")
+  private String paymentMethod;
+
+  @Column(name = "payment_date")
+  private Instant paymentDate;
 
   @Builder.Default
   @ManyToMany(
