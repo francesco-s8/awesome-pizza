@@ -229,13 +229,13 @@ components:
           description: The status of the pizza order
           examples:
             - 'IN_PROCESS'
+            - 'PAID'
     PizzaOrderRequest:
       type: object
       properties:
         customerName:
           type: string
           minLength: 4
-          nullable: false
           description: The name of the user placing the order
           examples:
             - "John Doe"
