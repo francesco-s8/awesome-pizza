@@ -30,25 +30,29 @@ class PizzaServiceImplTest {
   @Test
   void givenAListOfPizzasShouldReturnSuccessfully() {
 
-    var firstPizza =
-        Pizza.builder().id(1L).name("Margherita").description("Margherita").version(0).build();
-    var secondPizza =
-        Pizza.builder().id(1L).name("Marinara").description("Marinara").version(0).build();
-
     var input = List.of("Margherita", "Marinara");
 
-    when(pizzaRepository.findByNameIn(input)).thenReturn(List.of(firstPizza, secondPizza));
+    when(pizzaRepository.findByNameIn(input)).thenReturn(getPizzasStub());
 
     var actual = pizzaService.getPizzas(input);
     assertThat(actual).isNotEmpty().hasSize(2);
   }
 
+  private List<Pizza> getPizzasStub() {
+
+    var firstPizza =
+        Pizza.builder().id(1L).name("Margherita").price(BigDecimal.ONE).description("Margherita").version(0).build();
+    var secondPizza =
+        Pizza.builder().id(1L).name("Marinara").price(BigDecimal.valueOf(2L)).description("Marinara").version(0).build();
+
+    return List.of(firstPizza, secondPizza);
+  }
+
   @Test
   void givenANotExistingPizzaShouldRaiseAnException() {
-    var input = List.of("Gourmet");
-    when(pizzaRepository.findByNameIn(input)).thenReturn(List.of());
-
-    assertThatThrownBy(() -> pizzaService.getPizzas(input))
+    var pizzasName = List.of("Quattro stagioni");
+    when(pizzaRepository.findByNameIn(any())).thenReturn(List.of());
+    assertThatThrownBy(() -> pizzaService.getPizzas(pizzasName))
         .isExactlyInstanceOf(AwesomePizzaException.class)
         .hasMessageContaining("Some pizzas not found");
   }
@@ -56,15 +60,7 @@ class PizzaServiceImplTest {
   @Test
   void addPizza() {
 
-    var pizza =
-        Pizza.builder()
-            .id(1L)
-            .name("Margherita")
-            .description("Margherita")
-            .price(BigDecimal.ONE)
-            .build();
-
-    when(pizzaRepository.save(any(Pizza.class))).thenReturn(pizza);
+    when(pizzaRepository.save(any(Pizza.class))).thenReturn(getPizzasStub().getFirst());
     var actual =
         pizzaService.addPizza(
             PizzaDto.builder()
@@ -86,7 +82,7 @@ class PizzaServiceImplTest {
             .build();
     when(pizzaRepository.findById(1L))
         .thenReturn(
-            java.util.Optional.of(
+            Optional.of(
                 Pizza.builder()
                     .id(1L)
                     .name("Margherita")
@@ -109,19 +105,10 @@ class PizzaServiceImplTest {
   @Test
   void givenAValidPizzaIdShouldReturnThePizzaDetails() {
 
-    var pizza =
-        Pizza.builder()
-            .id(1L)
-            .name("Margherita")
-            .description("Margherita")
-            .price(BigDecimal.ONE)
-            .build();
-    when(pizzaRepository.findById(any())).thenReturn(Optional.of(pizza));
-
+    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
     var actual = pizzaService.getPizzaDetails(1L);
     log.info("Actual pizza details: {}", actual);
     assertThat(actual).isNotNull().extracting("name").isEqualTo("Margherita");
-
     assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.ONE);
   }
 }
