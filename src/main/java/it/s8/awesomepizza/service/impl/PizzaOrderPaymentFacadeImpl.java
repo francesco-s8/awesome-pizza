@@ -6,15 +6,14 @@ import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.utils.PizzaOrderUtils;
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
 import org.openapitools.model.PizzaOrderTotalToPay;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -56,6 +55,9 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
   public void processPayment(Long orderId, PizzaOrderPaymentInfo pizzaOrderPaid)
       throws EntityNotFoundException, OrderNotReadyToBePaidException {
     var order = pizzaOrderService.getOrder(orderId);
+    if (order.getTotal().compareTo(pizzaOrderPaid.getTotal()) != 0) {
+      throw new AwesomePizzaException("Total to pay is not correct");
+    }
     if (order.getTotal() != null
         && Objects.equals(
             order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())) {

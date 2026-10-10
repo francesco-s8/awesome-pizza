@@ -317,5 +317,12 @@ components:
           description: The payment method used for the pizza order
           examples:
             - 'CASH'
+        total:
+          type: number
+          format: double
+          description: "The amount to pay"
+          examples:
+            - 29,00
       required:
         - paymentMethod
+        - total

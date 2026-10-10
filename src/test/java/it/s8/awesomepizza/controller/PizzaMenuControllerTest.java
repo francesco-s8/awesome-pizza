@@ -1,28 +1,35 @@
 package it.s8.awesomepizza.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import it.s8.awesomepizza.entity.Pizza;
+import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
-import it.s8.awesomepizza.mapper.PizzaToPizzaDto;
+import it.s8.awesomepizza.mapper.PizzaToPizzaDtoMapper;
 import it.s8.awesomepizza.service.PizzaService;
 import it.s8.awesomepizza.validator.PizzaInfoValidator;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.PizzaDto;
 import org.openapitools.model.PizzaMenu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+@Slf4j
 @WebMvcTest(controllers = PizzaMenuController.class)
 class PizzaMenuControllerTest {
 
@@ -38,7 +45,7 @@ class PizzaMenuControllerTest {
 
   @MockitoBean PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper;
 
-  @MockitoBean PizzaToPizzaDto pizzaToPizzaDto;
+  @MockitoBean PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper;
 
   @MockitoBean PizzaInfoValidator pizzaInfoValidator;
 
@@ -138,5 +145,62 @@ class PizzaMenuControllerTest {
 
     var response = jsonMapper.readValue(actual.getResponse().getContentAsString(), PizzaMenu.class);
     assertThat(response.getMenu()).isEmpty();
+  }
+
+  @Test
+  void _pizzaDetails() throws Exception {
+
+    when(pizzaService.getPizzaDetails(anyLong())).thenReturn(pizzasList.getFirst());
+    when(pizzaToPizzaDtoMapper.apply(pizzasList.getFirst())).thenReturn(pizzasDtoList.getFirst());
+    var actual =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.get("/api/awesome-pizza/menu/1")
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+    log.info("response {}", actual);
+    var response = jsonMapper.readValue(actual.getResponse().getContentAsString(), PizzaDto.class);
+    assertThat(response).isNotNull().isEqualTo(pizzasDtoList.getFirst());
+  }
+
+  @Test
+  void givenANonExistingOrderIdShouldBeReturnANotFoundStatus() throws Exception {
+
+    when(pizzaService.getPizzaDetails(99L))
+        .thenThrow(new EntityNotFoundException("Pizza not found id " + 99));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get("/api/awesome-pizza/menu/99")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andReturn();
+  }
+
+  @Test
+  void givenValidInputWithAnUnknownPizzaIsAnInternalErrorShouldBeReturned() throws Exception {
+
+    when(pizzaService.getAvailablePizzas())
+        .thenThrow(new AwesomePizzaException("Some pizzas not found"));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get("/api/awesome-pizza/menu")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andReturn();
+  }
+
+  @Test
+  void givenValidInputWithADatabaseIssuesAnInternalErrorShouldBeReturned() throws Exception {
+
+    doThrow(EmptyResultDataAccessException.class).when(pizzaService).getAvailablePizzas();
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get("/api/awesome-pizza/menu")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andReturn();
   }
 }

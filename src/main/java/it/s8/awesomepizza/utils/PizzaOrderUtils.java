@@ -13,6 +13,9 @@ public class PizzaOrderUtils {
 
   @NonNull
   public String getTotalAsString(long total) {
+    if (total < 0) {
+      throw new IllegalArgumentException("Total amount is negative");
+    }
     return NumberFormat.getCurrencyInstance().format(total / 100.00);
   }
 

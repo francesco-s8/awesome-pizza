@@ -1,7 +1,7 @@
 package it.s8.awesomepizza.controller;
 
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
-import it.s8.awesomepizza.mapper.PizzaToPizzaDto;
+import it.s8.awesomepizza.mapper.PizzaToPizzaDtoMapper;
 import it.s8.awesomepizza.service.PizzaService;
 import it.s8.awesomepizza.validator.PizzaInfoValidator;
 import java.net.URI;
@@ -18,17 +18,17 @@ public class PizzaMenuController implements MenuApi {
   private final PizzaService pizzaService;
   private final PizzaInfoValidator pizzaInfoValidator;
   private final PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper;
-  private final PizzaToPizzaDto pizzaToPizzaDto;
+  private final PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper;
 
   public PizzaMenuController(
       PizzaService pizzaService,
       PizzaInfoValidator pizzaInfoValidator,
       PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper,
-      PizzaToPizzaDto pizzaToPizzaDto) {
+      PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper) {
     this.pizzaService = pizzaService;
     this.pizzaInfoValidator = pizzaInfoValidator;
     this.pizzaListToPizzaDtoListMapper = pizzaListToPizzaDtoListMapper;
-    this.pizzaToPizzaDto = pizzaToPizzaDto;
+    this.pizzaToPizzaDtoMapper = pizzaToPizzaDtoMapper;
   }
 
   @Override
@@ -52,7 +52,8 @@ public class PizzaMenuController implements MenuApi {
 
   @Override
   public ResponseEntity<PizzaDto> _pizzaDetails(Long pizzaId) {
-    return ResponseEntity.ok(pizzaToPizzaDto.apply(pizzaService.getPizzaDetails(pizzaId)));
+    var mapped=pizzaToPizzaDtoMapper.apply(pizzaService.getPizzaDetails(pizzaId));
+    return ResponseEntity.ok(mapped);
   }
 
   @Override

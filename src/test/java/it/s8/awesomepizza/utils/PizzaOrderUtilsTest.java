@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
@@ -17,6 +18,13 @@ class PizzaOrderUtilsTest {
     var total = 1250;
     String formattedTotal = PizzaOrderUtils.getTotalAsString(total);
     assertThat(formattedTotal.replace("\u00a0", StringUtils.SPACE)).isEqualTo("12,50 €");
+  }
+
+  @Test
+  void givenAnOrder_whenTotalIsNegative_shouldBeThrownAnIllegalException() {
+    var total = -10;
+    assertThatThrownBy(() -> PizzaOrderUtils.getTotalAsString(total))
+        .isExactlyInstanceOf(IllegalArgumentException.class);
   }
 
   @Test

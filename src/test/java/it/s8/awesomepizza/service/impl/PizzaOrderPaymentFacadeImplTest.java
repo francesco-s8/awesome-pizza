@@ -1,11 +1,16 @@
 package it.s8.awesomepizza.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.exception.OrderNotReadyToBePaidException;
 import it.s8.awesomepizza.helper.TestHelper;
-import it.s8.awesomepizza.service.PizzaOrderService;
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,13 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 class PizzaOrderPaymentFacadeImplTest {
@@ -29,7 +27,7 @@ class PizzaOrderPaymentFacadeImplTest {
   private static final String ORDER_BEFORE_PAYMENT = "Order before payment: {}";
   @InjectMocks private PizzaOrderPaymentFacadeImpl paymentFacade;
 
-  @Mock private PizzaOrderService pizzaOrderService;
+  @Mock private PizzaOrderServiceImpl pizzaOrderService;
 
   private static void printOrder(PizzaOrder order) {
     log.info(ORDER_BEFORE_PAYMENT, order);
@@ -80,6 +78,7 @@ class PizzaOrderPaymentFacadeImplTest {
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
     var pizzaOrderPaymentInfo =
         PizzaOrderPaymentInfo.builder()
+            .total(BigDecimal.ONE)
             .paymentMethod(PizzaOrderPaymentInfo.PaymentMethodEnum.CREDIT_CARD)
             .build();
     paymentFacade.processPayment(order.getId(), pizzaOrderPaymentInfo);
@@ -97,9 +96,31 @@ class PizzaOrderPaymentFacadeImplTest {
     var pizzaOrderPaymentInfo =
         PizzaOrderPaymentInfo.builder()
             .paymentMethod(PizzaOrderPaymentInfo.PaymentMethodEnum.CREDIT_CARD)
+            .total(BigDecimal.ONE)
             .build();
     assertThatThrownBy(() -> paymentFacade.processPayment(1L, pizzaOrderPaymentInfo))
         .isExactlyInstanceOf(OrderNotReadyToBePaidException.class)
         .hasMessageContaining(" is not ready to be paid, cannot process payment");
+  }
+
+  @Test
+  void calculateOrderTotal() {
+    var order = TestHelper.getOrder();
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
+    when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
+
+    var actual = paymentFacade.calculateOrderTotal(1L);
+    assertThat(actual).isNotNull();
+    assertThat(actual.getTotal()).startsWith("29,00");
+  }
+
+  @Test
+  void processPayment() {
+
+    var order = TestHelper.getOrder();
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
+    when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
+    assertThatThrownBy(() -> paymentFacade.calculateOrderTotal(1L))
+        .isExactlyInstanceOf(AwesomePizzaException.class);
   }
 }
