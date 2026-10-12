@@ -13,7 +13,7 @@ class PizzaInfoValidatorTest {
   private final PizzaInfoValidator pizzaInfoValidator = new PizzaInfoValidator();
 
   @Test
-  void givenAValidPrizzaPriceShouldReturnTrue() {
+  void givenAValidPizzaPriceShouldReturnTrue() {
     var pizza =
         PizzaDto.builder()
             .price(BigDecimal.valueOf(10L))
@@ -31,7 +31,7 @@ class PizzaInfoValidatorTest {
     var price = BigDecimal.valueOf(-10);
     assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(price))
         .isInstanceOf(AwesomePizzaException.class)
-        .hasMessageContaining("Pizza price can't be less then zero");
+        .hasMessageContaining("Pizza price can't be zero or less");
   }
 
   @Test
@@ -39,6 +39,6 @@ class PizzaInfoValidatorTest {
 
     assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(BigDecimal.ZERO))
         .isInstanceOf(AwesomePizzaException.class)
-        .hasMessageContaining("Pizza price can't be zero or less then");
+        .hasMessageContaining("Pizza price can't be zero or less");
   }
 }

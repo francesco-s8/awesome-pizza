@@ -9,8 +9,8 @@ public class PizzaInfoValidator {
 
   public boolean isPizzaPriceValid(BigDecimal pizzaPrice) {
 
-    if (pizzaPrice == null || BigDecimal.ZERO.compareTo(pizzaPrice) >= 0) {
-      throw new AwesomePizzaException("Pizza price can't be zero or less then");
+    if (BigDecimal.ZERO.compareTo(pizzaPrice) >= 0) {
+      throw new AwesomePizzaException("Pizza price can't be zero or less");
     }
     return true;
   }
