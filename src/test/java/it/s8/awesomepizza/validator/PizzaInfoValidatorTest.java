@@ -1,13 +1,12 @@
 package it.s8.awesomepizza.validator;
 
-import it.s8.awesomepizza.exception.AwesomePizzaException;
-import org.junit.jupiter.api.Test;
-import org.openapitools.model.PizzaDto;
-
-import java.math.BigDecimal;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import it.s8.awesomepizza.exception.AwesomePizzaException;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
+import org.openapitools.model.PizzaDto;
 
 class PizzaInfoValidatorTest {
 
@@ -18,7 +17,7 @@ class PizzaInfoValidatorTest {
 
     var pizza = PizzaDto.builder().build();
     assertThatThrownBy(() -> pizzaInfoValidator.isValid(pizza))
-        .isInstanceOf(AwesomePizzaException.class)
+        .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("Pizza info not provided");
   }
 
@@ -34,17 +33,27 @@ class PizzaInfoValidatorTest {
   }
 
   @Test
-  void givenANegativePriceShouldThrowAnException(){
+  void givenANegativePriceShouldThrowAnException() {
+    var pizza =
+        PizzaDto.builder()
+            .price(BigDecimal.valueOf(-10L))
+            .name("a pizza")
+            .description("A delicious pizza")
+            .build();
+
+    assertThatThrownBy(() -> pizzaInfoValidator.isValid(pizza))
+        .isInstanceOf(AwesomePizzaException.class)
+        .hasMessageContaining("Pizza price is null or less then zero");
+  }
+  @Test
+  void givenAnullPriceAnExceptionShouldBeRaised(){
     var pizza =
             PizzaDto.builder()
-                    .price(BigDecimal.valueOf(-10L))
                     .name("a pizza")
                     .description("A delicious pizza")
                     .build();
-
     assertThatThrownBy(() -> pizzaInfoValidator.isValid(pizza))
             .isInstanceOf(AwesomePizzaException.class)
-            .hasMessageContaining("Pizza price cannot be negative");
-
+            .hasMessageContaining("Pizza price is null or less then zero");
   }
 }

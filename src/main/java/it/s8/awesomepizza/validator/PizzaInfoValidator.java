@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.validator;
 
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import java.math.BigDecimal;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.model.PizzaDto;
 import org.springframework.stereotype.Component;
@@ -13,10 +14,11 @@ public class PizzaInfoValidator {
     if (StringUtils.isBlank(pizzaDto.getName())
         && StringUtils.isBlank(pizzaDto.getDescription())
         && pizzaDto.getPrice() == null) {
-      throw new AwesomePizzaException("Pizza info not provided");
+      throw new IllegalArgumentException("Pizza info not provided");
     }
-      if(pizzaDto.getPrice() !=null && pizzaDto.getPrice().doubleValue() < 0) {
-      throw new AwesomePizzaException("Pizza price cannot be negative");
+
+    if (pizzaDto.getPrice() == null || BigDecimal.ZERO.compareTo(pizzaDto.getPrice()) >= 0) {
+      throw new AwesomePizzaException("Pizza price is null or less then zero");
     }
     return true;
   }

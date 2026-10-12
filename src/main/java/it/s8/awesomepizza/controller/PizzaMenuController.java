@@ -52,14 +52,14 @@ public class PizzaMenuController implements MenuApi {
 
   @Override
   public ResponseEntity<PizzaDto> _pizzaDetails(Long pizzaId) {
-    var mapped=pizzaToPizzaDtoMapper.apply(pizzaService.getPizzaDetails(pizzaId));
+    var mapped = pizzaToPizzaDtoMapper.apply(pizzaService.getPizzaDetails(pizzaId));
     return ResponseEntity.ok(mapped);
   }
 
   @Override
   public ResponseEntity<PizzaDto> _updatePizzaInMenu(Long pizzaId, PizzaDto pizzaDto) {
-    if (pizzaInfoValidator.isValid(pizzaDto)) {
-      log.info("Updating pizza with id {} and info {}", pizzaId, pizzaDto);
+    if (!pizzaInfoValidator.isValid(pizzaDto)) {
+      log.warn("Input is not valid {}", pizzaDto);
     }
     var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaDto);
     return ResponseEntity.ok(
