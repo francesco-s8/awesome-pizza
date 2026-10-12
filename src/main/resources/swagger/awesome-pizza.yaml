@@ -127,6 +127,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PizzaDto'
+        '202':
+          description: Nothing to be update
         '404':
           description: Pizza not found
         '500':
@@ -287,6 +289,8 @@ components:
           description: The price of the pizza with 2 decimal places
           examples:
             - 5.5
+      required:
+        - price
     PizzaOrderTotalToPay:
       type: object
       properties:

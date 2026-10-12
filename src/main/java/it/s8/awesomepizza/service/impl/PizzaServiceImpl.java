@@ -2,11 +2,13 @@ package it.s8.awesomepizza.service.impl;
 
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.exception.PizzaPriceNoUpdateException;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import it.s8.awesomepizza.service.PizzaService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.openapitools.model.PizzaDto;
 import org.springframework.stereotype.Service;
 
@@ -48,11 +50,7 @@ public class PizzaServiceImpl implements PizzaService {
   @Override
   public Pizza addPizza(PizzaDto pizzaDto) {
     return pizzaRepository.save(
-        Pizza.builder()
-            .name(pizzaDto.getName())
-            .description(pizzaDto.getDescription())
-            .price(pizzaDto.getPrice())
-            .build());
+        Pizza.builder().name(pizzaDto.getName()).price(pizzaDto.getPrice()).build());
   }
 
   @Override
@@ -61,15 +59,17 @@ public class PizzaServiceImpl implements PizzaService {
         pizzaRepository
             .findById(pizzaId)
             .orElseThrow(() -> new EntityNotFoundException("Pizza not found id " + pizzaId));
-    if (pizzaDto.getDescription() != null) {
+    log.info("Pizza fields to be updated {}", pizzaDto);
+    if (pizza.getPrice().compareTo(pizzaDto.getPrice()) == 0) {
+      log.warn(
+          "New price {} for pizza {} is the same nothing to update", pizzaDto.getPrice(), pizza);
+      throw new PizzaPriceNoUpdateException("Pizza Price has not been updated");
+    }
+    pizza.setPrice(pizzaDto.getPrice());
+    if (StringUtils.isNotBlank(pizzaDto.getDescription())) {
       pizza.setDescription(pizzaDto.getDescription());
+      return pizzaRepository.save(pizza);
     }
-    if (pizzaDto.getName() != null) {
-      pizza.setName(pizzaDto.getName());
-    }
-    if (pizzaDto.getPrice() != null) {
-      pizza.setPrice(pizzaDto.getPrice());
-    }
-    return pizzaRepository.save(pizza);
+    return pizza;
   }
 }

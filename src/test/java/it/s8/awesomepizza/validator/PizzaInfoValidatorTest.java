@@ -13,47 +13,32 @@ class PizzaInfoValidatorTest {
   private final PizzaInfoValidator pizzaInfoValidator = new PizzaInfoValidator();
 
   @Test
-  void givenAnInvalidDtoShouldThrowAndException() {
-
-    var pizza = PizzaDto.builder().build();
-    assertThatThrownBy(() -> pizzaInfoValidator.isValid(pizza))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("Pizza info not provided");
-  }
-
-  @Test
-  void givenAValidInputShouldReturnTrue() {
+  void givenAValidPrizzaPriceShouldReturnTrue() {
     var pizza =
         PizzaDto.builder()
             .price(BigDecimal.valueOf(10L))
             .name("a pizza")
             .description("A delicious pizza")
             .build();
-    assertThat(pizzaInfoValidator.isValid(pizza)).isTrue();
+
+    var actual = pizzaInfoValidator.isPizzaPriceValid(pizza.getPrice());
+    assertThat(actual).isTrue();
   }
 
   @Test
   void givenANegativePriceShouldThrowAnException() {
-    var pizza =
-        PizzaDto.builder()
-            .price(BigDecimal.valueOf(-10L))
-            .name("a pizza")
-            .description("A delicious pizza")
-            .build();
 
-    assertThatThrownBy(() -> pizzaInfoValidator.isValid(pizza))
+    var price = BigDecimal.valueOf(-10);
+    assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(price))
         .isInstanceOf(AwesomePizzaException.class)
-        .hasMessageContaining("Pizza price is null or less then zero");
+        .hasMessageContaining("Pizza price can't be less then zero");
   }
+
   @Test
-  void givenAnullPriceAnExceptionShouldBeRaised(){
-    var pizza =
-            PizzaDto.builder()
-                    .name("a pizza")
-                    .description("A delicious pizza")
-                    .build();
-    assertThatThrownBy(() -> pizzaInfoValidator.isValid(pizza))
-            .isInstanceOf(AwesomePizzaException.class)
-            .hasMessageContaining("Pizza price is null or less then zero");
+  void givenAZeroPriceShouldThrowAnException() {
+
+    assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(BigDecimal.ZERO))
+        .isInstanceOf(AwesomePizzaException.class)
+        .hasMessageContaining("Pizza price can't be less then zero");
   }
 }

@@ -3,10 +3,11 @@ package it.s8.awesomepizza.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.exception.PizzaPriceNoUpdateException;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,9 +42,21 @@ class PizzaServiceImplTest {
   private List<Pizza> getPizzasStub() {
 
     var firstPizza =
-        Pizza.builder().id(1L).name("Margherita").price(BigDecimal.ONE).description("Margherita").version(0).build();
+        Pizza.builder()
+            .id(1L)
+            .name("Margherita")
+            .price(BigDecimal.ONE)
+            .description("Margherita")
+            .version(0)
+            .build();
     var secondPizza =
-        Pizza.builder().id(1L).name("Marinara").price(BigDecimal.valueOf(2L)).description("Marinara").version(0).build();
+        Pizza.builder()
+            .id(1L)
+            .name("Marinara")
+            .price(BigDecimal.valueOf(2L))
+            .description("Marinara")
+            .version(0)
+            .build();
 
     return List.of(firstPizza, secondPizza);
   }
@@ -100,6 +113,23 @@ class PizzaServiceImplTest {
 
     var actual = pizzaService.updatePizza(1L, pizzaInfo);
     assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.valueOf(10L));
+  }
+
+  @Test
+  void givenTheSamePizzaPriceShouldBeThrownAPizzaPriceNoUpdateException() {
+    var pizzaInfo = PizzaDto.builder().price(BigDecimal.ONE).build();
+    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
+    assertThatThrownBy(() -> pizzaService.updatePizza(1L, pizzaInfo))
+        .isExactlyInstanceOf(PizzaPriceNoUpdateException.class);
+    verify(pizzaRepository, times(0)).save(any());
+  }
+
+  @Test
+  void givenANullPizzaDescriptionNoUpdatingRecordInteraction() {
+    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.valueOf(5)).build();
+    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
+    pizzaService.updatePizza(1L, pizzaInfo);
+    verify(pizzaRepository, times(0)).save(any());
   }
 
   @Test
