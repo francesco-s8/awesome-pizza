@@ -2,7 +2,6 @@ package it.s8.awesomepizza.service.impl;
 
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
-import it.s8.awesomepizza.exception.PizzaPriceNoUpdateException;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import it.s8.awesomepizza.service.PizzaService;
 import jakarta.persistence.EntityNotFoundException;
@@ -60,16 +59,21 @@ public class PizzaServiceImpl implements PizzaService {
             .findById(pizzaId)
             .orElseThrow(() -> new EntityNotFoundException("Pizza not found id " + pizzaId));
     log.info("Pizza fields to be updated {}", pizzaDto);
-    if (pizza.getPrice().compareTo(pizzaDto.getPrice()) == 0) {
+
+    var isDescriptionChanged=StringUtils.isNotBlank(pizzaDto.getDescription());
+
+    if (isDescriptionChanged) {
+      pizza.setDescription(pizzaDto.getDescription());
+    }
+
+    if (pizza.getPrice().compareTo(pizzaDto.getPrice()) == 0
+        && !isDescriptionChanged) {
       log.warn(
           "New price {} for pizza {} is the same nothing to update", pizzaDto.getPrice(), pizza);
-      throw new PizzaPriceNoUpdateException("Pizza Price has not been updated");
+      return pizza;
     }
     pizza.setPrice(pizzaDto.getPrice());
-    if (StringUtils.isNotBlank(pizzaDto.getDescription())) {
-      pizza.setDescription(pizzaDto.getDescription());
-      return pizzaRepository.save(pizza);
-    }
-    return pizza;
+    log.info("New record updated {}",pizza);
+    return pizzaRepository.save(pizza);
   }
 }

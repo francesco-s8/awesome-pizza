@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
-import it.s8.awesomepizza.exception.PizzaPriceNoUpdateException;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import java.math.BigDecimal;
 import java.util.List;
@@ -119,17 +118,24 @@ class PizzaServiceImplTest {
   void givenTheSamePizzaPriceShouldBeThrownAPizzaPriceNoUpdateException() {
     var pizzaInfo = PizzaDto.builder().price(BigDecimal.ONE).build();
     when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
-    assertThatThrownBy(() -> pizzaService.updatePizza(1L, pizzaInfo))
-        .isExactlyInstanceOf(PizzaPriceNoUpdateException.class);
+    pizzaService.updatePizza(1L, pizzaInfo);
     verify(pizzaRepository, times(0)).save(any());
   }
 
   @Test
-  void givenANullPizzaDescriptionNoUpdatingRecordInteraction() {
-    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.valueOf(5)).build();
+  void givenANullPizzaDescriptionAndSamePriceShouldNotUpdateRecord() {
+    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.ONE).build();
     when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
     pizzaService.updatePizza(1L, pizzaInfo);
     verify(pizzaRepository, times(0)).save(any());
+  }
+
+  @Test
+  void givenNUllDescriptionButDifferentPriceRecordShouldBeUpdated() {
+    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.valueOf(5)).build();
+    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
+    pizzaService.updatePizza(1L, pizzaInfo);
+    verify(pizzaRepository, times(1)).save(any());
   }
 
   @Test

@@ -39,6 +39,6 @@ class PizzaInfoValidatorTest {
 
     assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(BigDecimal.ZERO))
         .isInstanceOf(AwesomePizzaException.class)
-        .hasMessageContaining("Pizza price can't be less then zero");
+        .hasMessageContaining("Pizza price can't be zero or less then");
   }
 }
