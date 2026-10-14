@@ -13,7 +13,7 @@
     <version>1.0.0</version>
     <properties>
         <java.version>25</java.version>
-        <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
+        <openapi-generator-maven-plugin.version>7.26.0</openapi-generator-maven-plugin.version>
         <swagger-openapiv3.version>2.2.54</swagger-openapiv3.version>
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -97,12 +97,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>11.14.1</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
