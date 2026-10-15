@@ -77,7 +77,7 @@ class PizzaOrderServiceImplTest {
     verify(pizzaOrderRepository).findById(order.getId());
     verify(pizzaOrderRepository).save(orderCaptor.capture());
     assertThat(orderCaptor).isNotNull();
-    assertThat(orderCaptor.getValue().getTotal()).isEqualTo(BigDecimal.valueOf(2900));
+    assertThat(orderCaptor.getValue().getTotal()).isEqualTo(new BigDecimal("29.00"));
     assertThat(orderCaptor.getValue().getOrderStatus())
         .isEqualTo(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
   }

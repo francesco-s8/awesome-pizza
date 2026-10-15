@@ -12,11 +12,11 @@ import org.jspecify.annotations.NonNull;
 public class PizzaOrderUtils {
 
   @NonNull
-  public String getTotalAsString(long total) {
-    if (total < 0) {
+  public String getTotalAsString(BigDecimal total) {
+    if (total.compareTo(BigDecimal.ZERO) < 0) {
       throw new IllegalArgumentException("Total amount is negative");
     }
-    return NumberFormat.getCurrencyInstance().format(total / 100.00);
+    return NumberFormat.getCurrencyInstance().format(total);
   }
 
   public BigDecimal getTotal(PizzaOrder order) {
@@ -24,7 +24,6 @@ public class PizzaOrderUtils {
         .map(Pizza::getPrice)
         .filter(java.util.Objects::nonNull)
         .reduce(BigDecimal.ZERO, BigDecimal::add)
-        .setScale(2, RoundingMode.HALF_UP)
-        .movePointRight(2);
+        .setScale(2, RoundingMode.HALF_UP);
   }
 }

@@ -6,7 +6,6 @@ import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.utils.PizzaOrderUtils;
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +38,8 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
       log.info("Order {} is ready to be paid", orderId);
       throw new AwesomePizzaException("Order " + orderId + " is already marked as TO_BE_PAID");
     }
-    var total = PizzaOrderUtils.getTotal(order).longValue();
-    order.setTotal(BigDecimal.valueOf(total));
+    var total = PizzaOrderUtils.getTotal(order);
+    order.setTotal(total);
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
     pizzaOrderService.saveOrder(order);
 

@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.LinkedList;
@@ -41,7 +42,8 @@ public class PizzaOrder extends EntityInfo {
   @Column(name = "payment_date")
   private Instant paymentDate;
 
-  @Column(name = "total")
+  @Digits(integer = 10, fraction = 2)
+  @Column(name = "total",precision = 10, scale = 2)
   private BigDecimal total;
 
   @Builder.Default

@@ -27,12 +27,12 @@ class PizzaRepositoryTest {
             Pizza.builder()
                 .name("Margherita")
                 .description("'La classica con pomodoro, mozzarella e basilico'")
-                .price(BigDecimal.valueOf(7.00F))
+                .price(new BigDecimal("7.00"))
                 .build(),
             Pizza.builder()
                 .name("Marinara")
                 .description("'Pomodoro, aglio e origano'")
-                .price(BigDecimal.valueOf(5.00F))
+                .price(new BigDecimal("5.00"))
                 .build());
   }
 
@@ -42,6 +42,7 @@ class PizzaRepositoryTest {
     pizzaRepository.saveAll(pizzaList);
     var actual = pizzaRepository.findByNameIn(List.of("Margherita"));
     assertThat(actual).isNotEmpty().hasSize(1);
+    assertThat(actual.getFirst().getPrice()).isEqualTo(new BigDecimal("7.00"));
   }
 
   @Test

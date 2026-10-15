@@ -44,7 +44,7 @@ class PizzaOrderPaymentFacadeImplTest {
 
     assertThat(actual.getName()).isEqualTo("alice");
     assertThat(actual.getTotal())
-        .isEqualTo(NumberFormat.getCurrencyInstance().format(2900 / 100.0));
+        .isEqualTo(NumberFormat.getCurrencyInstance().format(2900 / 100.00));
   }
 
   @Test

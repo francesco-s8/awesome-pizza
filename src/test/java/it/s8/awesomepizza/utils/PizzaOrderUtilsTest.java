@@ -15,14 +15,14 @@ class PizzaOrderUtilsTest {
 
   @Test
   void givenAnOrder_whenGetTotalAsString_thenReturnFormattedString() {
-    var total = 1250;
-    String formattedTotal = PizzaOrderUtils.getTotalAsString(total);
+
+    String formattedTotal = PizzaOrderUtils.getTotalAsString(new BigDecimal("12.50"));
     assertThat(formattedTotal.replace("\u00a0", StringUtils.SPACE)).isEqualTo("12,50 €");
   }
 
   @Test
   void givenAnOrder_whenTotalIsNegative_shouldBeThrownAnIllegalException() {
-    var total = -10;
+    var total = BigDecimal.valueOf(-10L);
     assertThatThrownBy(() -> PizzaOrderUtils.getTotalAsString(total))
         .isExactlyInstanceOf(IllegalArgumentException.class);
   }
@@ -31,7 +31,7 @@ class PizzaOrderUtilsTest {
   void givenAPizzaOrderShouldReturnTheProperTotalPrice() {
     var input = TestHelper.getOrder();
     var actual = PizzaOrderUtils.getTotal(input);
-    assertThat(actual).isEqualTo(BigDecimal.valueOf(2900));
+    assertThat(actual).isEqualTo(new BigDecimal("29.00"));
   }
 
   @Test

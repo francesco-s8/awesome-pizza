@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
@@ -32,7 +33,8 @@ public class Pizza extends EntityInfo {
 
   @Positive
   @NotNull
-  @Column(name = "price")
+  @Digits(integer = 10, fraction = 2)
+  @Column(name = "price", precision = 10, scale = 2)
   private BigDecimal price;
 
   @Version
@@ -60,6 +62,4 @@ public class Pizza extends EntityInfo {
   public int hashCode() {
     return Objects.hashCode(getId());
   }
-
-
 }
