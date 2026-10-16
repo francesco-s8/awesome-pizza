@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -17,6 +18,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.PizzaDto;
@@ -201,6 +203,27 @@ class PizzaMenuControllerTest {
             MockMvcRequestBuilders.get("/api/awesome-pizza/menu")
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isInternalServerError())
+        .andReturn();
+  }
+
+  @Test
+  void _addPizzaToMenu() throws Exception {
+    var pizzaDtoStub = Instancio.create(PizzaDto.class);
+    var pizzaStub =
+        Pizza.builder()
+            .id(1L)
+            .version(1)
+            .description(pizzaDtoStub.getDescription())
+            .price(pizzaDtoStub.getPrice())
+            .name(pizzaDtoStub.getName())
+            .build();
+    when(pizzaService.addPizza(any())).thenReturn(pizzaStub);
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/awesome-pizza/menu")
+                .content(jsonMapper.writeValueAsString(pizzaDtoStub))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
         .andReturn();
   }
 }
