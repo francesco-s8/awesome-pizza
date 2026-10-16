@@ -18,6 +18,7 @@
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.48</lombok.version>
+        <instancio-junit.version>6.1.0</instancio-junit.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -25,6 +26,13 @@
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-bom</artifactId>
                 <version>${swagger-openapiv3.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.instancio</groupId>
+                <artifactId>instancio-bom</artifactId>
+                <version>${instancio-junit.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -115,6 +123,16 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-data-jpa-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
