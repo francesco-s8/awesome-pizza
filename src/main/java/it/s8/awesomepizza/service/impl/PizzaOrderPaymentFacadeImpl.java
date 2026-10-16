@@ -13,6 +13,7 @@ import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
 import org.openapitools.model.PizzaOrderTotalToPay;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -51,6 +52,7 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
   }
 
   @Override
+  @Transactional
   public void processPayment(Long orderId, PizzaOrderPaymentInfo pizzaOrderPaid)
       throws EntityNotFoundException, OrderNotReadyToBePaidException {
     var order = pizzaOrderService.getOrder(orderId);

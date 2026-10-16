@@ -14,6 +14,8 @@ import java.text.NumberFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,6 +30,8 @@ class PizzaOrderPaymentFacadeImplTest {
   @InjectMocks private PizzaOrderPaymentFacadeImpl paymentFacade;
 
   @Mock private PizzaOrderServiceImpl pizzaOrderService;
+
+  @Captor private ArgumentCaptor<PizzaOrder> pizzaOrderArgumentCaptor;
 
   private static void printOrder(PizzaOrder order) {
     log.info(ORDER_BEFORE_PAYMENT, order);
@@ -66,6 +70,7 @@ class PizzaOrderPaymentFacadeImplTest {
     assertThatThrownBy(() -> paymentFacade.calculateOrderTotal(99L))
         .isInstanceOf(EntityNotFoundException.class)
         .hasMessageContaining("Order 99 not found");
+    verify(pizzaOrderService, times(0)).saveOrder(any());
   }
 
   @Test
@@ -81,8 +86,11 @@ class PizzaOrderPaymentFacadeImplTest {
             .total(BigDecimal.ONE)
             .paymentMethod(PizzaOrderPaymentInfo.PaymentMethodEnum.CREDIT_CARD)
             .build();
+
     paymentFacade.processPayment(order.getId(), pizzaOrderPaymentInfo);
-    verify(pizzaOrderService, times(1)).saveOrder(order);
+    verify(pizzaOrderService, times(1)).saveOrder(pizzaOrderArgumentCaptor.capture());
+    assertThat(pizzaOrderArgumentCaptor.getValue().getOrderStatus())
+        .isEqualTo(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
   }
 
   @Test
