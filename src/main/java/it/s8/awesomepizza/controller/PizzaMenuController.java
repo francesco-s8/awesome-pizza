@@ -34,7 +34,7 @@ public class PizzaMenuController implements MenuApi {
   @Override
   public ResponseEntity<PizzaDto> _addPizzaToMenu(PizzaDto pizzaDto) {
     var newPizza = pizzaService.addPizza(pizzaDto);
-    return ResponseEntity.created(URI.create("/menu/" + newPizza.getId()))
+    return ResponseEntity.created(URI.create(PATH_ADD_PIZZA_TO_MENU + newPizza.getId()))
         .body(
             PizzaDto.builder()
                 .price(newPizza.getPrice())
