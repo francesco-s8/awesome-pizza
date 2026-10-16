@@ -59,7 +59,7 @@ class PizzaOrderControllerTest {
   void givenAnInvalidOrderIdShouldThrowAPizzaOrderAlreadyDeliveredException() throws Exception {
 
     when(pizzaOrderFacade.retrieveOrderStatus(anyLong()))
-        .thenReturn(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue());
+        .thenReturn(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
 
     var actual =
         mockMvc
@@ -72,7 +72,7 @@ class PizzaOrderControllerTest {
         .isEqualTo(
             jsonMapper.writeValueAsString(
                 PizzaOrderStatus.builder()
-                    .orderStatus(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED)
+                    .orderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED)
                     .build()));
   }
 

@@ -65,14 +65,7 @@ public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
   @Override
   public String retrieveOrderStatus(Long orderId) {
     var order = pizzaOrderService.getOrder(orderId);
-    // Silly condition to manage already delivered order
     log.info("Order is {}", order);
-    if (PizzaOrderStatus.OrderStatusEnum.PAID.getValue().equals(order.getOrderStatus())
-        && Boolean.TRUE.equals(order.getPaid())) {
-      order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.ALREADY_DELIVERED.getValue());
-      pizzaOrderService.saveOrder(order);
-      return order.getOrderStatus();
-    }
     return order.getOrderStatus();
   }
 }

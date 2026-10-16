@@ -62,7 +62,7 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
             order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())) {
 
       order.setPaid(true);
-      order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID.getValue());
+      order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
       order.setPaymentMethod(pizzaOrderPaid.getPaymentMethod().getValue());
       order.setPaymentDate(Instant.now());
       pizzaOrderService.saveOrder(order);

@@ -226,8 +226,7 @@ components:
             - 'IN_PROCESS'
             - 'READY_FOR_DELIVERY'
             - 'TO_BE_PAID'
-            - 'PAID'
-            - 'ALREADY DELIVERED'
+            - 'PAID_AND_DELIVERED'
           description: The status of the pizza order
           examples:
             - 'IN_PROCESS'
