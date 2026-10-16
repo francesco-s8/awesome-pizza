@@ -59,18 +59,16 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
     if (order.getTotal().compareTo(pizzaOrderPaid.getTotal()) != 0) {
       throw new AwesomePizzaException("Total to pay is not correct");
     }
-    if (order.getTotal() != null
-        && Objects.equals(
-            order.getOrderStatus(), PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())) {
+    if (PizzaOrderUtils.orderCanBePaid(order)) {
 
       order.setPaid(true);
       order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
       order.setPaymentMethod(pizzaOrderPaid.getPaymentMethod().getValue());
       order.setPaymentDate(Instant.now());
       pizzaOrderService.saveOrder(order);
-      return;
+    } else {
+      throw new OrderNotReadyToBePaidException(
+          "Order " + orderId + " is not ready to be paid, cannot process payment");
     }
-    throw new OrderNotReadyToBePaidException(
-        "Order " + orderId + " is not ready to be paid, cannot process payment");
   }
 }

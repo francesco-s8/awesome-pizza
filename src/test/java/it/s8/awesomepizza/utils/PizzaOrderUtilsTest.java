@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.PizzaOrderStatus;
 
 class PizzaOrderUtilsTest {
 
@@ -43,5 +44,12 @@ class PizzaOrderUtilsTest {
             .build();
     var actual = PizzaOrderUtils.getTotal(order);
     assertThat(actual).isZero();
+  }
+
+  @Test
+  void orderCanBePaid() {
+    var order = TestHelper.getOrder();
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
+    assertThat(PizzaOrderUtils.orderCanBePaid(order)).isFalse();
   }
 }

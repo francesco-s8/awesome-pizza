@@ -7,11 +7,11 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import lombok.experimental.UtilityClass;
 import org.jspecify.annotations.NonNull;
+import org.openapitools.model.PizzaOrderStatus;
 
 @UtilityClass
 public class PizzaOrderUtils {
 
-  @NonNull
   public String getTotalAsString(BigDecimal total) {
     if (total.compareTo(BigDecimal.ZERO) < 0) {
       throw new IllegalArgumentException("Total amount is negative");
@@ -25,5 +25,10 @@ public class PizzaOrderUtils {
         .filter(java.util.Objects::nonNull)
         .reduce(BigDecimal.ZERO, BigDecimal::add)
         .setScale(2, RoundingMode.HALF_UP);
+  }
+
+  public boolean orderCanBePaid(@NonNull PizzaOrder order) {
+
+    return order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
   }
 }
