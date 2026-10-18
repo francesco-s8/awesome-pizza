@@ -13,12 +13,10 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.PizzaOrderPaymentInfo;
 import org.openapitools.model.PizzaOrderStatus;
@@ -38,6 +36,11 @@ class PizzaOrderPaymentFacadeImplTest {
     log.info(ORDER_BEFORE_PAYMENT, order);
   }
 
+  @BeforeAll
+  static void setUp() {
+    Locale.setDefault(Locale.ITALY);
+  }
+
   @Test
   void givenOrderWithMultiplePizzasShouldCalculateTotalCentsIgnoringNullPrices() {
     var order = TestHelper.getOrder();
@@ -49,8 +52,7 @@ class PizzaOrderPaymentFacadeImplTest {
 
     var expected = NumberFormat.getCurrencyInstance(Locale.ITALY).format(2900 / 100.00);
     assertThat(actual.getName()).isEqualTo("alice");
-    assertThat(actual.getTotal())
-        .isEqualTo(expected);
+    assertThat(actual.getTotal()).isEqualTo(expected);
   }
 
   @Test
