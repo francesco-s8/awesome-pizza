@@ -11,6 +11,7 @@ import it.s8.awesomepizza.helper.TestHelper;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,9 +47,10 @@ class PizzaOrderPaymentFacadeImplTest {
 
     var actual = paymentFacade.calculateOrderTotal(order.getId());
 
+    var expected = NumberFormat.getCurrencyInstance(Locale.ITALY).format(2900 / 100.00);
     assertThat(actual.getName()).isEqualTo("alice");
     assertThat(actual.getTotal())
-        .isEqualTo(NumberFormat.getCurrencyInstance().format(2900 / 100.00));
+        .isEqualTo(expected);
   }
 
   @Test

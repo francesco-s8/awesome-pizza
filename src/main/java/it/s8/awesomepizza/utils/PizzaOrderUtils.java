@@ -5,6 +5,7 @@ import it.s8.awesomepizza.entity.PizzaOrder;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.Locale;
 import lombok.experimental.UtilityClass;
 import org.jspecify.annotations.NonNull;
 import org.openapitools.model.PizzaOrderStatus;
@@ -16,7 +17,7 @@ public class PizzaOrderUtils {
     if (total.compareTo(BigDecimal.ZERO) < 0) {
       throw new IllegalArgumentException("Total amount is negative");
     }
-    return NumberFormat.getCurrencyInstance().format(total);
+    return NumberFormat.getCurrencyInstance(Locale.ITALY).format(total);
   }
 
   public BigDecimal getTotal(PizzaOrder order) {
