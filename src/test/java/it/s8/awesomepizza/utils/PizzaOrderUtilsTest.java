@@ -8,6 +8,7 @@ import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.helper.TestHelper;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.PizzaOrderStatus;
@@ -17,7 +18,9 @@ class PizzaOrderUtilsTest {
   @Test
   void givenAnOrder_whenGetTotalAsString_thenReturnFormattedString() {
 
-    String formattedTotal = PizzaOrderUtils.getTotalAsString(new BigDecimal("12.50"));
+    Locale.setDefault(Locale.ITALY);
+    String formattedTotal =
+        PizzaOrderUtils.getTotalAsString(new BigDecimal("12.50"));
     assertThat(formattedTotal.replace("\u00a0", StringUtils.SPACE)).isEqualTo("12,50 €");
   }
 

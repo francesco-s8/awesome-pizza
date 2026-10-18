@@ -17,7 +17,7 @@ public class PizzaOrderUtils {
     if (total.compareTo(BigDecimal.ZERO) < 0) {
       throw new IllegalArgumentException("Total amount is negative");
     }
-    return NumberFormat.getCurrencyInstance(Locale.ITALY).format(total);
+    return NumberFormat.getCurrencyInstance(Locale.getDefault()).format(total);
   }
 
   public BigDecimal getTotal(PizzaOrder order) {
