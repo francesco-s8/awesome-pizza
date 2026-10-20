@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.exception.InvalidInputException;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.PizzaDto;
@@ -14,15 +15,18 @@ class PizzaInfoValidatorTest {
 
   @Test
   void givenAValidPizzaPriceShouldReturnTrue() {
-    var pizza =
-        PizzaDto.builder()
-            .price(BigDecimal.valueOf(10L))
-            .name("a pizza")
-            .description("A delicious pizza")
-            .build();
+    var pizza = getPizza();
 
     var actual = pizzaInfoValidator.isPizzaPriceValid(pizza.getPrice());
     assertThat(actual).isTrue();
+  }
+
+  private static PizzaDto getPizza() {
+      return PizzaDto.builder()
+          .price(new BigDecimal("10.00"))
+          .name("a pizza")
+          .description("A delicious pizza")
+          .build();
   }
 
   @Test
@@ -40,5 +44,23 @@ class PizzaInfoValidatorTest {
     assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(BigDecimal.ZERO))
         .isInstanceOf(AwesomePizzaException.class)
         .hasMessageContaining("Pizza price can't be zero or less");
+  }
+
+  @Test
+  void isValidPizzaInfo() {
+
+    var newPizza=PizzaDto.builder().build();
+    assertThatThrownBy(()->pizzaInfoValidator.isValidPizzaInfo(newPizza)).isExactlyInstanceOf(InvalidInputException.class);
+  }
+  @Test
+  void isValidPizzaName(){
+    var newPizza=PizzaDto.builder().description("dummy").price(BigDecimal.ONE).build();
+    assertThatThrownBy(()->pizzaInfoValidator.isValidPizzaInfo(newPizza)).isExactlyInstanceOf(InvalidInputException.class);
+  }
+
+  @Test
+  void givenAValidPizzaShouldReturnTrue(){
+    assertThat(pizzaInfoValidator.isValidPizzaInfo(getPizza())).isTrue();
+
   }
 }

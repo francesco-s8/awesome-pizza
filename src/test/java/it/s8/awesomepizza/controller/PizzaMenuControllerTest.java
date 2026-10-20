@@ -226,4 +226,16 @@ class PizzaMenuControllerTest {
         .andExpect(status().isCreated())
         .andReturn();
   }
+  @Test
+  void givenAnInvalidInputShouldBeRaisedAnInvalidInputException() throws Exception {
+    var newPizza=Pizza.builder().build();
+    mockMvc
+            .perform(
+                    MockMvcRequestBuilders.post("/api/awesome-pizza/menu")
+                            .content(jsonMapper.writeValueAsString(newPizza))
+                            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+  }
+
 }

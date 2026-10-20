@@ -53,4 +53,10 @@ public class ExceptionManager {
     log.warn("OrderNotReadyToBePaidException occurred ", ex);
     return ResponseEntity.status(422).body(ex.getMessage());
   }
+
+  @ExceptionHandler(InvalidInputException.class)
+  public ResponseEntity<String> invalidInput(InvalidInputException invalidInputException) {
+    log.error("Input not valid due to", invalidInputException);
+    return ResponseEntity.badRequest().body(invalidInputException.getMessage());
+  }
 }
