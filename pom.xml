@@ -225,12 +225,8 @@
                                 <verbose>true</verbose>
                             </configOptions>
                             <typeMappings>
-                                <typeMapping>OffsetDateTime=LocalDateTime</typeMapping>
                                 <typeMapping>Double=java.math.BigDecimal</typeMapping>
                             </typeMappings>
-                            <importMappings>
-                                <importMapping>java.time.OffsetDateTime=java.time.LocalDateTime</importMapping>
-                            </importMappings>
                         </configuration>
                     </execution>
                 </executions>
