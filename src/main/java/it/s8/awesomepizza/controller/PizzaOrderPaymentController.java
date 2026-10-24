@@ -25,6 +25,12 @@ public class PizzaOrderPaymentController implements PaymentApi {
   }
 
   @Override
+  public ResponseEntity<Void> _logicalDeletePayment(Long orderId) {
+    pizzaOrderPaymentFacade.deletePayment(orderId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
   public ResponseEntity<Void> _markOrderAsPaid(Long orderId, PizzaOrderPaymentInfo pizzaOrderPaid) {
     pizzaOrderPaymentFacade.processPayment(orderId, pizzaOrderPaid);
     return ResponseEntity.noContent().build();

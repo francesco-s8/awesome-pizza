@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.repository.PizzaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,30 @@ class PizzaServiceImplTest {
 
   @Mock PizzaRepository pizzaRepository;
 
+  private List<Pizza> getPizzasStub() {
+
+    var firstPizza =
+        Pizza.builder()
+            .id(1L)
+            .name("Margherita")
+            .price(BigDecimal.ONE)
+            .description("Margherita")
+            .isAvailable(Boolean.TRUE)
+            .version(0)
+            .build();
+    var secondPizza =
+        Pizza.builder()
+            .id(1L)
+            .name("Marinara")
+            .price(BigDecimal.valueOf(2L))
+            .isAvailable(Boolean.TRUE)
+            .description("Marinara")
+            .version(0)
+            .build();
+
+    return List.of(firstPizza, secondPizza);
+  }
+
   @Test
   void givenAListOfPizzasShouldReturnSuccessfully() {
 
@@ -38,26 +63,17 @@ class PizzaServiceImplTest {
     assertThat(actual).isNotEmpty().hasSize(2);
   }
 
-  private List<Pizza> getPizzasStub() {
+  @Test
+  void givenAValidPizzaListButNoPizzaIsAvailable() {
 
-    var firstPizza =
-        Pizza.builder()
-            .id(1L)
-            .name("Margherita")
-            .price(BigDecimal.ONE)
-            .description("Margherita")
-            .version(0)
-            .build();
-    var secondPizza =
-        Pizza.builder()
-            .id(1L)
-            .name("Marinara")
-            .price(BigDecimal.valueOf(2L))
-            .description("Marinara")
-            .version(0)
-            .build();
+    var input = List.of("Margherita", "Marinara");
+    var pizzas = getPizzasStub();
+    pizzas.forEach(p -> p.setIsAvailable(Boolean.FALSE));
+    when(pizzaRepository.findByNameIn(input)).thenReturn(pizzas);
 
-    return List.of(firstPizza, secondPizza);
+    assertThatThrownBy(() -> pizzaService.getPizzas(input))
+        .isExactlyInstanceOf(AwesomePizzaException.class)
+        .hasMessageContaining("No pizzas available");
   }
 
   @Test
@@ -146,5 +162,29 @@ class PizzaServiceImplTest {
     log.info("Actual pizza details: {}", actual);
     assertThat(actual).isNotNull().extracting("name").isEqualTo("Margherita");
     assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.ONE);
+  }
+
+  @Test
+  void getAvailablePizzas() {
+
+    var pizza = getPizzasStub();
+    pizza.getFirst().setIsAvailable(Boolean.FALSE);
+
+    when(pizzaRepository.findAll()).thenReturn(pizza);
+    List<Pizza> actual = pizzaService.getAvailablePizzas();
+    assertThat(actual).hasSize(1);
+    assertThat(actual.getFirst().getName()).isEqualTo("Marinara");
+  }
+
+  @Test
+  void getAvailablePizzasException() {
+
+    var pizza = getPizzasStub();
+    pizza.forEach(p -> p.setIsAvailable(Boolean.FALSE));
+
+    when(pizzaRepository.findAll()).thenReturn(pizza);
+    assertThatThrownBy(() -> pizzaService.getAvailablePizzas())
+        .isExactlyInstanceOf(EntityNotFoundException.class)
+            .hasMessageContaining("No pizzas available");
   }
 }

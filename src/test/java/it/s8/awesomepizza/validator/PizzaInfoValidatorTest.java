@@ -3,7 +3,6 @@ package it.s8.awesomepizza.validator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.exception.InvalidInputException;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
@@ -22,11 +21,11 @@ class PizzaInfoValidatorTest {
   }
 
   private static PizzaDto getPizza() {
-      return PizzaDto.builder()
-          .price(new BigDecimal("10.00"))
-          .name("a pizza")
-          .description("A delicious pizza")
-          .build();
+    return PizzaDto.builder()
+        .price(new BigDecimal("10.00"))
+        .name("a pizza")
+        .description("A delicious pizza")
+        .build();
   }
 
   @Test
@@ -34,7 +33,7 @@ class PizzaInfoValidatorTest {
 
     var price = BigDecimal.valueOf(-10);
     assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(price))
-        .isInstanceOf(AwesomePizzaException.class)
+        .isInstanceOf(InvalidInputException.class)
         .hasMessageContaining("Pizza price can't be zero or less");
   }
 
@@ -42,25 +41,27 @@ class PizzaInfoValidatorTest {
   void givenAZeroPriceShouldThrowAnException() {
 
     assertThatThrownBy(() -> pizzaInfoValidator.isPizzaPriceValid(BigDecimal.ZERO))
-        .isInstanceOf(AwesomePizzaException.class)
+        .isInstanceOf(InvalidInputException.class)
         .hasMessageContaining("Pizza price can't be zero or less");
   }
 
   @Test
   void isValidPizzaInfo() {
 
-    var newPizza=PizzaDto.builder().build();
-    assertThatThrownBy(()->pizzaInfoValidator.isValidPizzaInfo(newPizza)).isExactlyInstanceOf(InvalidInputException.class);
-  }
-  @Test
-  void isValidPizzaName(){
-    var newPizza=PizzaDto.builder().description("dummy").price(BigDecimal.ONE).build();
-    assertThatThrownBy(()->pizzaInfoValidator.isValidPizzaInfo(newPizza)).isExactlyInstanceOf(InvalidInputException.class);
+    var newPizza = PizzaDto.builder().build();
+    assertThatThrownBy(() -> pizzaInfoValidator.isValidPizzaInfo(newPizza))
+        .isExactlyInstanceOf(InvalidInputException.class);
   }
 
   @Test
-  void givenAValidPizzaShouldReturnTrue(){
+  void isValidPizzaName() {
+    var newPizza = PizzaDto.builder().description("dummy").price(BigDecimal.ONE).build();
+    assertThatThrownBy(() -> pizzaInfoValidator.isValidPizzaInfo(newPizza))
+        .isExactlyInstanceOf(InvalidInputException.class);
+  }
+
+  @Test
+  void givenAValidPizzaShouldReturnTrue() {
     assertThat(pizzaInfoValidator.isValidPizzaInfo(getPizza())).isTrue();
-
   }
 }

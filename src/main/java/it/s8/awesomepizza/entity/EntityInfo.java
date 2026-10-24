@@ -18,11 +18,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class EntityInfo {
 
-    @CreatedDate
-    @Column(name = "created_at")
-    private Instant createdAt;
+  @CreatedDate
+  @Column(name = "created_at", nullable = false)
+  private Instant createdAt;
 
-    @LastModifiedDate
-    @Column(name = "modified_at")
-    private Instant modifiedAt;
+  @LastModifiedDate
+  @Column(name = "modified_at", insertable = false)
+  private Instant modifiedAt;
 }

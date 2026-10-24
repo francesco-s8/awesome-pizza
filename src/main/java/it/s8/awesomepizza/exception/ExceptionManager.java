@@ -51,12 +51,27 @@ public class ExceptionManager {
   @ExceptionHandler(OrderNotReadyToBePaidException.class)
   public ResponseEntity<String> handleOrderNotReadyException(OrderNotReadyToBePaidException ex) {
     log.warn("OrderNotReadyToBePaidException occurred ", ex);
-    return ResponseEntity.status(422).body(ex.getMessage());
+    return ResponseEntity.unprocessableContent().build();
   }
 
   @ExceptionHandler(InvalidInputException.class)
   public ResponseEntity<String> invalidInput(InvalidInputException invalidInputException) {
     log.error("Input not valid due to", invalidInputException);
     return ResponseEntity.badRequest().body(invalidInputException.getMessage());
+  }
+
+  @ExceptionHandler(AwesomePizzaOperationNotSupportedException.class)
+  public ResponseEntity<Void> operationNotSupported(
+      AwesomePizzaOperationNotSupportedException awesomePizzaOperationNotSupportedException) {
+    log.warn(
+        "Operation not possible due to {}",
+        awesomePizzaOperationNotSupportedException.getMessage());
+    return ResponseEntity.unprocessableContent().build();
+  }
+
+  @ExceptionHandler(NullPointerException.class)
+  public ResponseEntity<Void> npe(NullPointerException nullPointerException) {
+    log.error("An NPE occurred, investigate ", nullPointerException);
+    return ResponseEntity.internalServerError().build();
   }
 }

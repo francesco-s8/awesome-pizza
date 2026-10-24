@@ -133,6 +133,28 @@ paths:
           description: Pizza not found
         '500':
           description: Internal error
+    delete:
+      tags:
+        - menu
+      summary: Set availability of a pizza to none
+      description: Operation to set unavailability of a given pizza
+      operationId: disablePizzaAvailability
+      parameters:
+        - in: path
+          name: pizzaId
+          schema:
+            type: integer
+            format: int64
+          description: The unique identifier for the pizza
+          example: 1
+          required: true
+      responses:
+        '204':
+          description: Successful operation
+        '404':
+          description: Pizza not found
+        '500':
+          description: Internal error
     get:
       tags:
         - menu
@@ -215,6 +237,28 @@ paths:
           description: No order found
         '500':
           description: Internal error
+    delete:
+      tags:
+        - payment
+      operationId: logicalDeletePayment
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            type: integer
+            format: int64
+          description: The unique identifier for the pizza order
+          required: true
+      responses:
+        '204':
+          description: Successful operation
+        '404':
+          description: No order found
+        '500':
+          description: Internal error
+        '422':
+          description: Order cannot be deleted
+
 components:
   schemas:
     PizzaOrderStatus:
@@ -226,6 +270,7 @@ components:
             - 'IN_PROCESS'
             - 'READY_FOR_DELIVERY'
             - 'TO_BE_PAID'
+            - 'CANCELLED'
             - 'PAID_AND_DELIVERED'
           description: The status of the pizza order
           examples:
@@ -275,16 +320,19 @@ components:
       properties:
         name:
           type: string
+          minLength: 1
           description: The name of the pizza
           examples:
             - "Margherita"
         description:
           type: string
+          minLength: 1
           description: A brief description of the pizza
           examples:
             - "A classic Italian pizza with tomato sauce and mozzarella"
         price:
           type: number
+          minimum: 0.01
           description: The price of the pizza with 2 decimal places
           examples:
             - 5.5

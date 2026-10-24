@@ -41,6 +41,10 @@ public class Pizza extends EntityInfo {
   @Column(name = "version")
   private Integer version;
 
+  @Builder.Default
+  @Column(name = "is_available")
+  private Boolean isAvailable = Boolean.TRUE;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

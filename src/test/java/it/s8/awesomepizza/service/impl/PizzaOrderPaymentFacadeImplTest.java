@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.exception.AwesomePizzaOperationNotSupportedException;
 import it.s8.awesomepizza.exception.OrderNotReadyToBePaidException;
 import it.s8.awesomepizza.helper.TestHelper;
 import jakarta.persistence.EntityNotFoundException;
@@ -134,5 +135,18 @@ class PizzaOrderPaymentFacadeImplTest {
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
     assertThatThrownBy(() -> paymentFacade.calculateOrderTotal(1L))
         .isExactlyInstanceOf(AwesomePizzaException.class);
+  }
+
+  @Test
+  void deletePayment() {
+
+    doThrow(AwesomePizzaOperationNotSupportedException.class)
+        .when(pizzaOrderService)
+        .deleteOrder(anyLong());
+
+    assertThatThrownBy(() -> paymentFacade.deletePayment(1L))
+            .isExactlyInstanceOf(AwesomePizzaOperationNotSupportedException.class);
+
+
   }
 }

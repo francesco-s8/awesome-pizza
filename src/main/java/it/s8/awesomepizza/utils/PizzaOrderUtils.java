@@ -32,4 +32,14 @@ public class PizzaOrderUtils {
 
     return order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
   }
+
+  public boolean orderCanBeDeleted(@NonNull PizzaOrder order) {
+
+    var status= order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())
+        || order
+            .getOrderStatus()
+            .equals(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue())
+            ||order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.CANCELLED.getValue());
+    return !status;
+  }
 }

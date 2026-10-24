@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import it.s8.awesomepizza.entity.PizzaOrder;
+import it.s8.awesomepizza.exception.AwesomePizzaOperationNotSupportedException;
 import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.repository.PizzaOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -80,5 +81,29 @@ class PizzaOrderServiceImplTest {
     assertThat(orderCaptor.getValue().getTotal()).isEqualTo(new BigDecimal("29.00"));
     assertThat(orderCaptor.getValue().getOrderStatus())
         .isEqualTo(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
+  }
+
+  @Test
+  void deleteOrder() {
+    var order = TestHelper.getOrder();
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
+    when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+    assertThatThrownBy(() -> pizzaOrderService.deleteOrder(1L))
+        .isExactlyInstanceOf(AwesomePizzaOperationNotSupportedException.class);
+  }
+
+  @Test
+  void deleteOrderWithRightStatus() {
+    var order = TestHelper.getOrder();
+    order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
+    when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+
+    pizzaOrderService.deleteOrder(order.getId());
+
+    verify(pizzaOrderRepository, times(1)).findById(order.getId());
+    verify(pizzaOrderRepository, times(1)).save(order);
+    verify(pizzaOrderRepository).save(orderCaptor.capture());
+    assertThat(orderCaptor.getValue().getOrderStatus())
+        .isEqualTo(PizzaOrderStatus.OrderStatusEnum.CANCELLED.getValue());
   }
 }

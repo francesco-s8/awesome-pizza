@@ -36,12 +36,14 @@ public class PizzaMenuController implements MenuApi {
     pizzaInfoValidator.isValidPizzaInfo(pizzaDto);
     var newPizza = pizzaService.addPizza(pizzaDto);
     return ResponseEntity.created(URI.create(PATH_ADD_PIZZA_TO_MENU + newPizza.getId()))
-        .body(
-            PizzaDto.builder()
-                .price(newPizza.getPrice())
-                .description(newPizza.getDescription())
-                .name(newPizza.getName())
-                .build());
+        .body(pizzaToPizzaDtoMapper.apply(newPizza));
+  }
+
+  @Override
+  public ResponseEntity<Void> _disablePizzaAvailability(Long pizzaId) {
+
+    pizzaService.disablePizza(pizzaId);
+    return ResponseEntity.noContent().build();
   }
 
   @Override

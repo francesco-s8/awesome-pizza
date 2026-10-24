@@ -39,6 +39,7 @@ class PizzaOrderFacadeImplTest {
         Pizza.builder()
             .id(1L)
             .name(MARGHERITA_PIZZA)
+            .isAvailable(Boolean.TRUE)
             .description(MARGHERITA_PIZZA)
             .version(0)
             .build();

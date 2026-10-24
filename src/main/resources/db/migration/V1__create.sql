@@ -7,20 +7,20 @@ CREATE TABLE pizza_order
     "order_status"   varchar(255) NULL,
     "username"       varchar(255) NOT NULL,
     "version"        int4         NULL,
-    "created_at"     TIMESTAMP(6) NULL,
+    "created_at"     TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "modified_at"    TIMESTAMP(6) NULL,
     CONSTRAINT pizza_order_pkey PRIMARY KEY (pizza_order_id)
 );
 
 CREATE TABLE pizza
 (
-    pizza_id       int8         NOT NULL,
-    description    varchar(255) NULL,
-    "name"         varchar(255) NULL,
-    "price"        NUMERIC(10, 2) NULL,
-    "version"      INTEGER      DEFAULT 0,
-    "created_at"   TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
-    "modified_at"  TIMESTAMP(6) NULL,
+    pizza_id      int8           NOT NULL,
+    description   varchar(255)   NULL,
+    "name"        varchar(255)   NULL,
+    "price"       NUMERIC(10, 2) NULL,
+    "version"     INTEGER      DEFAULT 0,
+    "created_at"  TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "modified_at" TIMESTAMP(6)   NULL,
 
     CONSTRAINT pizza_pkey PRIMARY KEY (pizza_id)
 );

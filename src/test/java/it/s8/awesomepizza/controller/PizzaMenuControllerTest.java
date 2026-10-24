@@ -3,8 +3,7 @@ package it.s8.awesomepizza.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -226,16 +225,81 @@ class PizzaMenuControllerTest {
         .andExpect(status().isCreated())
         .andReturn();
   }
+
   @Test
   void givenAnInvalidInputShouldBeRaisedAnInvalidInputException() throws Exception {
-    var newPizza=Pizza.builder().build();
+    var newPizza = Pizza.builder().build();
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/awesome-pizza/menu")
+                .content(jsonMapper.writeValueAsString(newPizza))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andReturn();
+  }
+
+  @Test
+  void _getMenu() throws Exception {
+    when(pizzaService.getAvailablePizzas())
+        .thenThrow(new EntityNotFoundException("No pizzas available"));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get("/api/awesome-pizza/menu")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andReturn();
+  }
+
+  @Test
+  void _disablePizzaAvailability() throws Exception {
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.delete("/api/awesome-pizza/menu/1")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent())
+        .andReturn();
+  }
+
+  @Test
+  void disablePizzaWhenPizzaIsNotFound() throws Exception {
+    doThrow(new EntityNotFoundException("No pizza with id " + 1))
+        .when(pizzaService)
+        .disablePizza(anyLong());
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.delete("/api/awesome-pizza/menu/1")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andReturn();
+  }
+
+  @Test
+  void _updatePizzaInMenuValidInput() throws Exception {
+
+    var input=PizzaDto.builder().price(BigDecimal.ONE).description("new desc").build();
+    var pizzaStub= Pizza.builder().name("pizza stub").description(input.getDescription()).price(input.getPrice()).build();
+    when(pizzaService.updatePizza(1L,input)).thenReturn(pizzaStub);
     mockMvc
             .perform(
-                    MockMvcRequestBuilders.post("/api/awesome-pizza/menu")
-                            .content(jsonMapper.writeValueAsString(newPizza))
+                    MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
+                            .content(jsonMapper.writeValueAsString(input))
+                            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+  }
+  @Test
+  void _updatePizzaInMenuImvalidInput() throws Exception{
+    var input=PizzaDto.builder().price(new BigDecimal(-1)).description("new desc").build();
+    mockMvc
+            .perform(
+                    MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
+                            .content(jsonMapper.writeValueAsString(input))
                             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andReturn();
-  }
 
+
+
+  }
 }

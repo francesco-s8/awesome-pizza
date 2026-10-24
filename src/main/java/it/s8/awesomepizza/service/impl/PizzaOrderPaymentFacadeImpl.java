@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.service.impl;
 
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.exception.AwesomePizzaOperationNotSupportedException;
 import it.s8.awesomepizza.exception.OrderNotReadyToBePaidException;
 import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
@@ -70,5 +71,11 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
       throw new OrderNotReadyToBePaidException(
           "Order " + orderId + " is not ready to be paid, cannot process payment");
     }
+  }
+
+  @Override
+  public void deletePayment(Long orderId) throws AwesomePizzaOperationNotSupportedException {
+    log.info("Trying to set as canceled order {}", orderId);
+    pizzaOrderService.deleteOrder(orderId);
   }
 }

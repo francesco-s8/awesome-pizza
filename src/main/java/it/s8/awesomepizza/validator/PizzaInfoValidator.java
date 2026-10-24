@@ -1,6 +1,5 @@
 package it.s8.awesomepizza.validator;
 
-import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.exception.InvalidInputException;
 import java.math.BigDecimal;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ public class PizzaInfoValidator {
   public boolean isPizzaPriceValid(BigDecimal pizzaPrice) {
 
     if (BigDecimal.ZERO.compareTo(pizzaPrice) >= 0) {
-      throw new AwesomePizzaException("Pizza price can't be zero or less");
+      throw new InvalidInputException("Pizza price can't be zero or less");
     }
     return true;
   }
