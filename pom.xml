@@ -200,11 +200,14 @@
                             <apiPackage>it.s8.awesomepizza.controller</apiPackage>
                             <generatorName>spring</generatorName>
                             <library>spring-boot</library>
+                            <generateSupportingFiles>false</generateSupportingFiles>
                             <configOptions>
                                 <generateJsonIncludeAnnotations>true</generateJsonIncludeAnnotations>
                                 <generateJsonSetterNullsAnnotations>false</generateJsonSetterNullsAnnotations>
                                 <generateBuilders>true</generateBuilders>
                                 <apiDocs>true</apiDocs>
+                                <disallowAdditionalPropertiesIfNotPresent>false
+                                </disallowAdditionalPropertiesIfNotPresent>
                                 <openApiNullable>false</openApiNullable>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
@@ -214,6 +217,7 @@
                                 <useTags>true</useTags>
                                 <useJackson3>true</useJackson3>
                                 <useSpringBoot4>true</useSpringBoot4>
+                                <useSpringController>true</useSpringController>
                                 <useJakartaEe>true</useJakartaEe>
                                 <serializableModel>true</serializableModel>
                                 <snapshotVersion>true</snapshotVersion>
