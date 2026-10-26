@@ -168,9 +168,8 @@ class PizzaServiceImplTest {
   void getAvailablePizzas() {
 
     var pizza = getPizzasStub();
-    pizza.getFirst().setIsAvailable(Boolean.FALSE);
 
-    when(pizzaRepository.findAll()).thenReturn(pizza);
+    when(pizzaRepository.findByIsAvailableTrue()).thenReturn(List.of(pizza.getLast()));
     List<Pizza> actual = pizzaService.getAvailablePizzas();
     assertThat(actual).hasSize(1);
     assertThat(actual.getFirst().getName()).isEqualTo("Marinara");
@@ -182,7 +181,7 @@ class PizzaServiceImplTest {
     var pizza = getPizzasStub();
     pizza.forEach(p -> p.setIsAvailable(Boolean.FALSE));
 
-    when(pizzaRepository.findAll()).thenReturn(pizza);
+    when(pizzaRepository.findByIsAvailableTrue()).thenReturn(List.of());
     assertThatThrownBy(() -> pizzaService.getAvailablePizzas())
         .isExactlyInstanceOf(EntityNotFoundException.class)
             .hasMessageContaining("No pizzas available");

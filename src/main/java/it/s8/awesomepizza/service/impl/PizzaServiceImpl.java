@@ -42,16 +42,14 @@ public class PizzaServiceImpl implements PizzaService {
 
   @Override
   public List<Pizza> getAvailablePizzas() {
-    var pizzas = pizzaRepository.findAll();
+    var pizzas = pizzaRepository.findByIsAvailableTrue();
 
     if ((pizzas.isEmpty())) {
       log.warn("Pizza list is empty");
-    }
-    var availablePizzas = pizzas.stream().filter(Pizza::getIsAvailable).toList();
-    if (availablePizzas.isEmpty()) {
       throw new EntityNotFoundException("No pizzas available");
     }
-    return availablePizzas;
+
+    return pizzas;
   }
 
   @Override

@@ -6,7 +6,8 @@ import it.s8.awesomepizza.config.JpaConfig;
 import it.s8.awesomepizza.entity.Pizza;
 import java.math.BigDecimal;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -19,8 +20,8 @@ class PizzaRepositoryTest {
   static List<Pizza> pizzaList;
   @Autowired PizzaRepository pizzaRepository;
 
-  @BeforeAll
-  static void setup() {
+  @BeforeEach
+  void setup() {
 
     pizzaList =
         List.of(
@@ -28,18 +29,25 @@ class PizzaRepositoryTest {
                 .name("Margherita")
                 .description("'La classica con pomodoro, mozzarella e basilico'")
                 .price(new BigDecimal("7.00"))
+                .isAvailable(Boolean.TRUE)
                 .build(),
             Pizza.builder()
                 .name("Marinara")
                 .description("'Pomodoro, aglio e origano'")
                 .price(new BigDecimal("5.00"))
+                .isAvailable(Boolean.FALSE)
                 .build());
+    pizzaRepository.saveAll(pizzaList);
+  }
+
+  @AfterEach
+  void cleanData() {
+    pizzaRepository.deleteAll();
   }
 
   @Test
   void givenAnExistingPizzaShouldBeFoundAndReturnSuccessfully() {
 
-    pizzaRepository.saveAll(pizzaList);
     var actual = pizzaRepository.findByNameIn(List.of("Margherita"));
     assertThat(actual).isNotEmpty().hasSize(1);
     assertThat(actual.getFirst().getPrice()).isEqualTo(new BigDecimal("7.00"));
@@ -49,5 +57,13 @@ class PizzaRepositoryTest {
   void givenAnNonExistingPizzaShouldBeFoundAndReturnEmpty() {
     var actual = pizzaRepository.findByNameIn(List.of("Gourmet"));
     assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void findByIsAvailableTrue() {
+
+    var availablePizza = pizzaRepository.findByIsAvailableTrue();
+    assertThat(availablePizza).isNotEmpty().hasSize(1);
+    assertThat(availablePizza.getFirst()).extracting("name").isEqualTo("Margherita");
   }
 }
