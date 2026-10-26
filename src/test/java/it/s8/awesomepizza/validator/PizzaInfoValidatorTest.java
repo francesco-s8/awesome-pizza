@@ -12,20 +12,20 @@ class PizzaInfoValidatorTest {
 
   private final PizzaInfoValidator pizzaInfoValidator = new PizzaInfoValidator();
 
-  @Test
-  void givenAValidPizzaPriceShouldReturnTrue() {
-    var pizza = getPizza();
-
-    var actual = pizzaInfoValidator.isPizzaPriceValid(pizza.getPrice());
-    assertThat(actual).isTrue();
-  }
-
   private static PizzaDto getPizza() {
     return PizzaDto.builder()
         .price(new BigDecimal("10.00"))
         .name("a pizza")
         .description("A delicious pizza")
         .build();
+  }
+
+  @Test
+  void givenAValidPizzaPriceShouldReturnTrue() {
+    var pizza = getPizza();
+
+    var actual = pizzaInfoValidator.isPizzaPriceValid(pizza.getPrice());
+    assertThat(actual).isTrue();
   }
 
   @Test

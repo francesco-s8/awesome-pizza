@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Import;
 @Import(JpaConfig.class)
 class PizzaOrderRepositoryTest {
 
-  @Autowired PizzaOrderRepository pizzaOrderRepository;
+  @Autowired private PizzaOrderRepository pizzaOrderRepository;
 
   @BeforeEach
   void setup() {
@@ -44,8 +44,7 @@ class PizzaOrderRepositoryTest {
                         .build()))
             .build();
 
-    var saved = pizzaOrderRepository.save(order);
-    log.info("Saved order: {}", saved);
+    pizzaOrderRepository.save(order);
   }
 
   @Test
