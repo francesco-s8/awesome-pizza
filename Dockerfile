@@ -9,6 +9,10 @@ RUN java -Djarmode=tools -jar target/*.jar extract --layers --destination extrac
 
 FROM eclipse-temurin:25.0.4.1_1-jre-noble
 
+RUN addgroup --system app && adduser --system --ingroup app --home /home/app app
+
+USER app
+
 WORKDIR /application
 
 COPY --from=builder /builder/extracted/dependencies/ ./
@@ -16,5 +20,6 @@ COPY --from=builder /builder/extracted/spring-boot-loader/ ./
 COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
 COPY --from=builder /builder/extracted/application/ ./
 COPY --from=builder /builder/target/*.jar application.jar
+
 
 ENTRYPOINT ["java","-XX:+UseZGC","-XX:+UseCompactObjectHeaders","-XX:+UseStringDeduplication","-XX:+UseCompressedOops","-XX:+UseCompressedClassPointers","-jar","/application/application.jar"]
