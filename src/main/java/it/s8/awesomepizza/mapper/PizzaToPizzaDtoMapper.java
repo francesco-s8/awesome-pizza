@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class PizzaToPizzaDtoMapper implements Function<Pizza, PizzaDto> {
   @Override
   public PizzaDto apply(Pizza pizza) {
-    if (pizza.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+    if (BigDecimal.ZERO.compareTo(pizza.getPrice()) > 0) {
       throw new IllegalArgumentException("Price cannot be negative");
     }
     if (StringUtils.isBlank(pizza.getName())) {

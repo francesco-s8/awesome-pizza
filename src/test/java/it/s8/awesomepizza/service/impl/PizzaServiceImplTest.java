@@ -15,6 +15,8 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,6 +29,8 @@ class PizzaServiceImplTest {
   @InjectMocks PizzaServiceImpl pizzaService;
 
   @Mock PizzaRepository pizzaRepository;
+
+  @Captor private ArgumentCaptor<Pizza> pizzaArgumentCaptor;
 
   private List<Pizza> getPizzasStub() {
 
@@ -88,15 +92,16 @@ class PizzaServiceImplTest {
   @Test
   void addPizza() {
 
-    when(pizzaRepository.save(any(Pizza.class))).thenReturn(getPizzasStub().getFirst());
-    var actual =
-        pizzaService.addPizza(
-            PizzaDto.builder()
-                .name("Margherita")
-                .price(BigDecimal.ONE)
-                .description("Margherita")
-                .build());
-    assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.ONE);
+    String margherita = "Margherita";
+    var pizzaStub =
+        PizzaDto.builder().name(margherita).price(BigDecimal.ONE).description(margherita).build();
+
+    when(pizzaRepository.save(any(Pizza.class))).thenAnswer(i -> i.getArgument(0));
+    var actual = pizzaService.addPizza(pizzaStub);
+    assertThat(actual).isNotNull();
+    assertThat(actual.getName()).isNotEmpty().isEqualTo(margherita);
+    assertThat(actual.getDescription()).isNotEmpty().isEqualTo(margherita);
+    assertThat(actual.getPrice()).isEqualTo(BigDecimal.ONE);
   }
 
   @Test
@@ -106,7 +111,7 @@ class PizzaServiceImplTest {
         PizzaDto.builder()
             .name("Margherita")
             .price(BigDecimal.valueOf(10L))
-            .description("Margherita")
+            .description("Margherita NEW")
             .build();
     when(pizzaRepository.findById(1L))
         .thenReturn(
@@ -117,17 +122,12 @@ class PizzaServiceImplTest {
                     .description("Margherita")
                     .price(BigDecimal.ONE)
                     .build()));
-    when(pizzaRepository.save(any(Pizza.class)))
-        .thenReturn(
-            Pizza.builder()
-                .id(1L)
-                .name("Margherita")
-                .description("Margherita")
-                .price(BigDecimal.valueOf(10L))
-                .build());
+    when(pizzaRepository.save(any(Pizza.class))).thenAnswer(i -> i.getArgument(0));
 
     var actual = pizzaService.updatePizza(1L, pizzaInfo);
-    assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.valueOf(10L));
+    assertThat(actual).isNotNull();
+    assertThat(actual.getDescription()).isNotEmpty().isEqualTo("Margherita NEW");
+    assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(10L));
   }
 
   @Test
@@ -142,7 +142,17 @@ class PizzaServiceImplTest {
   void givenANullPizzaDescriptionAndSamePriceShouldNotUpdateRecord() {
     var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.ONE).build();
     when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
-    pizzaService.updatePizza(1L, pizzaInfo);
+    var actual = pizzaService.updatePizza(1L, pizzaInfo);
+    assertThat(actual).isNotNull();
+    verify(pizzaRepository, times(0)).save(any());
+  }
+
+  @Test
+  void givenAnInvalidPizzaIdShouldBeThrownAEntityNotFoundException() {
+    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.ONE).build();
+    when(pizzaRepository.findById(anyLong())).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> pizzaService.updatePizza(1L, pizzaInfo))
+        .isExactlyInstanceOf(EntityNotFoundException.class);
     verify(pizzaRepository, times(0)).save(any());
   }
 
@@ -159,9 +169,16 @@ class PizzaServiceImplTest {
 
     when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
     var actual = pizzaService.getPizzaDetails(1L);
-    log.info("Actual pizza details: {}", actual);
     assertThat(actual).isNotNull().extracting("name").isEqualTo("Margherita");
     assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.ONE);
+  }
+
+  @Test
+  void givenAnInValidPizzaIdShouldReturnThrownAnException() {
+
+    when(pizzaRepository.findById(any())).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> pizzaService.getPizzaDetails(1L))
+        .isExactlyInstanceOf(EntityNotFoundException.class);
   }
 
   @Test
@@ -184,6 +201,22 @@ class PizzaServiceImplTest {
     when(pizzaRepository.findByIsAvailableTrue()).thenReturn(List.of());
     assertThatThrownBy(() -> pizzaService.getAvailablePizzas())
         .isExactlyInstanceOf(EntityNotFoundException.class)
-            .hasMessageContaining("No pizzas available");
+        .hasMessageContaining("No pizzas available");
+  }
+
+  @Test
+  void givenAValidPizzaIdShouldBeSetToBeDisabled() {
+    var pizza = getPizzasStub().getFirst();
+    when(pizzaRepository.findById(pizza.getId())).thenReturn(Optional.of(pizza));
+    pizzaService.disablePizza(pizza.getId());
+    verify(pizzaRepository, times(1)).save(pizzaArgumentCaptor.capture());
+    assertThat(pizzaArgumentCaptor.getValue().getIsAvailable()).isEqualTo(Boolean.FALSE);
+  }
+
+  @Test
+  void givenAnInValidPizzaIdShouldBeThrownAEntityNotFoundException() {
+    when(pizzaRepository.findById(1L)).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> pizzaService.disablePizza(1L))
+        .isExactlyInstanceOf(EntityNotFoundException.class);
   }
 }

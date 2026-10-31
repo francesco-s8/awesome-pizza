@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import it.s8.awesomepizza.entity.Pizza;
 import java.math.BigDecimal;
@@ -39,5 +40,18 @@ class PizzaListToPizzaDtoListMapperTest {
   void givenAnEmptyListShouldReturnEmptyArray() {
     var actual = pizzaListToPizzaDtoListMapper.apply(List.of());
     assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void givenANullPizza() {
+    var pizza = Pizza.builder().build();
+    var actual = pizzaListToPizzaDtoListMapper.apply(List.of(pizza));
+    assertThat(actual).isNotEmpty();
+  }
+
+  @Test
+  void givenANullPizzaListShouldBeThrownANPE() {
+    assertThatThrownBy(() -> pizzaListToPizzaDtoListMapper.apply(null))
+        .isExactlyInstanceOf(NullPointerException.class);
   }
 }
