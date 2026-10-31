@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class EntityInfo {
+abstract class EntityInfo {
 
   @CreatedDate
   @Column(name = "created_at", nullable = false)
