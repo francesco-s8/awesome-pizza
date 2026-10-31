@@ -18,6 +18,7 @@
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <instancio-junit.version>6.1.0</instancio-junit.version>
+        <pitest-parent.version>1.30.1</pitest-parent.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -139,10 +140,32 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>1.2.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest-parent.version}</version>
+                <configuration>
+                    <targetClasses>
+                        <param>it.s8.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>it.s8.*</param>
+                    </targetTests>
+                    <threads>4</threads>
+                    <outputFormats>
+                        <param>HTML</param>
+                    </outputFormats>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
