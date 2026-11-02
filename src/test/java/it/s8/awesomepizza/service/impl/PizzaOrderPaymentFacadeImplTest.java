@@ -52,6 +52,9 @@ class PizzaOrderPaymentFacadeImplTest {
     var actual = paymentFacade.calculateOrderTotal(order.getId());
 
     var expected = NumberFormat.getCurrencyInstance(Locale.ITALY).format(2900 / 100.00);
+    verify(pizzaOrderService, times(1)).saveOrder(pizzaOrderArgumentCaptor.capture());
+    assertThat(pizzaOrderArgumentCaptor.getValue().getOrderStatus())
+        .isEqualTo(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
     assertThat(actual.getName()).isEqualTo("alice");
     assertThat(actual.getTotal()).isEqualTo(expected);
   }
@@ -96,6 +99,10 @@ class PizzaOrderPaymentFacadeImplTest {
     verify(pizzaOrderService, times(1)).saveOrder(pizzaOrderArgumentCaptor.capture());
     assertThat(pizzaOrderArgumentCaptor.getValue().getOrderStatus())
         .isEqualTo(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
+    assertThat(pizzaOrderArgumentCaptor.getValue().getPaymentMethod())
+        .isEqualTo(PizzaOrderPaymentInfo.PaymentMethodEnum.CREDIT_CARD.getValue());
+    assertThat(pizzaOrderArgumentCaptor.getValue().getPaid()).isTrue();
+    assertThat(pizzaOrderArgumentCaptor.getValue().getPaymentDate()).isNotNull();
   }
 
   @Test
@@ -145,8 +152,6 @@ class PizzaOrderPaymentFacadeImplTest {
         .deleteOrder(anyLong());
 
     assertThatThrownBy(() -> paymentFacade.deletePayment(1L))
-            .isExactlyInstanceOf(AwesomePizzaOperationNotSupportedException.class);
-
-
+        .isExactlyInstanceOf(AwesomePizzaOperationNotSupportedException.class);
   }
 }

@@ -29,7 +29,7 @@ class PizzaToPizzaDtoTest {
 
             assertThatThrownBy(() -> pizzaToPizzaDtoMapper.apply(pizza))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Price cannot be negative");
+                .hasMessage("Price cannot be negative or zero");
 
     }
 }

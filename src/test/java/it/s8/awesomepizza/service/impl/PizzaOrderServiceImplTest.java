@@ -68,7 +68,7 @@ class PizzaOrderServiceImplTest {
   }
 
   @Test
-  void prepareOrder() {
+  void prepareOrder_whenValidOrderExists() {
 
     var order = TestHelper.getOrder();
 
@@ -84,12 +84,30 @@ class PizzaOrderServiceImplTest {
   }
 
   @Test
-  void deleteOrder() {
+  void prepareOrder_whenOrderDoesNotExist() {
+    when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> pizzaOrderService.prepareOrder(1L))
+        .isExactlyInstanceOf(EntityNotFoundException.class)
+        .hasMessageContaining("Order not found with ID: 1");
+  }
+
+  @Test
+  void deleteOrder_whenOrderExists() {
     var order = TestHelper.getOrder();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
     when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
     assertThatThrownBy(() -> pizzaOrderService.deleteOrder(1L))
         .isExactlyInstanceOf(AwesomePizzaOperationNotSupportedException.class);
+  }
+
+  @Test
+  void deleteOrder_whenOrderDoesNotExist() {
+
+    when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> pizzaOrderService.deleteOrder(1L))
+        .isExactlyInstanceOf(EntityNotFoundException.class)
+        .hasMessageContaining("Order not found with ID: 1");
   }
 
   @Test

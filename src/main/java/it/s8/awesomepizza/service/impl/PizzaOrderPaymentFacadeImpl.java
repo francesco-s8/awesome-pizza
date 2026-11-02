@@ -48,7 +48,7 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
     return PizzaOrderTotalToPay.builder()
         .name(order.getUsername())
         .order(order.getId())
-        .total(PizzaOrderUtils.getTotalAsString(total))
+        .total(PizzaOrderUtils.getTotalAsString(order.getTotal()))
         .build();
   }
 

@@ -14,8 +14,8 @@ import org.openapitools.model.PizzaOrderStatus;
 public class PizzaOrderUtils {
 
   public String getTotalAsString(BigDecimal total) {
-    if (total.compareTo(BigDecimal.ZERO) < 0) {
-      throw new IllegalArgumentException("Total amount is negative");
+    if (total.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Total amount is negative or zero");
     }
     return NumberFormat.getCurrencyInstance(Locale.getDefault()).format(total);
   }

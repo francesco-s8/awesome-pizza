@@ -1,7 +1,6 @@
 package it.s8.awesomepizza.mapper;
 
 import it.s8.awesomepizza.entity.Pizza;
-import java.math.BigDecimal;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.model.PizzaDto;
 import org.springframework.cglib.core.internal.Function;
@@ -11,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class PizzaToPizzaDtoMapper implements Function<Pizza, PizzaDto> {
   @Override
   public PizzaDto apply(Pizza pizza) {
-    if (BigDecimal.ZERO.compareTo(pizza.getPrice()) > 0) {
-      throw new IllegalArgumentException("Price cannot be negative");
+    if (pizza.getPrice().signum() <= 0) {
+      throw new IllegalArgumentException("Price cannot be negative or zero");
     }
     if (StringUtils.isBlank(pizza.getName())) {
       throw new IllegalArgumentException("Name cannot be blank");

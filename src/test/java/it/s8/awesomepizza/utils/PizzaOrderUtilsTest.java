@@ -32,6 +32,8 @@ class PizzaOrderUtilsTest {
     var total = BigDecimal.valueOf(-10L);
     assertThatThrownBy(() -> PizzaOrderUtils.getTotalAsString(total))
         .isExactlyInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> PizzaOrderUtils.getTotalAsString(BigDecimal.ZERO))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
