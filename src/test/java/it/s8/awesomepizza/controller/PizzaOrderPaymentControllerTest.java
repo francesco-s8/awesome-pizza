@@ -1,5 +1,6 @@
 package it.s8.awesomepizza.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -116,5 +117,22 @@ class PizzaOrderPaymentControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent())
         .andReturn();
+  }
+
+  @Test
+  void _calculateOrderTotal() throws Exception {
+
+    when(pizzaOrderPaymentFacade.calculateOrderTotal(1L)).thenReturn(
+        new org.openapitools.model.PizzaOrderTotalToPay().total(BigDecimal.valueOf(10.0).toPlainString()).toBuilder()
+            .order(1L)
+            .name("John Doe")
+            .build());
+    var actual=mockMvc
+            .perform(
+                    MockMvcRequestBuilders.get("/api/awesome-pizza/orders/1/total")
+                            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+    assertThat(actual.getResponse().getContentAsString()).contains("John Doe");
   }
 }

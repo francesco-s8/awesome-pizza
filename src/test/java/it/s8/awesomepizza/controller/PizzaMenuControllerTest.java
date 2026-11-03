@@ -277,29 +277,34 @@ class PizzaMenuControllerTest {
   @Test
   void _updatePizzaInMenuValidInput() throws Exception {
 
-    var input=PizzaDto.builder().price(BigDecimal.ONE).description("new desc").build();
-    var pizzaStub= Pizza.builder().name("pizza stub").description(input.getDescription()).price(input.getPrice()).build();
-    when(pizzaService.updatePizza(1L,input)).thenReturn(pizzaStub);
-    mockMvc
+    var input = PizzaDto.builder().price(BigDecimal.ONE).description("new desc").build();
+    var pizzaStub =
+        Pizza.builder()
+            .name("pizza stub")
+            .description(input.getDescription())
+            .price(input.getPrice())
+            .build();
+    when(pizzaService.updatePizza(1L, input)).thenReturn(pizzaStub);
+    var actual =
+        mockMvc
             .perform(
-                    MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
-                            .content(jsonMapper.writeValueAsString(input))
-                            .contentType(MediaType.APPLICATION_JSON))
+                MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
+                    .content(jsonMapper.writeValueAsString(input))
+                    .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn();
+    assertThat(actual.getResponse().getContentAsString()).isNotEmpty();
   }
+
   @Test
-  void _updatePizzaInMenuImvalidInput() throws Exception{
-    var input=PizzaDto.builder().price(new BigDecimal(-1)).description("new desc").build();
+  void _updatePizzaInMenuImvalidInput() throws Exception {
+    var input = PizzaDto.builder().price(new BigDecimal(-1)).description("new desc").build();
     mockMvc
-            .perform(
-                    MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
-                            .content(jsonMapper.writeValueAsString(input))
-                            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest())
-            .andReturn();
-
-
-
+        .perform(
+            MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
+                .content(jsonMapper.writeValueAsString(input))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andReturn();
   }
 }
