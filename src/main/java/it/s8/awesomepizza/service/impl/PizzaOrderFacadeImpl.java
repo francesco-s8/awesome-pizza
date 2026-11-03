@@ -8,7 +8,6 @@ import it.s8.awesomepizza.event.OrderCreatedEvent;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.service.PizzaOrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;
-import it.s8.awesomepizza.service.PizzaQueueService;
 import it.s8.awesomepizza.service.PizzaService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +22,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class PizzaOrderFacadeImpl implements PizzaOrderFacade {
 
   final PizzaService pizzaService;
-  final PizzaQueueService pizzaQueueService;
   final PizzaOrderService pizzaOrderService;
   final PizzaListToPizzaDtoListMapper pizzaListToPIzzaDtoListMapper;
   final ApplicationContext applicationContext;
 
   public PizzaOrderFacadeImpl(
       PizzaService pizzaService,
-      PizzaQueueService pizzaQueueService,
       PizzaOrderService pizzaOrderService,
       PizzaListToPizzaDtoListMapper pizzaListToPIzzaDtoListMapper,
       ApplicationContext applicationContext) {
 
     this.pizzaService = pizzaService;
-    this.pizzaQueueService = pizzaQueueService;
     this.pizzaOrderService = pizzaOrderService;
     this.pizzaListToPIzzaDtoListMapper = pizzaListToPIzzaDtoListMapper;
     this.applicationContext = applicationContext;
