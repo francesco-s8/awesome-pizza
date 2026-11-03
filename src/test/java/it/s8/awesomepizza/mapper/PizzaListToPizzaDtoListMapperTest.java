@@ -33,7 +33,7 @@ class PizzaListToPizzaDtoListMapperTest {
     var input = List.of(marinara, margherita);
 
     var actual = pizzaListToPizzaDtoListMapper.apply(input);
-    assertThat(actual).hasSize(2);
+    assertThat(actual).isNotEmpty().hasSize(2);
   }
 
   @Test
@@ -46,7 +46,7 @@ class PizzaListToPizzaDtoListMapperTest {
   void givenANullPizza() {
     var pizza = Pizza.builder().build();
     var actual = pizzaListToPizzaDtoListMapper.apply(List.of(pizza));
-    assertThat(actual).isNotEmpty();
+    assertThat(actual).isNotEmpty().extracting("name").isNotNull();
   }
 
   @Test

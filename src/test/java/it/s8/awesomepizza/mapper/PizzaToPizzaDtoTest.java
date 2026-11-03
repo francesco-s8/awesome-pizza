@@ -16,20 +16,48 @@ class PizzaToPizzaDtoTest {
 
     var pizza =
         Pizza.builder().name("A pizza").description(" A pizza").price(BigDecimal.ONE).build();
-
-    assertThat(pizzaToPizzaDtoMapper.apply(pizza))
-        .isNotNull()
-        .extracting("price")
-        .isEqualTo(BigDecimal.ONE);
+    var actual = pizzaToPizzaDtoMapper.apply(pizza);
+    assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.ONE);
+    assertThat(actual.getPrice()).isGreaterThan(BigDecimal.ZERO);
   }
 
   @Test
-    void givenANegativePizzaPriceShouldBeRaisedAnIllegalArgumentException() {
-        var pizza = Pizza.builder().name("A pizza").description(" A pizza").price(BigDecimal.valueOf(-1)).build();
+  void givenANegativePizzaPriceShouldBeRaisedAnIllegalArgumentException() {
+    var pizza =
+        Pizza.builder()
+            .name("A pizza")
+            .description(" A pizza")
+            .price(BigDecimal.valueOf(0))
+            .build();
 
-            assertThatThrownBy(() -> pizzaToPizzaDtoMapper.apply(pizza))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Price cannot be negative or zero");
+    assertThatThrownBy(() -> pizzaToPizzaDtoMapper.apply(pizza))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Price cannot be negative or zero");
+  }
+  @Test
+  void givenAPizzaWithoutPizzaNameShouldBeRaisedAnIllegalArgumentException() {
+    var pizza =
+        Pizza.builder()
+            .name(null)
+            .description(" A pizza")
+            .price(BigDecimal.valueOf(1))
+            .build();
 
-    }
+    assertThatThrownBy(() -> pizzaToPizzaDtoMapper.apply(pizza))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Name cannot be blank");
+  }
+  @Test
+  void givenAPizzaWithoutPizzaDescriptionShouldBeRaisedAnIllegalArgumentException() {
+    var pizza =
+            Pizza.builder()
+                    .name("A pizza")
+                    .description(null)
+                    .price(BigDecimal.valueOf(1))
+                    .build();
+
+    assertThatThrownBy(() -> pizzaToPizzaDtoMapper.apply(pizza))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Description cannot be blank");
+  }
 }
