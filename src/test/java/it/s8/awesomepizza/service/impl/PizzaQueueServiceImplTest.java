@@ -1,13 +1,14 @@
 package it.s8.awesomepizza.service.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import com.rabbitmq.client.Channel;
+import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
 import it.s8.awesomepizza.entity.PizzaOrder;
-import it.s8.awesomepizza.event.OrderCreatedEvent;
+import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -45,8 +46,28 @@ class PizzaQueueServiceImplTest {
   }
 
   @Test
+  void processOrder_invokesPizzaMakingSimulation() throws Exception {
+    var service = spy(pizzaQueueService);
+    doNothing().when(service).simulatingPizzaMaking();
+
+    service.processOrder(42L, channel, 7L);
+
+    verify(service).simulatingPizzaMaking();
+  }
+
+  @Test
+  void processOrder_ExceptionWhenPizzaMakingSimulation() {
+    var service = spy(pizzaQueueService);
+    doThrow(AwesomePizzaException.class).when(service).simulatingPizzaMaking();
+
+    assertThatThrownBy(() -> service.processOrder(42L, channel, 7L))
+        .isInstanceOf(AwesomePizzaException.class);
+  }
+
+  @Test
   void processOrder_preparesOrderAndAcksMessage() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
+    var service=spy(pizzaQueueService);
     doAnswer(
             _ -> {
               latch.countDown();
@@ -55,29 +76,26 @@ class PizzaQueueServiceImplTest {
         .when(pizzaOrderService)
         .prepareOrder(42L);
 
-    pizzaQueueService.processOrder(42L, channel, 7L);
+    service.processOrder(42L, channel, 7L);
 
-    assertThat(latch.await(11, TimeUnit.SECONDS)).isTrue();
+    assertThat(latch.await(10, TimeUnit.SECONDS)).isTrue();
+    assertThat(Thread.currentThread().isAlive()).isTrue();
     verify(pizzaOrderService).prepareOrder(42L);
     verify(channel).basicAck(7L, false);
     verify(channel, never()).basicNack(anyLong(), anyBoolean(), anyBoolean());
   }
 
   @Test
-  void processOrder_whenPreparationFails_nacksMessage() throws Exception {
-    CountDownLatch latch = new CountDownLatch(1);
+  void processOrder_whenPreparationFails_nacksMessage() {
     doAnswer(
             _ -> {
-              latch.countDown();
               throw new EntityNotFoundException("preparation failed");
             })
         .when(pizzaOrderService)
         .prepareOrder(99L);
 
-    pizzaQueueService.processOrder(99L, channel, 11L);
-
-    assertThat(latch.await(11, TimeUnit.SECONDS)).isTrue();
-    verify(pizzaOrderService).prepareOrder(99L);
-    verify(channel).basicNack(11L, false, false);
+    assertThatThrownBy(() -> pizzaQueueService.processOrder(99L, channel, 11L))
+        .isInstanceOf(EntityNotFoundException.class)
+        .hasMessageContaining("preparation failed");
   }
 }

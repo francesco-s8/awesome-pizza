@@ -26,15 +26,9 @@ public class PizzaOrderServiceImpl implements PizzaOrderService {
   @Override
   @Transactional(readOnly = true)
   public PizzaOrder getOrder(Long orderId) {
-    var orderFound =
-        pizzaOrderRepository
-            .findById(orderId)
-            .orElseThrow(() -> new EntityNotFoundException("Order " + orderId + " not found"));
-    log.info(
-        "Order found with status {} with pizzas size {}",
-        orderFound.getOrderStatus(),
-        orderFound.getPizzaList().size());
-    return orderFound;
+    return pizzaOrderRepository
+        .findById(orderId)
+        .orElseThrow(() -> new EntityNotFoundException("Order " + orderId + " not found"));
   }
 
   @Override
@@ -46,7 +40,6 @@ public class PizzaOrderServiceImpl implements PizzaOrderService {
     return order;
   }
 
-  @Transactional
   @Override
   public void prepareOrder(Long pizzaOrderId) {
     PizzaOrder order =

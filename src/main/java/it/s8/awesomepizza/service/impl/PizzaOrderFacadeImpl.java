@@ -2,9 +2,9 @@ package it.s8.awesomepizza.service.impl;
 
 import it.s8.awesomepizza.dto.OrderDto;
 import it.s8.awesomepizza.dto.PizzaOrderDto;
+import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.entity.PizzaOrder;
-import it.s8.awesomepizza.event.OrderCreatedEvent;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.service.PizzaOrderFacade;
 import it.s8.awesomepizza.service.PizzaOrderService;

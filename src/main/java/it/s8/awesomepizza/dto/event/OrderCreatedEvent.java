@@ -1,4 +1,4 @@
-package it.s8.awesomepizza.event;
+package it.s8.awesomepizza.dto.event;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

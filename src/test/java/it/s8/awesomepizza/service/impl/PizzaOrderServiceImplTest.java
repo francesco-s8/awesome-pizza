@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import it.s8.awesomepizza.entity.PizzaOrder;
+import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.exception.AwesomePizzaOperationNotSupportedException;
 import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.repository.PizzaOrderRepository;
@@ -124,4 +125,20 @@ class PizzaOrderServiceImplTest {
     assertThat(orderCaptor.getValue().getOrderStatus())
         .isEqualTo(PizzaOrderStatus.OrderStatusEnum.CANCELLED.getValue());
   }
+
+  @Test
+  void prepareOrder() {
+    var order = TestHelper.getOrder();
+
+    order.getPizzaList().forEach(pizza -> pizza.setPrice(BigDecimal.ZERO));
+    order.setTotal(BigDecimal.ZERO);
+
+    when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+
+    assertThatThrownBy(() -> pizzaOrderService.prepareOrder(1L))
+        .isExactlyInstanceOf(AwesomePizzaException.class)
+        .hasMessageContaining("Order total is not correct, please recalculate the order");
+  }
+
+
 }

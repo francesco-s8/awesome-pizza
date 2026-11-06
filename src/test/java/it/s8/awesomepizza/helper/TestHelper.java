@@ -5,12 +5,14 @@ import it.s8.awesomepizza.entity.PizzaOrder;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
 import org.junit.jupiter.params.provider.Arguments;
 import org.openapitools.model.PizzaOrderStatus;
 
+@UtilityClass
 public class TestHelper {
 
-  public static PizzaOrder getOrder() {
+  public PizzaOrder getOrder() {
     return PizzaOrder.builder()
         .id(1L)
         .username("alice")
@@ -34,7 +36,7 @@ public class TestHelper {
         .build();
   }
 
-  public static Stream<Arguments> checkOrderStatus() {
+  public Stream<Arguments> checkOrderStatus() {
     return Stream.of(
         Arguments.of(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue(), false),
         Arguments.of(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue(), false),
