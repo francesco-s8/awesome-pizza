@@ -13,11 +13,11 @@
     <version>1.0.0</version>
     <properties>
         <java.version>25</java.version>
-        <openapi-generator-maven-plugin.version>7.26.0</openapi-generator-maven-plugin.version>
-        <swagger-openapiv3.version>2.2.55</swagger-openapiv3.version>
+        <openapi-generator-maven-plugin.version>7.27.0</openapi-generator-maven-plugin.version>
+        <swagger-openapiv3.version>3.0.0</swagger-openapiv3.version>
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <instancio-junit.version>6.1.0</instancio-junit.version>
+        <instancio-junit.version>6.2.1</instancio-junit.version>
         <pitest-parent.version>1.30.1</pitest-parent.version>
     </properties>
     <dependencyManagement>
@@ -56,16 +56,8 @@
             <artifactId>swagger-integration</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations-jakarta</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-models-jakarta</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-core-jakarta</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

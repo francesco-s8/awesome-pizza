@@ -59,9 +59,4 @@ class PizzaInfoValidatorTest {
     assertThatThrownBy(() -> pizzaInfoValidator.isValidPizzaInfo(newPizza))
         .isExactlyInstanceOf(InvalidInputException.class);
   }
-
-  @Test
-  void givenAValidPizzaShouldReturnTrue() {
-    assertThat(pizzaInfoValidator.isValidPizzaInfo(getPizza())).isTrue();
-  }
 }

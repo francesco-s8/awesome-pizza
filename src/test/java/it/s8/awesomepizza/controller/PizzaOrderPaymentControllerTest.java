@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import it.s8.awesomepizza.exception.AwesomePizzaOperationNotSupportedException;
 import it.s8.awesomepizza.exception.OrderNotReadyToBePaidException;
 import it.s8.awesomepizza.service.PizzaOrderPaymentFacade;
@@ -20,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @WebMvcTest(controllers = PizzaOrderPaymentController.class)

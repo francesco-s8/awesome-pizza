@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
@@ -29,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @WebMvcTest(controllers = PizzaMenuController.class)
@@ -297,14 +297,15 @@ class PizzaMenuControllerTest {
   }
 
   @Test
-  void _updatePizzaInMenuImvalidInput() throws Exception {
+  void _updatePizzaInMenuInvalidInput() throws Exception {
     var input = PizzaDto.builder().price(new BigDecimal(-1)).description("new desc").build();
-    mockMvc
+    var actual=mockMvc
         .perform(
             MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
                 .content(jsonMapper.writeValueAsString(input))
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest())
         .andReturn();
+    assertThat(actual.getResponse().getContentAsString()).isNotEmpty().isEqualTo("Check the request body, some fields are not valid");
   }
 }
