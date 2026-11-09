@@ -2,9 +2,9 @@ package it.s8.awesomepizza.service.impl;
 
 import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
-import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
+import it.s8.awesomepizza.utils.Sleeper;
 import java.io.IOException;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -23,43 +23,34 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
 
   final RabbitTemplate rabbitTemplate;
   final PizzaOrderService pizzaOrderService;
+  final Sleeper sleeper;
 
-  public PizzaQueueServiceImpl(RabbitTemplate rabbitTemplate, PizzaOrderService pizzaOrderService) {
+  PizzaQueueServiceImpl(
+      RabbitTemplate rabbitTemplate, PizzaOrderService pizzaOrderService, Sleeper sleeper) {
     this.rabbitTemplate = rabbitTemplate;
     this.pizzaOrderService = pizzaOrderService;
+    this.sleeper = sleeper;
   }
 
   @Override
   @Transactional(rollbackFor = Exception.class)
-  @RabbitListener(ackMode = "MANUAL", queues = "orders")
+  @RabbitListener(
+      ackMode = "MANUAL",
+      queues = "orders",
+      containerFactory = "pizzaOrderListenerContainerFactory")
   public void processOrder(
       Long pizzaOrder, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag)
-      throws IOException {
+      throws IOException, InterruptedException {
 
     log.info("Simulating pizza preparation for order ID: {}", pizzaOrder);
-
-    simulatingPizzaMaking();
+    sleeper.sleep(Duration.ofSeconds(8).toMillis());
     pizzaOrderService.prepareOrder(pizzaOrder);
     channel.basicAck(tag, false);
-
     log.info("Order {} is ready for delivery", pizzaOrder);
   }
 
-  void simulatingPizzaMaking() {
-    Thread.ofVirtual()
-        .start(() -> {
-          try {
-            Thread.sleep(Duration.ofSeconds(8).toMillis());
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("Order processing thread interrupted for ", e);
-            throw new AwesomePizzaException("Order processing thread interrupted", e);
-          }
-        });
-  }
-
-  @TransactionalEventListener
   @Override
+  @TransactionalEventListener
   public void onOrderCreated(OrderCreatedEvent event) throws AmqpException {
     log.info("Order {} created event received, sending to queue", event.getOrderId());
     rabbitTemplate.convertAndSend("orders", event.getOrderId());

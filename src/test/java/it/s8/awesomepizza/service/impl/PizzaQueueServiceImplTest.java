@@ -8,12 +8,10 @@ import static org.mockito.Mockito.*;
 import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
 import it.s8.awesomepizza.entity.PizzaOrder;
-import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.service.PizzaOrderService;
+import it.s8.awesomepizza.utils.Sleeper;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +27,7 @@ class PizzaQueueServiceImplTest {
   @Mock RabbitTemplate rabbitTemplate;
   @Mock PizzaOrderService pizzaOrderService;
   @Mock Channel channel;
+  @Mock Sleeper sleeper;
 
   @Test
   void sendOrder_sendsMessageAndPersistsOrder_whenValidRequest() {
@@ -46,40 +45,12 @@ class PizzaQueueServiceImplTest {
   }
 
   @Test
-  void processOrder_invokesPizzaMakingSimulation() throws Exception {
+  void processOrder_preparesOrderAndAckMessage() throws Exception {
     var service = spy(pizzaQueueService);
-    doNothing().when(service).simulatingPizzaMaking();
 
     service.processOrder(42L, channel, 7L);
 
-    verify(service).simulatingPizzaMaking();
-  }
-
-  @Test
-  void processOrder_ExceptionWhenPizzaMakingSimulation() {
-    var service = spy(pizzaQueueService);
-    doThrow(AwesomePizzaException.class).when(service).simulatingPizzaMaking();
-
-    assertThatThrownBy(() -> service.processOrder(42L, channel, 7L))
-        .isInstanceOf(AwesomePizzaException.class);
-  }
-
-  @Test
-  void processOrder_preparesOrderAndAcksMessage() throws Exception {
-    CountDownLatch latch = new CountDownLatch(1);
-    var service=spy(pizzaQueueService);
-    doAnswer(
-            _ -> {
-              latch.countDown();
-              return null;
-            })
-        .when(pizzaOrderService)
-        .prepareOrder(42L);
-
-    service.processOrder(42L, channel, 7L);
-
-    assertThat(latch.await(10, TimeUnit.SECONDS)).isTrue();
-    assertThat(Thread.currentThread().isAlive()).isTrue();
+    verify(sleeper).sleep(8_000L);
     verify(pizzaOrderService).prepareOrder(42L);
     verify(channel).basicAck(7L, false);
     verify(channel, never()).basicNack(anyLong(), anyBoolean(), anyBoolean());

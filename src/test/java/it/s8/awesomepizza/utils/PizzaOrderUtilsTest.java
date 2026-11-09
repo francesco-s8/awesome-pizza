@@ -58,7 +58,7 @@ class PizzaOrderUtilsTest {
   void orderCanBePaid() {
     var order = TestHelper.getOrder();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
-    assertThat(PizzaOrderUtils.orderCanBePaid(order)).isFalse();
+    assertThat(PizzaOrderUtils.canOrderBePaid(order)).isFalse();
   }
 
   @ParameterizedTest
@@ -67,6 +67,6 @@ class PizzaOrderUtilsTest {
     var order = TestHelper.getOrder();
     order.setOrderStatus(orderStatus);
     log.info("Order status {}", order.getOrderStatus());
-    assertThat(PizzaOrderUtils.orderCanBeDeleted(order)).isEqualTo(canBePaid);
+    assertThat(PizzaOrderUtils.canOrderBeDeleted(order)).isEqualTo(canBePaid);
   }
 }

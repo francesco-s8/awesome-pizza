@@ -11,7 +11,7 @@ import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.mapper.PizzaToPizzaDtoMapper;
 import it.s8.awesomepizza.service.PizzaService;
-import it.s8.awesomepizza.validator.PizzaInfoValidator;
+import it.s8.awesomepizza.utils.PizzaInfoValidator;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -299,13 +299,16 @@ class PizzaMenuControllerTest {
   @Test
   void _updatePizzaInMenuInvalidInput() throws Exception {
     var input = PizzaDto.builder().price(new BigDecimal(-1)).description("new desc").build();
-    var actual=mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
-                .content(jsonMapper.writeValueAsString(input))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andReturn();
-    assertThat(actual.getResponse().getContentAsString()).isNotEmpty().isEqualTo("Check the request body, some fields are not valid");
+    var actual =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
+                    .content(jsonMapper.writeValueAsString(input))
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+    assertThat(actual.getResponse().getContentAsString())
+        .isNotEmpty()
+        .isEqualTo("Check the request body, some fields are not valid");
   }
 }

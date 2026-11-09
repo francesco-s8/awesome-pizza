@@ -20,7 +20,7 @@ public class PizzaOrderUtils {
     return NumberFormat.getCurrencyInstance(Locale.getDefault()).format(total);
   }
 
-  public BigDecimal getTotal(PizzaOrder order) {
+  public BigDecimal getTotal(@NonNull PizzaOrder order) {
     return order.getPizzaList().stream()
         .map(Pizza::getPrice)
         .filter(java.util.Objects::nonNull)
@@ -28,18 +28,19 @@ public class PizzaOrderUtils {
         .setScale(2, RoundingMode.HALF_UP);
   }
 
-  public boolean orderCanBePaid(@NonNull PizzaOrder order) {
+  public boolean canOrderBePaid(@NonNull PizzaOrder order) {
 
     return order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
   }
 
-  public boolean orderCanBeDeleted(@NonNull PizzaOrder order) {
+  public boolean canOrderBeDeleted(@NonNull PizzaOrder order) {
 
-    var status= order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())
-        || order
-            .getOrderStatus()
-            .equals(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue())
-            ||order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.CANCELLED.getValue());
+    var status =
+        order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue())
+            || order
+                .getOrderStatus()
+                .equals(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue())
+            || order.getOrderStatus().equals(PizzaOrderStatus.OrderStatusEnum.CANCELLED.getValue());
     return !status;
   }
 }

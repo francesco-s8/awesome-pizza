@@ -60,7 +60,7 @@ public class PizzaOrderPaymentFacadeImpl implements PizzaOrderPaymentFacade {
     if (order.getTotal().compareTo(pizzaOrderPaid.getTotal()) != 0) {
       throw new AwesomePizzaException("Total to pay is not correct");
     }
-    if (PizzaOrderUtils.orderCanBePaid(order)) {
+    if (PizzaOrderUtils.canOrderBePaid(order)) {
 
       order.setPaid(true);
       order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());

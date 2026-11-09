@@ -1,9 +1,10 @@
 package it.s8.awesomepizza.controller;
 
+import it.s8.awesomepizza.exception.InvalidInputException;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.mapper.PizzaToPizzaDtoMapper;
 import it.s8.awesomepizza.service.PizzaService;
-import it.s8.awesomepizza.validator.PizzaInfoValidator;
+import it.s8.awesomepizza.utils.PizzaInfoValidator;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaDto;
@@ -16,27 +17,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class PizzaMenuController implements MenuApi {
 
   private final PizzaService pizzaService;
-  private final PizzaInfoValidator pizzaInfoValidator;
   private final PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper;
   private final PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper;
 
   public PizzaMenuController(
       PizzaService pizzaService,
-      PizzaInfoValidator pizzaInfoValidator,
       PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper,
       PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper) {
     this.pizzaService = pizzaService;
-    this.pizzaInfoValidator = pizzaInfoValidator;
     this.pizzaListToPizzaDtoListMapper = pizzaListToPizzaDtoListMapper;
     this.pizzaToPizzaDtoMapper = pizzaToPizzaDtoMapper;
   }
 
   @Override
   public ResponseEntity<PizzaDto> _addPizzaToMenu(PizzaDto pizzaDto) {
-    pizzaInfoValidator.isValidPizzaInfo(pizzaDto);
-    var newPizza = pizzaService.addPizza(pizzaDto);
-    return ResponseEntity.created(URI.create(PATH_ADD_PIZZA_TO_MENU + newPizza.getId()))
-        .body(pizzaToPizzaDtoMapper.apply(newPizza));
+    var isValid = PizzaInfoValidator.isValidPizzaInfo(pizzaDto);
+    if (isValid) {
+
+      var newPizza = pizzaService.addPizza(pizzaDto);
+      return ResponseEntity.created(URI.create(PATH_ADD_PIZZA_TO_MENU + newPizza.getId()))
+          .body(pizzaToPizzaDtoMapper.apply(newPizza));
+    } else {
+      throw new InvalidInputException("Pizza info are invalid " + pizzaDto);
+    }
   }
 
   @Override
@@ -61,13 +64,17 @@ public class PizzaMenuController implements MenuApi {
 
   @Override
   public ResponseEntity<PizzaDto> _updatePizzaInMenu(Long pizzaId, PizzaDto pizzaDto) {
-    pizzaInfoValidator.isPizzaPriceValid(pizzaDto.getPrice());
-    var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaDto);
-    return ResponseEntity.ok(
-        PizzaDto.builder()
-            .price(updatedPizza.getPrice())
-            .description(updatedPizza.getDescription())
-            .name(updatedPizza.getName())
-            .build());
+    var isValidPrice = PizzaInfoValidator.isPizzaPriceValid(pizzaDto.getPrice());
+    if (isValidPrice) {
+      var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaDto);
+      return ResponseEntity.ok(
+          PizzaDto.builder()
+              .price(updatedPizza.getPrice())
+              .description(updatedPizza.getDescription())
+              .name(updatedPizza.getName())
+              .build());
+    } else {
+      throw new InvalidInputException("Pizza info are invalid " + pizzaDto);
+    }
   }
 }

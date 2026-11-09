@@ -42,15 +42,16 @@ public class PizzaOrderServiceImpl implements PizzaOrderService {
 
   @Override
   public void prepareOrder(Long pizzaOrderId) {
-    PizzaOrder order =
+
+    final var order =
         pizzaOrderRepository
             .findById(pizzaOrderId)
             .orElseThrow(
                 () -> new EntityNotFoundException("Order not found with ID: " + pizzaOrderId));
 
-    var total = PizzaOrderUtils.getTotal(order);
-    if (total.compareTo(BigDecimal.ZERO) == 0) {
-      log.warn("Order {} total is zero, recalculating", pizzaOrderId);
+    final var total = PizzaOrderUtils.getTotal(order);
+    if (BigDecimal.ZERO.compareTo(total) == 0 && !order.getPizzaList().isEmpty()) {
+      log.warn("Order {} total is zero, with {} pizzas", pizzaOrderId, order.getPizzaList().size());
       throw new AwesomePizzaException("Order total is not correct, please recalculate the order");
     }
 
@@ -66,7 +67,7 @@ public class PizzaOrderServiceImpl implements PizzaOrderService {
             .findById(orderId)
             .orElseThrow(() -> new EntityNotFoundException("Order not found with ID: " + orderId));
 
-    if (!PizzaOrderUtils.orderCanBeDeleted(order)) {
+    if (!PizzaOrderUtils.canOrderBeDeleted(order)) {
 
       throw new AwesomePizzaOperationNotSupportedException(
           "Order "

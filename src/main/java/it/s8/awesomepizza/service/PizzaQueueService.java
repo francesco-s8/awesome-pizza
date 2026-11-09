@@ -11,7 +11,7 @@ public interface PizzaQueueService {
 
 //    void sendOrder(Long orderId) throws AmqpException;
 
-    void processOrder(Long pizzaOrder, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException;
+    void processOrder(Long pizzaOrder, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException, InterruptedException;
 
     void onOrderCreated(OrderCreatedEvent event) throws AmqpException;
 }
