@@ -9,7 +9,7 @@ import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.service.PizzaOrderService;
-import it.s8.awesomepizza.utils.Sleeper;
+import it.s8.awesomepizza.utils.sleeper.Sleeper;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.Test;

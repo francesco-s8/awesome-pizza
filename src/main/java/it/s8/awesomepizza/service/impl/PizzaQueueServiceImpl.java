@@ -4,7 +4,7 @@ import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
-import it.s8.awesomepizza.utils.Sleeper;
+import it.s8.awesomepizza.utils.sleeper.Sleeper;
 import java.io.IOException;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
