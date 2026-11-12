@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -44,6 +46,17 @@ public class Pizza extends EntityInfo {
   @Builder.Default
   @Column(name = "is_available")
   private Boolean isAvailable = Boolean.TRUE;
+
+  @Builder.Default
+  @ManyToMany(
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @JoinTable(
+      name = "pizza_ingredients",
+      joinColumns = @JoinColumn(name = "pizza_id"),
+      inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
+  @ToString.Exclude
+  private List<Ingredient> ingredients = new LinkedList<>();
 
   @Override
   public boolean equals(Object o) {

@@ -336,8 +336,17 @@ components:
           description: The price of the pizza with 2 decimal places
           examples:
             - 5.5
-      required:
-        - price
+        ingredients:
+          type: array
+          description: The list of ingredients on the pizza
+          items:
+            type: string
+            minLength: 1
+          examples:
+            - "Tomato"
+            - "Mozzarella"
+            - "Basil"
+
     PizzaOrderTotalToPay:
       type: object
       properties:

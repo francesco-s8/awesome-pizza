@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
@@ -16,7 +17,6 @@ import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.PizzaDto;
@@ -207,7 +207,13 @@ class PizzaMenuControllerTest {
 
   @Test
   void _addPizzaToMenu() throws Exception {
-    var pizzaDtoStub = Instancio.create(PizzaDto.class);
+    var pizzaDtoStub =
+        PizzaDto.builder()
+            .name("Margherita")
+            .description("Tomato and mozzarella")
+            .price(new BigDecimal("8.00"))
+            .ingredients(List.of("Tomato", "Mozzarella"))
+            .build();
     var pizzaStub =
         Pizza.builder()
             .id(1L)
@@ -215,15 +221,25 @@ class PizzaMenuControllerTest {
             .description(pizzaDtoStub.getDescription())
             .price(pizzaDtoStub.getPrice())
             .name(pizzaDtoStub.getName())
+            .ingredients(
+                List.of(
+                    Ingredient.builder().name("Tomato").build(),
+                    Ingredient.builder().name("Mozzarella").build()))
             .build();
     when(pizzaService.addPizza(any())).thenReturn(pizzaStub);
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.post("/api/awesome-pizza/menu")
-                .content(jsonMapper.writeValueAsString(pizzaDtoStub))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isCreated())
-        .andReturn();
+    when(pizzaToPizzaDtoMapper.apply(pizzaStub)).thenReturn(pizzaDtoStub);
+    var response =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post("/api/awesome-pizza/menu")
+                    .content(jsonMapper.writeValueAsString(pizzaDtoStub))
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+    var createdPizza =
+        jsonMapper.readValue(response.getResponse().getContentAsString(), PizzaDto.class);
+    assertThat(createdPizza.getIngredients()).containsExactly("Tomato", "Mozzarella");
   }
 
   @Test
@@ -277,14 +293,26 @@ class PizzaMenuControllerTest {
   @Test
   void _updatePizzaInMenuValidInput() throws Exception {
 
-    var input = PizzaDto.builder().price(BigDecimal.ONE).description("new desc").build();
+    var input =
+        PizzaDto.builder()
+            .name("Margherita")
+            .price(BigDecimal.ONE)
+            .description("La classica")
+            .ingredients(List.of("Mozzarella", "Basilico"))
+            .build();
     var pizzaStub =
         Pizza.builder()
-            .name("pizza stub")
+            .name(input.getName())
             .description(input.getDescription())
             .price(input.getPrice())
+            .ingredients(
+                input.getIngredients().stream()
+                    .map(name -> Ingredient.builder().name(name).build())
+                    .toList())
             .build();
+
     when(pizzaService.updatePizza(1L, input)).thenReturn(pizzaStub);
+
     var actual =
         mockMvc
             .perform(
@@ -294,11 +322,19 @@ class PizzaMenuControllerTest {
             .andExpect(status().isOk())
             .andReturn();
     assertThat(actual.getResponse().getContentAsString()).isNotEmpty();
+    var updatedPizza =
+        jsonMapper.readValue(actual.getResponse().getContentAsString(), PizzaDto.class);
+    assertThat(updatedPizza.getIngredients()).containsExactly("Mozzarella", "Basilico");
   }
 
   @Test
   void _updatePizzaInMenuInvalidInput() throws Exception {
-    var input = PizzaDto.builder().price(new BigDecimal(-1)).description("new desc").build();
+    var input =
+        PizzaDto.builder()
+            .name("Margherita")
+            .price(new BigDecimal(-1))
+            .description("new desc")
+            .build();
     var actual =
         mockMvc
             .perform(

@@ -1,5 +1,6 @@
 package it.s8.awesomepizza.mapper;
 
+import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.entity.Pizza;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.model.PizzaDto;
@@ -23,6 +24,7 @@ public class PizzaToPizzaDtoMapper implements Function<Pizza, PizzaDto> {
         .price(pizza.getPrice())
         .description(pizza.getDescription())
         .name(pizza.getName())
+        .ingredients(pizza.getIngredients().stream().map(Ingredient::getName).toList())
         .build();
   }
 }

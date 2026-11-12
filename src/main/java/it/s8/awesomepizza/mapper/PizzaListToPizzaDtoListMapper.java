@@ -1,5 +1,6 @@
 package it.s8.awesomepizza.mapper;
 
+import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.entity.Pizza;
 import java.util.List;
 import java.util.Objects;
@@ -13,13 +14,14 @@ public class PizzaListToPizzaDtoListMapper implements Function<List<Pizza>, List
   @Override
   public List<PizzaDto> apply(List<Pizza> pizzas) {
     Objects.requireNonNull(pizzas);
-      return pizzas.stream()
-          .map(pizza ->
-              org.openapitools.model.PizzaDto.builder()
-                  .name(pizza.getName())
-                  .description(pizza.getDescription())
-                  .price(pizza.getPrice())
-                  .build())
-          .toList();
+    return pizzas.stream()
+        .map(pizza ->
+            org.openapitools.model.PizzaDto.builder()
+                .name(pizza.getName())
+                .description(pizza.getDescription())
+                .price(pizza.getPrice())
+                .ingredients(pizza.getIngredients().stream().map(Ingredient::getName).toList())
+                .build())
+        .toList();
   }
 }

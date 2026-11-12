@@ -1,24 +1,32 @@
 package it.s8.awesomepizza.service.impl;
 
+import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.repository.IngredientRepository;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import it.s8.awesomepizza.service.PizzaService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.model.PizzaDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 public class PizzaServiceImpl implements PizzaService {
 
   private final PizzaRepository pizzaRepository;
+  private final IngredientRepository ingredientRepository;
 
-  public PizzaServiceImpl(PizzaRepository pizzaRepository) {
+  public PizzaServiceImpl(
+      PizzaRepository pizzaRepository, IngredientRepository ingredientRepository) {
     this.pizzaRepository = pizzaRepository;
+    this.ingredientRepository = ingredientRepository;
   }
 
   @Override
@@ -59,10 +67,17 @@ public class PizzaServiceImpl implements PizzaService {
     pizza.setDescription(pizzaDto.getDescription());
     pizza.setName(pizzaDto.getName());
     pizza.setPrice(pizzaDto.getPrice());
+    pizza.setIngredients(
+        pizzaDto.getIngredients() == null
+            ? List.of()
+            : pizzaDto.getIngredients().stream()
+                .map(name -> Ingredient.builder().name(name).build())
+                .toList());
     return pizzaRepository.save(pizza);
   }
 
   @Override
+  @Transactional
   public Pizza updatePizza(Long pizzaId, PizzaDto pizzaDto) {
     var pizza =
         pizzaRepository
@@ -71,19 +86,50 @@ public class PizzaServiceImpl implements PizzaService {
 
     log.info("Pizza fields to be updated {}", pizzaDto);
 
-    var isDescriptionChanged = StringUtils.isNotBlank(pizzaDto.getDescription());
-    if (isDescriptionChanged) {
+    var descriptionChanged = StringUtils.isNotBlank(pizzaDto.getDescription());
+    if (descriptionChanged) {
       pizza.setDescription(pizzaDto.getDescription());
     }
-    if (pizza.getPrice().compareTo(pizzaDto.getPrice()) == 0 && !isDescriptionChanged) {
-      log.warn(
-          "New price {} for pizza {} is the same nothing to update", pizzaDto.getPrice(), pizza);
+    var priceChanged = pizza.getPrice().compareTo(pizzaDto.getPrice()) != 0;
+    var ingredientNames = pizzaDto.getIngredients();
+    var ingredientsChanged =
+        ingredientNames != null
+            && !pizza.getIngredients().stream()
+                .map(Ingredient::getName)
+                .toList()
+                .equals(ingredientNames.stream().distinct().toList());
+    if (!priceChanged && !descriptionChanged && !ingredientsChanged) {
+      log.warn("No changes for pizza {} is the same nothing to update", pizza);
       return pizza;
     }
 
-    pizza.setPrice(pizzaDto.getPrice());
-    log.info("New record updated {}", pizza);
+    if (priceChanged) {
+      pizza.setPrice(pizzaDto.getPrice());
+    }
+    if (ingredientsChanged) {
+      pizza.setIngredients(resolveIngredients(ingredientNames));
+    }
+    log.info("Pizza {} updated ", pizza);
     return pizzaRepository.save(pizza);
+  }
+
+  private List<Ingredient> resolveIngredients(List<String> ingredientNames) {
+    var uniqueNames = ingredientNames.stream().distinct().toList();
+    var ingredientsByName =
+        ingredientRepository.findByNameIn(uniqueNames).stream()
+            .collect(
+                Collectors.toMap(
+                    Ingredient::getName, Function.identity(), (first, ignored) -> first));
+    var missingIngredients =
+        uniqueNames.stream()
+            .filter(name -> !ingredientsByName.containsKey(name))
+            .map(name -> Ingredient.builder().name(name).build())
+            .toList();
+    ingredientRepository
+        .saveAll(missingIngredients)
+        .forEach(ingredient -> ingredientsByName.put(ingredient.getName(), ingredient));
+
+    return uniqueNames.stream().map(ingredientsByName::get).toList();
   }
 
   @Override

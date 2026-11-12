@@ -14,7 +14,7 @@ For brevity all credentials are clearly visible in the code (DO NOT DO THIS IN R
 
 ## Database population
 
-If you wanna add more pizza(s) just modify [this sql file](src/main/resources/db/migration/V2__add_pizzas.sql)and add entries according to the schema.
+If you wanna add more pizza(s) just modify [this sql file](src/main/resources/db/migration/V5__add_pizzas.sql)and add entries according to the schema.
 Or use the RESTFul endpoints.
 
 ## Execute app

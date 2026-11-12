@@ -8,6 +8,8 @@ RUN --mount=type=cache,target=/root/.m2 mvn -T 2C clean package --errors
 RUN java -Djarmode=tools -jar target/*.jar extract --layers --destination extracted
 
 FROM eclipse-temurin:25.0.4.1_1-jre-noble
+ARG JAR_FILE=application.jar
+ENV JAR_FILE=${JAR_FILE}
 
 RUN addgroup --system app && adduser --system --ingroup app --home /home/app app
 
@@ -19,7 +21,6 @@ COPY --from=builder /builder/extracted/dependencies/ ./
 COPY --from=builder /builder/extracted/spring-boot-loader/ ./
 COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
 COPY --from=builder /builder/extracted/application/ ./
-COPY --from=builder /builder/target/*.jar application.jar
+COPY --from=builder /builder/target/*.jar /application/${JAR_FILE}
 
-
-ENTRYPOINT ["java","-XX:+UseZGC","-XX:+UseCompactObjectHeaders","-XX:+UseStringDeduplication","-XX:+UseCompressedOops","-XX:+UseCompressedClassPointers","-jar","/application/application.jar"]
+ENTRYPOINT ["sh","-c","exec java -XX:+UseZGC -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication -XX:+UseCompressedOops -XX:+UseCompressedClassPointers -jar \"/application/$JAR_FILE\""]

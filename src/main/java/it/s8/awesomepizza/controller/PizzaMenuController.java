@@ -64,14 +64,18 @@ public class PizzaMenuController implements MenuApi {
 
   @Override
   public ResponseEntity<PizzaDto> _updatePizzaInMenu(Long pizzaId, PizzaDto pizzaDto) {
-    var isValidPrice = PizzaInfoValidator.isPizzaPriceValid(pizzaDto.getPrice());
-    if (isValidPrice) {
+    var isValid = PizzaInfoValidator.isValidPizzaInfo(pizzaDto);
+    if (isValid) {
       var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaDto);
       return ResponseEntity.ok(
           PizzaDto.builder()
               .price(updatedPizza.getPrice())
               .description(updatedPizza.getDescription())
               .name(updatedPizza.getName())
+              .ingredients(
+                  updatedPizza.getIngredients().stream()
+                      .map(it.s8.awesomepizza.entity.Ingredient::getName)
+                      .toList())
               .build());
     } else {
       throw new InvalidInputException("Pizza info are invalid " + pizzaDto);
