@@ -19,6 +19,8 @@ import org.openapitools.model.PizzaOrderStatus;
 @Slf4j
 class PizzaOrderUtilsTest {
 
+  private static final String STANDARD_PIZZA_ORDER_PRICE = "33.00";
+
   @Test
   void givenAnOrder_whenGetTotalAsString_thenReturnFormattedString() {
 
@@ -33,14 +35,14 @@ class PizzaOrderUtilsTest {
     assertThatThrownBy(() -> PizzaOrderUtils.getTotalAsString(total))
         .isExactlyInstanceOf(IllegalArgumentException.class);
     assertThatThrownBy(() -> PizzaOrderUtils.getTotalAsString(BigDecimal.ZERO))
-            .isExactlyInstanceOf(IllegalArgumentException.class);
+        .isExactlyInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void givenAPizzaOrderShouldReturnTheProperTotalPrice() {
-    var input = TestHelper.getOrder();
+    var input = TestHelper.getPizzaOrderStub();
     var actual = PizzaOrderUtils.getTotal(input);
-    assertThat(actual).isEqualTo(new BigDecimal("29.00"));
+    assertThat(actual).isEqualTo(new BigDecimal(STANDARD_PIZZA_ORDER_PRICE));
   }
 
   @Test
@@ -56,7 +58,7 @@ class PizzaOrderUtilsTest {
 
   @Test
   void orderCanBePaid() {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
     assertThat(PizzaOrderUtils.canOrderBePaid(order)).isFalse();
   }
@@ -64,7 +66,7 @@ class PizzaOrderUtilsTest {
   @ParameterizedTest
   @MethodSource("it.s8.awesomepizza.helper.TestHelper#checkOrderStatus")
   void orderCanBeDeleted(String orderStatus, boolean canBePaid) {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(orderStatus);
     log.info("Order status {}", order.getOrderStatus());
     assertThat(PizzaOrderUtils.canOrderBeDeleted(order)).isEqualTo(canBePaid);

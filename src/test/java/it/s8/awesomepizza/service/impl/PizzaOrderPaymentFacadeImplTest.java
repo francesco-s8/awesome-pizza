@@ -27,6 +27,7 @@ import org.openapitools.model.PizzaOrderStatus;
 class PizzaOrderPaymentFacadeImplTest {
 
   private static final String ORDER_BEFORE_PAYMENT = "Order before payment: {}";
+
   @InjectMocks private PizzaOrderPaymentFacadeImpl paymentFacade;
 
   @Mock private PizzaOrderServiceImpl pizzaOrderService;
@@ -44,14 +45,15 @@ class PizzaOrderPaymentFacadeImplTest {
 
   @Test
   void givenOrderWithMultiplePizzasShouldCalculateTotalCentsIgnoringNullPrices() {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
 
+    order.getPizzaList().getFirst().setPrice(null);
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
 
     var actual = paymentFacade.calculateOrderTotal(order.getId());
 
-    var expected = NumberFormat.getCurrencyInstance(Locale.ITALY).format(2900 / 100.00);
+    var expected = NumberFormat.getCurrencyInstance(Locale.ITALY).format(2300 / 100.00);
     verify(pizzaOrderService, times(1)).saveOrder(pizzaOrderArgumentCaptor.capture());
     assertThat(pizzaOrderArgumentCaptor.getValue().getOrderStatus())
         .isEqualTo(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
@@ -61,7 +63,7 @@ class PizzaOrderPaymentFacadeImplTest {
 
   @Test
   void givenOrderNotReadyForDeliveryShouldThrowException() {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
 
@@ -84,7 +86,7 @@ class PizzaOrderPaymentFacadeImplTest {
   @Test
   void givenAValidPaymentInfoShouldInvokeSaveOrderMethodOnce() {
 
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.TO_BE_PAID.getValue());
     order.setTotal(BigDecimal.ONE);
     printOrder(order);
@@ -108,7 +110,7 @@ class PizzaOrderPaymentFacadeImplTest {
   @Test
   void givenAValidPaymentInfoAndTheOrderStatusIsNotReadyShouldThrowException() {
 
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus("IN_PROGRESS");
     order.setTotal(BigDecimal.ONE);
     printOrder(order);
@@ -125,19 +127,19 @@ class PizzaOrderPaymentFacadeImplTest {
 
   @Test
   void calculateOrderTotal() {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
 
     var actual = paymentFacade.calculateOrderTotal(1L);
     assertThat(actual).isNotNull();
-    assertThat(actual.getTotal()).startsWith("29,00");
+    assertThat(actual.getTotal()).startsWith("33,00");
   }
 
   @Test
   void processPayment() {
 
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
     when(pizzaOrderService.getOrder(order.getId())).thenReturn(order);
     assertThatThrownBy(() -> paymentFacade.calculateOrderTotal(1L))

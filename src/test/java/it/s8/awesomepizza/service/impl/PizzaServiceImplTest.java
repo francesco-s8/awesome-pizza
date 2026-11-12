@@ -8,13 +8,16 @@ import static org.mockito.Mockito.*;
 import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.repository.IngredientRepository;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +31,8 @@ import org.openapitools.model.PizzaDto;
 @ExtendWith(MockitoExtension.class)
 class PizzaServiceImplTest {
 
+  private static List<String> input;
+
   @InjectMocks PizzaServiceImpl pizzaService;
 
   @Mock PizzaRepository pizzaRepository;
@@ -35,46 +40,24 @@ class PizzaServiceImplTest {
 
   @Captor private ArgumentCaptor<Pizza> pizzaArgumentCaptor;
 
-  private List<Pizza> getPizzasStub() {
-
-    var firstPizza =
-        Pizza.builder()
-            .id(1L)
-            .name("Margherita")
-            .price(BigDecimal.ONE)
-            .description("Margherita")
-            .isAvailable(Boolean.TRUE)
-            .version(0)
-            .build();
-    var secondPizza =
-        Pizza.builder()
-            .id(1L)
-            .name("Marinara")
-            .price(BigDecimal.valueOf(2L))
-            .isAvailable(Boolean.TRUE)
-            .description("Marinara")
-            .version(0)
-            .build();
-
-    return List.of(firstPizza, secondPizza);
+  @BeforeAll
+  static void setUp() {
+    input = TestHelper.getPizzaListStub().stream().map(Pizza::getName).toList();
   }
 
   @Test
   void givenAListOfPizzasShouldReturnSuccessfully() {
 
-    var input = List.of("Margherita", "Marinara");
-
-    when(pizzaRepository.findByNameIn(input)).thenReturn(getPizzasStub());
+    when(pizzaRepository.findByNameIn(input)).thenReturn(TestHelper.getPizzaListStub());
 
     var actual = pizzaService.getPizzas(input);
-    assertThat(actual).isNotEmpty().hasSize(2);
+    assertThat(actual).isNotEmpty().hasSize(3);
   }
 
   @Test
   void givenAValidPizzaListButNoPizzaIsAvailable() {
 
-    var input = List.of("Margherita", "Marinara");
-    var pizzas = getPizzasStub();
+    var pizzas = TestHelper.getPizzaListStub();
     pizzas.forEach(p -> p.setIsAvailable(Boolean.FALSE));
     when(pizzaRepository.findByNameIn(input)).thenReturn(pizzas);
 
@@ -85,9 +68,10 @@ class PizzaServiceImplTest {
 
   @Test
   void givenANotExistingPizzaShouldRaiseAnException() {
-    var pizzasName = List.of("Quattro stagioni");
+
+    var orderPizzaList = List.of("Speciale");
     when(pizzaRepository.findByNameIn(any())).thenReturn(List.of());
-    assertThatThrownBy(() -> pizzaService.getPizzas(pizzasName))
+    assertThatThrownBy(() -> pizzaService.getPizzas(orderPizzaList))
         .isExactlyInstanceOf(AwesomePizzaException.class)
         .hasMessageContaining("Some pizzas not found");
   }
@@ -149,7 +133,7 @@ class PizzaServiceImplTest {
 
   @Test
   void updatePizzaCreatesMissingIngredients() {
-    var pizza = getPizzasStub().getFirst();
+    var pizza = TestHelper.getPizzaListStub().getFirst();
     var newIngredient = Ingredient.builder().name("Basilico").build();
     var update =
         PizzaDto.builder().price(BigDecimal.valueOf(2)).ingredients(List.of("Basilico")).build();
@@ -192,20 +176,19 @@ class PizzaServiceImplTest {
   }
 
   @Test
-  void givenTheSamePizzaPriceShouldBeThrownAPizzaPriceNoUpdateException() {
-    var pizzaInfo = PizzaDto.builder().price(BigDecimal.ONE).build();
-    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
-    pizzaService.updatePizza(1L, pizzaInfo);
-    verify(pizzaRepository, times(0)).save(any());
-  }
-
-  @Test
   void givenANullPizzaDescriptionAndSamePriceShouldNotUpdateRecord() {
-    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.ONE).build();
-    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
+    var pizza = TestHelper.getPizzaListStub().getFirst();
+    var pizzaInfo =
+        PizzaDto.builder()
+            .description(null)
+            .ingredients(pizza.getIngredients().stream().map(Ingredient::getName).toList())
+            .price(BigDecimal.valueOf(10.00).setScale(2, RoundingMode.HALF_UP))
+            .build();
+    when(pizzaRepository.findById(any()))
+        .thenReturn(Optional.of(TestHelper.getPizzaListStub().getFirst()));
     var actual = pizzaService.updatePizza(1L, pizzaInfo);
     assertThat(actual).isNotNull();
-    verify(pizzaRepository, times(0)).save(any());
+    verify(pizzaRepository, never()).save(any());
   }
 
   @Test
@@ -220,7 +203,8 @@ class PizzaServiceImplTest {
   @Test
   void givenNUllDescriptionButDifferentPriceRecordShouldBeUpdated() {
     var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.valueOf(5)).build();
-    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
+    when(pizzaRepository.findById(any()))
+        .thenReturn(Optional.of(TestHelper.getPizzaListStub().getFirst()));
     pizzaService.updatePizza(1L, pizzaInfo);
     verify(pizzaRepository, times(1)).save(any());
   }
@@ -228,10 +212,14 @@ class PizzaServiceImplTest {
   @Test
   void givenAValidPizzaIdShouldReturnThePizzaDetails() {
 
-    when(pizzaRepository.findById(any())).thenReturn(Optional.of(getPizzasStub().getFirst()));
+    when(pizzaRepository.findById(any()))
+        .thenReturn(Optional.of(TestHelper.getPizzaListStub().getFirst()));
     var actual = pizzaService.getPizzaDetails(1L);
     assertThat(actual).isNotNull().extracting("name").isEqualTo("Margherita");
-    assertThat(actual).isNotNull().extracting("price").isEqualTo(BigDecimal.ONE);
+    assertThat(actual)
+        .isNotNull()
+        .extracting("price")
+        .isEqualTo(BigDecimal.valueOf(10.00).setScale(2, RoundingMode.HALF_UP));
   }
 
   @Test
@@ -245,7 +233,7 @@ class PizzaServiceImplTest {
   @Test
   void getAvailablePizzas() {
 
-    var pizza = getPizzasStub();
+    var pizza = TestHelper.getPizzaListStub();
 
     when(pizzaRepository.findByIsAvailableTrue()).thenReturn(List.of(pizza.getLast()));
     List<Pizza> actual = pizzaService.getAvailablePizzas();
@@ -256,7 +244,7 @@ class PizzaServiceImplTest {
   @Test
   void getAvailablePizzasException() {
 
-    var pizza = getPizzasStub();
+    var pizza = TestHelper.getPizzaListStub();
     pizza.forEach(p -> p.setIsAvailable(Boolean.FALSE));
 
     when(pizzaRepository.findByIsAvailableTrue()).thenReturn(List.of());
@@ -267,7 +255,7 @@ class PizzaServiceImplTest {
 
   @Test
   void givenAValidPizzaIdShouldBeSetToBeDisabled() {
-    var pizza = getPizzasStub().getFirst();
+    var pizza = TestHelper.getPizzaListStub().getFirst();
     when(pizzaRepository.findById(pizza.getId())).thenReturn(Optional.of(pizza));
     pizzaService.disablePizza(pizza.getId());
     verify(pizzaRepository, times(1)).save(pizzaArgumentCaptor.capture());

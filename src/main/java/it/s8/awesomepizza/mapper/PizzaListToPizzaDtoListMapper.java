@@ -16,7 +16,7 @@ public class PizzaListToPizzaDtoListMapper implements Function<List<Pizza>, List
     Objects.requireNonNull(pizzas);
     return pizzas.stream()
         .map(pizza ->
-            org.openapitools.model.PizzaDto.builder()
+            PizzaDto.builder()
                 .name(pizza.getName())
                 .description(pizza.getDescription())
                 .price(pizza.getPrice())

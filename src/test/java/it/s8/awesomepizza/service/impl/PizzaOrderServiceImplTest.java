@@ -12,7 +12,6 @@ import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.repository.PizzaOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,12 +34,7 @@ class PizzaOrderServiceImplTest {
   @Test
   void givenAValidOrderIdShouldReturnTheOrder() {
 
-    var order =
-        PizzaOrder.builder()
-            .pizzaList(List.of())
-            .orderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue())
-            .username("test")
-            .build();
+    var order = TestHelper.getPizzaOrderStub();
 
     when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
     var actual = pizzaOrderService.getOrder(anyLong());
@@ -61,7 +55,7 @@ class PizzaOrderServiceImplTest {
   @Test
   void givenAValidPIzzaOrderShouldReturnedProperly() {
 
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     when(pizzaOrderRepository.save(order)).thenReturn(order);
 
     var orderSaved = pizzaOrderService.saveOrder(order);
@@ -71,7 +65,7 @@ class PizzaOrderServiceImplTest {
   @Test
   void prepareOrder_whenValidOrderExists() {
 
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
 
     when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
@@ -79,7 +73,7 @@ class PizzaOrderServiceImplTest {
     verify(pizzaOrderRepository).findById(order.getId());
     verify(pizzaOrderRepository).save(orderCaptor.capture());
     assertThat(orderCaptor).isNotNull();
-    assertThat(orderCaptor.getValue().getTotal()).isEqualTo(new BigDecimal("29.00"));
+    assertThat(orderCaptor.getValue().getTotal()).isEqualTo(new BigDecimal("33.00"));
     assertThat(orderCaptor.getValue().getOrderStatus())
         .isEqualTo(PizzaOrderStatus.OrderStatusEnum.READY_FOR_DELIVERY.getValue());
   }
@@ -95,7 +89,7 @@ class PizzaOrderServiceImplTest {
 
   @Test
   void deleteOrder_whenOrderExists() {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.PAID_AND_DELIVERED.getValue());
     when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
     assertThatThrownBy(() -> pizzaOrderService.deleteOrder(1L))
@@ -113,7 +107,7 @@ class PizzaOrderServiceImplTest {
 
   @Test
   void deleteOrderWithRightStatus() {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
     order.setOrderStatus(PizzaOrderStatus.OrderStatusEnum.IN_PROCESS.getValue());
     when(pizzaOrderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
@@ -128,7 +122,7 @@ class PizzaOrderServiceImplTest {
 
   @Test
   void prepareOrder() {
-    var order = TestHelper.getOrder();
+    var order = TestHelper.getPizzaOrderStub();
 
     order.getPizzaList().forEach(pizza -> pizza.setPrice(BigDecimal.ZERO));
     order.setTotal(BigDecimal.ZERO);
@@ -139,6 +133,4 @@ class PizzaOrderServiceImplTest {
         .isExactlyInstanceOf(AwesomePizzaException.class)
         .hasMessageContaining("Order total is not correct, please recalculate the order");
   }
-
-
 }
