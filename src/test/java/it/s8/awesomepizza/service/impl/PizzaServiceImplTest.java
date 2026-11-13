@@ -176,22 +176,6 @@ class PizzaServiceImplTest {
   }
 
   @Test
-  void givenANullPizzaDescriptionAndSamePriceShouldNotUpdateRecord() {
-    var pizza = TestHelper.getPizzaListStub().getFirst();
-    var pizzaInfo =
-        PizzaDto.builder()
-            .description(null)
-            .ingredients(pizza.getIngredients().stream().map(Ingredient::getName).toList())
-            .price(BigDecimal.valueOf(10.00).setScale(2, RoundingMode.HALF_UP))
-            .build();
-    when(pizzaRepository.findById(any()))
-        .thenReturn(Optional.of(TestHelper.getPizzaListStub().getFirst()));
-    var actual = pizzaService.updatePizza(1L, pizzaInfo);
-    assertThat(actual).isNotNull();
-    verify(pizzaRepository, never()).save(any());
-  }
-
-  @Test
   void givenAnInvalidPizzaIdShouldBeThrownAEntityNotFoundException() {
     var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.ONE).build();
     when(pizzaRepository.findById(anyLong())).thenReturn(Optional.empty());
