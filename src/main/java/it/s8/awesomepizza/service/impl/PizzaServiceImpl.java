@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.openapitools.model.PizzaDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,30 +85,31 @@ public class PizzaServiceImpl implements PizzaService {
 
     log.info("Pizza fields to be updated {}", pizzaDto);
 
-    var descriptionChanged = StringUtils.isNotBlank(pizzaDto.getDescription());
+    var ingredientNames = pizzaDto.getIngredients().stream().distinct().toList();
+
+    var nameChanged = !pizza.getName().equals(pizzaDto.getName());
+    var descriptionChanged = !pizza.getDescription().equals(pizzaDto.getDescription());
+    var priceChanged = pizza.getPrice().compareTo(pizzaDto.getPrice()) != 0;
+    var ingredientsChanged =
+        !ingredientNames.isEmpty() && ingredientNames.size() != pizza.getIngredients().size();
+
+    if (!priceChanged && !descriptionChanged && !ingredientsChanged) {
+      log.warn("No changes for pizza {}, nothing to update", pizza);
+      return pizza;
+    }
+    if (nameChanged) {
+      pizza.setName(pizzaDto.getName());
+    }
     if (descriptionChanged) {
       pizza.setDescription(pizzaDto.getDescription());
     }
-    var priceChanged = pizza.getPrice().compareTo(pizzaDto.getPrice()) != 0;
-    var ingredientNames = pizzaDto.getIngredients();
-    var ingredientsChanged =
-        ingredientNames != null
-            && !pizza.getIngredients().stream()
-                .map(Ingredient::getName)
-                .toList()
-                .equals(ingredientNames.stream().distinct().toList());
-    if (!priceChanged && !descriptionChanged && !ingredientsChanged) {
-      log.warn("No changes for pizza {} is the same nothing to update", pizza);
-      return pizza;
-    }
-
     if (priceChanged) {
       pizza.setPrice(pizzaDto.getPrice());
     }
     if (ingredientsChanged) {
       pizza.setIngredients(resolveIngredients(ingredientNames));
     }
-    log.info("Pizza {} updated ", pizza);
+    log.info("Pizza info has been updated {} ", pizza);
     return pizzaRepository.save(pizza);
   }
 

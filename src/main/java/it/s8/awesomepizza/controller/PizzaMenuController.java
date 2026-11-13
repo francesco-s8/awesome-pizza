@@ -64,8 +64,8 @@ public class PizzaMenuController implements MenuApi {
 
   @Override
   public ResponseEntity<PizzaDto> _updatePizzaInMenu(Long pizzaId, PizzaDto pizzaDto) {
-    var isValid = PizzaInfoValidator.isValidPizzaInfo(pizzaDto);
-    if (isValid) {
+    var isPriceValid = PizzaInfoValidator.isPizzaPriceValid(pizzaDto.getPrice());
+    if (isPriceValid) {
       var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaDto);
       return ResponseEntity.ok(
           PizzaDto.builder()

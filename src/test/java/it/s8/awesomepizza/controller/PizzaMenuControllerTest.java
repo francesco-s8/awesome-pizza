@@ -39,15 +39,11 @@ class PizzaMenuControllerTest {
   private final JsonMapper jsonMapper = new JsonMapper();
 
   private List<Pizza> pizzasList;
-
   private List<PizzaDto> pizzasDtoList;
 
   @MockitoBean PizzaService pizzaService;
-
   @MockitoBean PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper;
-
   @MockitoBean PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper;
-
   @MockitoBean PizzaInfoValidator pizzaInfoValidator;
 
   @BeforeEach
@@ -316,7 +312,7 @@ class PizzaMenuControllerTest {
     var actual =
         mockMvc
             .perform(
-                MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
+                MockMvcRequestBuilders.patch("/api/awesome-pizza/menu/1")
                     .content(jsonMapper.writeValueAsString(input))
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -338,7 +334,7 @@ class PizzaMenuControllerTest {
     var actual =
         mockMvc
             .perform(
-                MockMvcRequestBuilders.put("/api/awesome-pizza/menu/1")
+                MockMvcRequestBuilders.patch("/api/awesome-pizza/menu/1")
                     .content(jsonMapper.writeValueAsString(input))
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())

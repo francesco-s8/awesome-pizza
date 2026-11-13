@@ -39,7 +39,7 @@ class PizzaInfoValidatorTest {
   }
 
   @Test
-  void isPIzzaInfoValid() {
+  void isPizzaInfoValid() {
     var stub = Instancio.create(PizzaDto.class);
     assertThat(PizzaInfoValidator.isValidPizzaInfo(stub)).isTrue();
   }
