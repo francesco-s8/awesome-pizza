@@ -7,6 +7,7 @@ import it.s8.awesomepizza.service.PizzaService;
 import it.s8.awesomepizza.utils.PizzaInfoValidator;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
+import org.openapitools.model.PizzaBaseDto;
 import org.openapitools.model.PizzaDto;
 import org.openapitools.model.PizzaMenu;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,6 @@ public class PizzaMenuController implements MenuApi {
   public ResponseEntity<PizzaDto> _addPizzaToMenu(PizzaDto pizzaDto) {
     var isValid = PizzaInfoValidator.isValidPizzaInfo(pizzaDto);
     if (isValid) {
-
       var newPizza = pizzaService.addPizza(pizzaDto);
       return ResponseEntity.created(URI.create(PATH_ADD_PIZZA_TO_MENU + newPizza.getId()))
           .body(pizzaToPizzaDtoMapper.apply(newPizza));
@@ -62,11 +62,13 @@ public class PizzaMenuController implements MenuApi {
     return ResponseEntity.ok(mapped);
   }
 
+
+
   @Override
-  public ResponseEntity<PizzaDto> _updatePizzaInMenu(Long pizzaId, PizzaDto pizzaDto) {
-    var isPriceValid = PizzaInfoValidator.isPizzaPriceValid(pizzaDto.getPrice());
+  public ResponseEntity<PizzaDto> _updatePizzaInMenu(Long pizzaId, PizzaBaseDto pizzaBaseDto) {
+    var isPriceValid = PizzaInfoValidator.isPizzaPriceValid(pizzaBaseDto.getPrice());
     if (isPriceValid) {
-      var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaDto);
+      var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaBaseDto);
       return ResponseEntity.ok(
           PizzaDto.builder()
               .price(updatedPizza.getPrice())
@@ -78,7 +80,7 @@ public class PizzaMenuController implements MenuApi {
                       .toList())
               .build());
     } else {
-      throw new InvalidInputException("Pizza info are invalid " + pizzaDto);
+      throw new InvalidInputException("Pizza info are invalid " + pizzaBaseDto);
     }
   }
 }

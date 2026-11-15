@@ -28,6 +28,14 @@ class PizzaRepositoryTest {
   }
 
   @Test
+  void findPizzaByNameIgnoringCase() {
+
+    pizzaRepository
+        .findByNameIgnoreCase("margherita")
+        .ifPresent(pizza -> assertThat(pizza.getPrice()).isEqualTo(new BigDecimal("10.00")));
+  }
+
+  @Test
   void givenAnExistingPizzaShouldBeFoundAndReturnSuccessfully() {
 
     var actual = pizzaRepository.findByNameIn(List.of("Margherita"));

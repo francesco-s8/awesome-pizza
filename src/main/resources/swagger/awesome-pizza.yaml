@@ -103,7 +103,7 @@ paths:
       tags:
         - menu
       summary: Update an existing pizza in the menu
-      description: Updates the details of an existing pizza in the menu.
+      description: Updates description and or price of an existing pizza.
       operationId: updatePizzaInMenu
       parameters:
         - in: path
@@ -118,7 +118,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PizzaDto'
+              $ref: '#/components/schemas/PizzaBaseDto'
         required: true
       responses:
         '200':
@@ -315,15 +315,9 @@ components:
           description: A list of available pizzas
           items:
             $ref: '#/components/schemas/PizzaDto'
-    PizzaDto:
+    PizzaBaseDto:
       type: object
       properties:
-        name:
-          type: string
-          minLength: 1
-          description: The name of the pizza
-          examples:
-            - "Margherita"
         description:
           type: string
           minLength: 1
@@ -336,16 +330,29 @@ components:
           description: The price of the pizza with 2 decimal places
           examples:
             - 5.5
-        ingredients:
-          type: array
-          description: The list of ingredients on the pizza
-          items:
-            type: string
-            minLength: 1
-          examples:
-            - "Tomato"
-            - "Mozzarella"
-            - "Basil"
+
+    PizzaDto:
+      allOf:
+        - $ref: '#/components/schemas/PizzaBaseDto'
+        - type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+              description: The name of the pizza
+              examples:
+                - "Margherita"
+            ingredients:
+              type: array
+              description: The list of ingredients on the pizza
+              items:
+                type: string
+                minLength: 1
+                description: The name of the ingredient
+              examples:
+                - "Tomato"
+                - "Mozzarella"
+                - "Basil"
 
     PizzaOrderTotalToPay:
       type: object

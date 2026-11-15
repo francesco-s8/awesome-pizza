@@ -8,9 +8,8 @@ import it.s8.awesomepizza.repository.PizzaRepository;
 import it.s8.awesomepizza.service.PizzaService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.openapitools.model.PizzaBaseDto;
 import org.openapitools.model.PizzaDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +30,7 @@ public class PizzaServiceImpl implements PizzaService {
   @Override
   public List<Pizza> getPizzas(List<String> pizzaNames) {
     var pizzas = pizzaRepository.findByNameIn(pizzaNames);
+
     if (pizzas.size() != pizzaNames.size()) {
       throw new AwesomePizzaException("Some pizzas not found in the menu");
     }
@@ -60,54 +60,49 @@ public class PizzaServiceImpl implements PizzaService {
   }
 
   @Override
+  @Transactional
   public Pizza addPizza(PizzaDto pizzaDto) {
 
-    var pizza = new Pizza();
-    pizza.setDescription(pizzaDto.getDescription());
-    pizza.setName(pizzaDto.getName());
-    pizza.setPrice(pizzaDto.getPrice());
-    pizza.setIngredients(
-        pizzaDto.getIngredients() == null
-            ? List.of()
-            : pizzaDto.getIngredients().stream()
-                .map(name -> Ingredient.builder().name(name).build())
-                .toList());
+    var existPizza =
+        pizzaRepository.findByNameIgnoreCase(pizzaDto.getName());
+    if (existPizza.isPresent()) {
+      log.info("Pizza with name {} already exists", pizzaDto.getName());
+      throw new AwesomePizzaException("Pizza with name " + pizzaDto.getName() + " already exists");
+    }
+    var pizza =
+        Pizza.builder()
+            .name(pizzaDto.getName())
+            .description(pizzaDto.getDescription())
+            .price(pizzaDto.getPrice())
+            .ingredients(resolveIngredients(pizzaDto.getIngredients()))
+            .isAvailable(Boolean.TRUE)
+            .build();
     return pizzaRepository.save(pizza);
   }
 
   @Override
   @Transactional
-  public Pizza updatePizza(Long pizzaId, PizzaDto pizzaDto) {
+  public Pizza updatePizza(Long pizzaId, PizzaBaseDto pizzaBaseDto) {
     var pizza =
         pizzaRepository
             .findById(pizzaId)
             .orElseThrow(() -> new EntityNotFoundException("Pizza not found id " + pizzaId));
 
-    log.info("Pizza fields to be updated {}", pizzaDto);
+    log.info("Pizza fields to be updated {}", pizzaBaseDto);
 
-    var ingredientNames = pizzaDto.getIngredients().stream().distinct().toList();
+    var descriptionChanged = !pizza.getDescription().equals(pizzaBaseDto.getDescription());
+    var priceChanged = pizza.getPrice().compareTo(pizzaBaseDto.getPrice()) != 0;
 
-    var nameChanged = !pizza.getName().equals(pizzaDto.getName());
-    var descriptionChanged = !pizza.getDescription().equals(pizzaDto.getDescription());
-    var priceChanged = pizza.getPrice().compareTo(pizzaDto.getPrice()) != 0;
-    var ingredientsChanged =
-        !ingredientNames.isEmpty() && ingredientNames.size() != pizza.getIngredients().size();
-
-    if (!priceChanged && !descriptionChanged && !ingredientsChanged) {
+    if (!priceChanged && !descriptionChanged) {
       log.warn("No changes for pizza {}, nothing to update", pizza);
       return pizza;
     }
-    if (nameChanged) {
-      pizza.setName(pizzaDto.getName());
-    }
+
     if (descriptionChanged) {
-      pizza.setDescription(pizzaDto.getDescription());
+      pizza.setDescription(pizzaBaseDto.getDescription());
     }
     if (priceChanged) {
-      pizza.setPrice(pizzaDto.getPrice());
-    }
-    if (ingredientsChanged) {
-      pizza.setIngredients(resolveIngredients(ingredientNames));
+      pizza.setPrice(pizzaBaseDto.getPrice());
     }
     log.info("Pizza info has been updated {} ", pizza);
     return pizzaRepository.save(pizza);
@@ -115,21 +110,15 @@ public class PizzaServiceImpl implements PizzaService {
 
   private List<Ingredient> resolveIngredients(List<String> ingredientNames) {
     var uniqueNames = ingredientNames.stream().distinct().toList();
-    var ingredientsByName =
-        ingredientRepository.findByNameIn(uniqueNames).stream()
-            .collect(
-                Collectors.toMap(
-                    Ingredient::getName, Function.identity(), (first, ignored) -> first));
-    var missingIngredients =
-        uniqueNames.stream()
-            .filter(name -> !ingredientsByName.containsKey(name))
-            .map(name -> Ingredient.builder().name(name).build())
-            .toList();
-    ingredientRepository
-        .saveAll(missingIngredients)
-        .forEach(ingredient -> ingredientsByName.put(ingredient.getName(), ingredient));
-
-    return uniqueNames.stream().map(ingredientsByName::get).toList();
+    var foundIngredients = ingredientRepository.findByNameIn(uniqueNames);
+    if (foundIngredients.isEmpty() || foundIngredients.size() != uniqueNames.size()) {
+      log.info(
+          " Expected ingredients {}  mismatched with one in the database {}",
+          uniqueNames,
+          foundIngredients);
+      throw new AwesomePizzaException("Some ingredients " + uniqueNames + "not found");
+    }
+    return foundIngredients;
   }
 
   @Override

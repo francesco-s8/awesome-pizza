@@ -19,6 +19,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.model.PizzaBaseDto;
 import org.openapitools.model.PizzaDto;
 import org.openapitools.model.PizzaMenu;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -290,21 +291,14 @@ class PizzaMenuControllerTest {
   void _updatePizzaInMenuValidInput() throws Exception {
 
     var input =
-        PizzaDto.builder()
-            .name("Margherita")
+            PizzaBaseDto.builder()
             .price(BigDecimal.ONE)
             .description("La classica")
-            .ingredients(List.of("Mozzarella", "Basilico"))
             .build();
     var pizzaStub =
         Pizza.builder()
-            .name(input.getName())
             .description(input.getDescription())
             .price(input.getPrice())
-            .ingredients(
-                input.getIngredients().stream()
-                    .map(name -> Ingredient.builder().name(name).build())
-                    .toList())
             .build();
 
     when(pizzaService.updatePizza(1L, input)).thenReturn(pizzaStub);
@@ -320,7 +314,7 @@ class PizzaMenuControllerTest {
     assertThat(actual.getResponse().getContentAsString()).isNotEmpty();
     var updatedPizza =
         jsonMapper.readValue(actual.getResponse().getContentAsString(), PizzaDto.class);
-    assertThat(updatedPizza.getIngredients()).containsExactly("Mozzarella", "Basilico");
+    assertThat(updatedPizza.getDescription()).isEqualTo(input.getDescription());
   }
 
   @Test

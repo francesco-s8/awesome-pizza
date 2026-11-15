@@ -4,6 +4,7 @@ import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import org.openapitools.model.PizzaBaseDto;
 import org.openapitools.model.PizzaDto;
 
 public interface PizzaService {
@@ -17,7 +18,7 @@ public interface PizzaService {
 
   Pizza addPizza(PizzaDto pizzaDto) throws EntityNotFoundException, AwesomePizzaException;
 
-  Pizza updatePizza(Long pizzaId, PizzaDto pizzaDto) throws EntityNotFoundException;
+  Pizza updatePizza(Long pizzaId, PizzaBaseDto pizzaBaseDto) throws EntityNotFoundException;
 
   void disablePizza(Long pizzaId);
 }

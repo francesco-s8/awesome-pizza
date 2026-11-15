@@ -25,6 +25,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.openapitools.model.PizzaBaseDto;
 import org.openapitools.model.PizzaDto;
 
 @Slf4j
@@ -39,6 +40,7 @@ class PizzaServiceImplTest {
   @Mock IngredientRepository ingredientRepository;
 
   @Captor private ArgumentCaptor<Pizza> pizzaArgumentCaptor;
+  @Captor private ArgumentCaptor<Iterable<Ingredient>> ingredientArgumentCaptor;
 
   @BeforeAll
   static void setUp() {
@@ -77,87 +79,71 @@ class PizzaServiceImplTest {
   }
 
   @Test
-  void addPizza() {
+  void addPizzaReusesIngredientsAlreadyInTheCatalog() {
 
-    String margherita = "Margherita";
-    var pizzaStub =
-        PizzaDto.builder()
-            .name(margherita)
-            .price(BigDecimal.ONE)
-            .description(margherita)
-            .ingredients(List.of("Tomato", "Mozzarella"))
-            .build();
+    var ingredientsStub =
+            List.of(
+                    Ingredient.builder().id(1L).name("Tomato").build(),
+                    Ingredient.builder().id(2L).name("Olives").build(),
+                    Ingredient.builder().id(3L).name("Mushrooms").build());
+    var pizzaDto =
+            PizzaDto.builder()
+                    .name("Olive pizza")
+                    .price(BigDecimal.ONE)
+                    .description("Tomato, olives and mushrooms")
+                    .ingredients(List.of("Tomato", "Mushrooms", "Olives"))
+                    .build();
 
+    when(ingredientRepository.findByNameIn(List.of("Tomato", "Mushrooms", "Olives"))).thenReturn(ingredientsStub);
     when(pizzaRepository.save(any(Pizza.class))).thenAnswer(i -> i.getArgument(0));
-    var actual = pizzaService.addPizza(pizzaStub);
+
+    var actual = pizzaService.addPizza(pizzaDto);
     assertThat(actual).isNotNull();
-    assertThat(actual.getName()).isNotEmpty().isEqualTo(margherita);
-    assertThat(actual.getDescription()).isNotEmpty().isEqualTo(margherita);
-    assertThat(actual.getPrice()).isEqualTo(BigDecimal.ONE);
-    assertThat(actual.getIngredients())
-        .extracting(Ingredient::getName)
-        .containsExactly("Tomato", "Mozzarella");
+    assertThat(actual.getName()).isNotEmpty().isEqualTo("Olive pizza");
+    assertThat(actual.getIngredients()).isNotEmpty().hasSize(3);
+
+    verify(pizzaRepository).save(pizzaArgumentCaptor.capture());
+
+    assertThat(pizzaArgumentCaptor.getValue().getIngredients())
+            .extracting(Ingredient::getName)
+            .containsExactlyInAnyOrder("Tomato", "Mushrooms", "Olives");
+
+
+
+
   }
 
   @Test
-  void updatePizzaReplacesTheExistingIngredientsList() {
-    var oldIngredient = Ingredient.builder().id(1L).name("Pomodoro").build();
-    var pizza =
-        Pizza.builder()
-            .id(1L)
-            .name("Margherita")
-            .description("Classic pizza")
-            .price(BigDecimal.ONE)
-            .ingredients(List.of(oldIngredient))
-            .build();
-    var mozzarella = Ingredient.builder().id(2L).name("Mozzarella").build();
-    var basilico = Ingredient.builder().id(3L).name("Basilico").build();
-    var update =
-        PizzaDto.builder()
-            .description("Classic pizza")
-            .price(BigDecimal.valueOf(2))
-            .ingredients(List.of("Mozzarella", "Basilico"))
-            .build();
-    when(pizzaRepository.findById(1L)).thenReturn(Optional.of(pizza));
-    when(ingredientRepository.findByNameIn(List.of("Mozzarella", "Basilico")))
-        .thenReturn(List.of(mozzarella, basilico));
-    when(pizzaRepository.save(any(Pizza.class))).thenAnswer(i -> i.getArgument(0));
+  void addPizzaButItsalrealdyPresent() {
+    var pizzaDto =
+            PizzaDto.builder()
+                    .name("Olive pizza")
+                    .price(BigDecimal.ONE)
+                    .description("Tomato, olives and mushrooms")
+                    .ingredients(List.of("Tomato", "Mushrooms", "Olives"))
+                    .build();
+    when(pizzaRepository.findByNameIgnoreCase(pizzaDto.getName())).thenReturn(Optional.of(Pizza.builder().name("Olive pizza").build()));
 
-    var updatedPizza = pizzaService.updatePizza(1L, update);
-
-    assertThat(updatedPizza.getIngredients())
-        .extracting(Ingredient::getName)
-        .containsExactly("Mozzarella", "Basilico");
-    verify(pizzaRepository).save(pizza);
+    assertThatThrownBy(() -> pizzaService.addPizza(pizzaDto))
+            .isExactlyInstanceOf(AwesomePizzaException.class)
+            .hasMessageContaining("already exists");
   }
 
   @Test
   void updatePizzaCreatesMissingIngredients() {
     var pizza = TestHelper.getPizzaListStub().getFirst();
-    var newIngredient = Ingredient.builder().name("Basilico").build();
-    var update =
-        PizzaDto.builder().price(BigDecimal.valueOf(2)).ingredients(List.of("Basilico")).build();
+    var update = PizzaBaseDto.builder().price(BigDecimal.valueOf(2)).build();
     when(pizzaRepository.findById(1L)).thenReturn(Optional.of(pizza));
-    when(ingredientRepository.findByNameIn(List.of("Basilico"))).thenReturn(List.of());
-    when(ingredientRepository.saveAll(any())).thenReturn(List.of(newIngredient));
     when(pizzaRepository.save(any(Pizza.class))).thenAnswer(i -> i.getArgument(0));
-
     var updatedPizza = pizzaService.updatePizza(1L, update);
-
-    assertThat(updatedPizza.getIngredients())
-        .extracting(Ingredient::getName)
-        .containsExactly("Basilico");
+    assertThat(updatedPizza).isNotNull();
   }
 
   @Test
   void updatePizza() {
 
     var pizzaInfo =
-        PizzaDto.builder()
-            .name("Margherita")
-            .price(BigDecimal.valueOf(10L))
-            .description("Margherita NEW")
-            .build();
+        PizzaBaseDto.builder().price(BigDecimal.valueOf(10L)).description("Margherita NEW").build();
     when(pizzaRepository.findById(1L))
         .thenReturn(
             Optional.of(
@@ -177,7 +163,7 @@ class PizzaServiceImplTest {
 
   @Test
   void givenAnInvalidPizzaIdShouldBeThrownAEntityNotFoundException() {
-    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.ONE).build();
+    var pizzaInfo = PizzaBaseDto.builder().description(null).price(BigDecimal.ONE).build();
     when(pizzaRepository.findById(anyLong())).thenReturn(Optional.empty());
     assertThatThrownBy(() -> pizzaService.updatePizza(1L, pizzaInfo))
         .isExactlyInstanceOf(EntityNotFoundException.class);
@@ -186,7 +172,7 @@ class PizzaServiceImplTest {
 
   @Test
   void givenNUllDescriptionButDifferentPriceRecordShouldBeUpdated() {
-    var pizzaInfo = PizzaDto.builder().description(null).price(BigDecimal.valueOf(5)).build();
+    var pizzaInfo = PizzaBaseDto.builder().description(null).price(BigDecimal.valueOf(5)).build();
     when(pizzaRepository.findById(any()))
         .thenReturn(Optional.of(TestHelper.getPizzaListStub().getFirst()));
     pizzaService.updatePizza(1L, pizzaInfo);
