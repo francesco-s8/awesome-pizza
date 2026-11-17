@@ -9,10 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
+import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.mapper.PizzaToPizzaDtoMapper;
-import it.s8.awesomepizza.service.PizzaService;
-import it.s8.awesomepizza.utils.PizzaInfoValidator;
+import it.s8.awesomepizza.service.PizzaServiceFacade;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -42,78 +42,19 @@ class PizzaMenuControllerTest {
   private List<Pizza> pizzasList;
   private List<PizzaDto> pizzasDtoList;
 
-  @MockitoBean PizzaService pizzaService;
+  @MockitoBean PizzaServiceFacade pizzaServiceFacade;
   @MockitoBean PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper;
   @MockitoBean PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper;
-  @MockitoBean PizzaInfoValidator pizzaInfoValidator;
 
   @BeforeEach
   void setupStubs() {
-    var margherita =
-        Pizza.builder()
-            .id(1L)
-            .name("Margherita")
-            .price(new BigDecimal("8.00"))
-            .description("La classica con pomodoro, mozzarella e basilico")
-            .build();
-    var marinara =
-        Pizza.builder()
-            .id(2L)
-            .name("Marinara")
-            .price(new BigDecimal("7.00"))
-            .description("Pomodoro, aglio e origano")
-            .build();
-
-    var margheritaDto =
-        PizzaDto.builder()
-            .name("Margherita")
-            .description("La classica con pomodoro, mozzarella e basilico")
-            .price(new BigDecimal("8.00"))
-            .build();
-    var marinaraDto =
-        PizzaDto.builder()
-            .name("Marinara")
-            .description("Pomodoro, aglio e origano")
-            .price(new BigDecimal("7.00"))
-            .build();
-    pizzasList = List.of(margherita, marinara);
-    pizzasDtoList = List.of(margheritaDto, marinaraDto);
+    pizzasList = TestHelper.getPizzaListStub();
+    pizzasDtoList = TestHelper.getPizzaDtoListStub();
   }
 
   @Test
   void shouldReturnMenuWithAvailablePizzas() throws Exception {
-
-    var margherita =
-        Pizza.builder()
-            .id(1L)
-            .name("Margherita")
-            .price(new BigDecimal("8.00"))
-            .description("La classica con pomodoro, mozzarella e basilico")
-            .build();
-    var marinara =
-        Pizza.builder()
-            .id(2L)
-            .name("Marinara")
-            .price(new BigDecimal("7.00"))
-            .description("Pomodoro, aglio e origano")
-            .build();
-
-    var margheritaDto =
-        PizzaDto.builder()
-            .name("Margherita")
-            .description("La classica con pomodoro, mozzarella e basilico")
-            .price(new BigDecimal("8.00"))
-            .build();
-    var marinaraDto =
-        PizzaDto.builder()
-            .name("Marinara")
-            .description("Pomodoro, aglio e origano")
-            .price(new BigDecimal("7.00"))
-            .build();
-    pizzasList = List.of(margherita, marinara);
-    pizzasDtoList = List.of(margheritaDto, marinaraDto);
-
-    when(pizzaService.getAvailablePizzas()).thenReturn(pizzasList);
+    when(pizzaServiceFacade.pizzaMenu()).thenReturn(pizzasList);
     when(pizzaListToPizzaDtoListMapper.apply(pizzasList)).thenReturn(pizzasDtoList);
 
     var actual =
@@ -130,7 +71,7 @@ class PizzaMenuControllerTest {
   @Test
   void shouldReturnMenuWithEmptyListWhenNoPizzasAvailable() throws Exception {
 
-    when(pizzaService.getAvailablePizzas()).thenReturn(List.of());
+    when(pizzaServiceFacade.pizzaMenu()).thenReturn(List.of());
     when(pizzaListToPizzaDtoListMapper.apply(List.of())).thenReturn(List.of());
 
     var actual =
@@ -148,7 +89,7 @@ class PizzaMenuControllerTest {
   @Test
   void _pizzaDetails() throws Exception {
 
-    when(pizzaService.getPizzaDetails(anyLong())).thenReturn(pizzasList.getFirst());
+    when(pizzaServiceFacade.pizzaDetails(anyLong())).thenReturn(pizzasList.getFirst());
     when(pizzaToPizzaDtoMapper.apply(pizzasList.getFirst())).thenReturn(pizzasDtoList.getFirst());
     var actual =
         mockMvc
@@ -165,7 +106,7 @@ class PizzaMenuControllerTest {
   @Test
   void givenANonExistingOrderIdShouldBeReturnANotFoundStatus() throws Exception {
 
-    when(pizzaService.getPizzaDetails(99L))
+    when(pizzaServiceFacade.pizzaDetails(99L))
         .thenThrow(new EntityNotFoundException("Pizza not found id " + 99));
 
     mockMvc
@@ -179,7 +120,7 @@ class PizzaMenuControllerTest {
   @Test
   void givenValidInputWithAnUnknownPizzaIsAnInternalErrorShouldBeReturned() throws Exception {
 
-    when(pizzaService.getAvailablePizzas())
+    when(pizzaServiceFacade.pizzaMenu())
         .thenThrow(new AwesomePizzaException("Some pizzas not found"));
 
     mockMvc
@@ -193,7 +134,7 @@ class PizzaMenuControllerTest {
   @Test
   void givenValidInputWithADatabaseIssuesAnInternalErrorShouldBeReturned() throws Exception {
 
-    doThrow(EmptyResultDataAccessException.class).when(pizzaService).getAvailablePizzas();
+    doThrow(EmptyResultDataAccessException.class).when(pizzaServiceFacade).pizzaMenu();
     mockMvc
         .perform(
             MockMvcRequestBuilders.get("/api/awesome-pizza/menu")
@@ -223,7 +164,7 @@ class PizzaMenuControllerTest {
                     Ingredient.builder().name("Tomato").build(),
                     Ingredient.builder().name("Mozzarella").build()))
             .build();
-    when(pizzaService.addPizza(any())).thenReturn(pizzaStub);
+    when(pizzaServiceFacade.addNewPizza(any())).thenReturn(pizzaStub);
     when(pizzaToPizzaDtoMapper.apply(pizzaStub)).thenReturn(pizzaDtoStub);
     var response =
         mockMvc
@@ -253,7 +194,7 @@ class PizzaMenuControllerTest {
 
   @Test
   void _getMenu() throws Exception {
-    when(pizzaService.getAvailablePizzas())
+    when(pizzaServiceFacade.pizzaMenu())
         .thenThrow(new EntityNotFoundException("No pizzas available"));
 
     mockMvc
@@ -277,7 +218,7 @@ class PizzaMenuControllerTest {
   @Test
   void disablePizzaWhenPizzaIsNotFound() throws Exception {
     doThrow(new EntityNotFoundException("No pizza with id " + 1))
-        .when(pizzaService)
+        .when(pizzaServiceFacade)
         .disablePizza(anyLong());
     mockMvc
         .perform(
@@ -290,19 +231,17 @@ class PizzaMenuControllerTest {
   @Test
   void _updatePizzaInMenuValidInput() throws Exception {
 
-    var input =
-            PizzaBaseDto.builder()
-            .price(BigDecimal.ONE)
-            .description("La classica")
-            .build();
-    var pizzaStub =
-        Pizza.builder()
-            .description(input.getDescription())
-            .price(input.getPrice())
-            .build();
+    var stub = TestHelper.getPizzaListStub().getFirst();
+    var input = PizzaBaseDto.builder().price(BigDecimal.ONE).build();
 
-    when(pizzaService.updatePizza(1L, input)).thenReturn(pizzaStub);
-
+    when(pizzaServiceFacade.updatePizza(1L, input)).thenReturn(stub);
+    when(pizzaToPizzaDtoMapper.apply(stub))
+        .thenReturn(
+            PizzaDto.builder()
+                .name(stub.getName())
+                .description(stub.getDescription())
+                .price(input.getPrice())
+                .build());
     var actual =
         mockMvc
             .perform(
@@ -314,7 +253,8 @@ class PizzaMenuControllerTest {
     assertThat(actual.getResponse().getContentAsString()).isNotEmpty();
     var updatedPizza =
         jsonMapper.readValue(actual.getResponse().getContentAsString(), PizzaDto.class);
-    assertThat(updatedPizza.getDescription()).isEqualTo(input.getDescription());
+    assertThat(updatedPizza.getPrice()).isEqualTo(input.getPrice());
+    assertThat(updatedPizza.getDescription()).isEqualTo(stub.getDescription());
   }
 
   @Test

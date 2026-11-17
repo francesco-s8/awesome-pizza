@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
 
 @Entity
 @Getter
@@ -38,25 +37,18 @@ public class Ingredient extends EntityInfo {
   @Column(name = "version")
   private Integer version;
 
+  @Column(name = "is_available")
+  @Builder.Default private Boolean isAvailable = true;
+
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null) return false;
-    Class<?> oEffectiveClass =
-        o instanceof HibernateProxy hibernateproxy
-            ? hibernateproxy.getHibernateLazyInitializer().getPersistentClass()
-            : o.getClass();
-    Class<?> thisEffectiveClass =
-        this instanceof HibernateProxy hibernateproxy
-            ? hibernateproxy.getHibernateLazyInitializer().getPersistentClass()
-            : this.getClass();
-    if (thisEffectiveClass != oEffectiveClass) return false;
-    Ingredient ingredient = (Ingredient) o;
-    return getId() != null && Objects.equals(getId(), ingredient.getId());
+    if (o == null || getClass() != o.getClass()) return false;
+    Ingredient that = (Ingredient) o;
+    return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getVersion(), that.getVersion()) && Objects.equals(getIsAvailable(), that.getIsAvailable());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(getId());
+    return Objects.hash(getId(), getName(), getVersion(), getIsAvailable());
   }
 }

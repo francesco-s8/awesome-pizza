@@ -3,7 +3,7 @@ package it.s8.awesomepizza.controller;
 import it.s8.awesomepizza.exception.InvalidInputException;
 import it.s8.awesomepizza.mapper.PizzaListToPizzaDtoListMapper;
 import it.s8.awesomepizza.mapper.PizzaToPizzaDtoMapper;
-import it.s8.awesomepizza.service.PizzaService;
+import it.s8.awesomepizza.service.PizzaServiceFacade;
 import it.s8.awesomepizza.utils.PizzaInfoValidator;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
@@ -17,15 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PizzaMenuController implements MenuApi {
 
-  private final PizzaService pizzaService;
+  private final PizzaServiceFacade pizzaServiceFacade;
   private final PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper;
   private final PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper;
 
   public PizzaMenuController(
-      PizzaService pizzaService,
+      PizzaServiceFacade pizzaServiceFacade,
       PizzaListToPizzaDtoListMapper pizzaListToPizzaDtoListMapper,
       PizzaToPizzaDtoMapper pizzaToPizzaDtoMapper) {
-    this.pizzaService = pizzaService;
+    this.pizzaServiceFacade = pizzaServiceFacade;
+
     this.pizzaListToPizzaDtoListMapper = pizzaListToPizzaDtoListMapper;
     this.pizzaToPizzaDtoMapper = pizzaToPizzaDtoMapper;
   }
@@ -34,7 +35,7 @@ public class PizzaMenuController implements MenuApi {
   public ResponseEntity<PizzaDto> _addPizzaToMenu(PizzaDto pizzaDto) {
     var isValid = PizzaInfoValidator.isValidPizzaInfo(pizzaDto);
     if (isValid) {
-      var newPizza = pizzaService.addPizza(pizzaDto);
+      var newPizza = pizzaServiceFacade.addNewPizza(pizzaDto);
       return ResponseEntity.created(URI.create(PATH_ADD_PIZZA_TO_MENU + newPizza.getId()))
           .body(pizzaToPizzaDtoMapper.apply(newPizza));
     } else {
@@ -45,40 +46,30 @@ public class PizzaMenuController implements MenuApi {
   @Override
   public ResponseEntity<Void> _disablePizzaAvailability(Long pizzaId) {
 
-    pizzaService.disablePizza(pizzaId);
+    pizzaServiceFacade.disablePizza(pizzaId);
     return ResponseEntity.noContent().build();
   }
 
   @Override
   public ResponseEntity<PizzaMenu> _getMenu() {
-    var pizzas = pizzaService.getAvailablePizzas();
+    var pizzas = pizzaServiceFacade.pizzaMenu();
     return ResponseEntity.ok(
         PizzaMenu.builder().menu(pizzaListToPizzaDtoListMapper.apply(pizzas)).build());
   }
 
   @Override
   public ResponseEntity<PizzaDto> _pizzaDetails(Long pizzaId) {
-    var mapped = pizzaToPizzaDtoMapper.apply(pizzaService.getPizzaDetails(pizzaId));
+    var mapped = pizzaToPizzaDtoMapper.apply(pizzaServiceFacade.pizzaDetails(pizzaId));
     return ResponseEntity.ok(mapped);
   }
-
-
 
   @Override
   public ResponseEntity<PizzaDto> _updatePizzaInMenu(Long pizzaId, PizzaBaseDto pizzaBaseDto) {
     var isPriceValid = PizzaInfoValidator.isPizzaPriceValid(pizzaBaseDto.getPrice());
     if (isPriceValid) {
-      var updatedPizza = pizzaService.updatePizza(pizzaId, pizzaBaseDto);
-      return ResponseEntity.ok(
-          PizzaDto.builder()
-              .price(updatedPizza.getPrice())
-              .description(updatedPizza.getDescription())
-              .name(updatedPizza.getName())
-              .ingredients(
-                  updatedPizza.getIngredients().stream()
-                      .map(it.s8.awesomepizza.entity.Ingredient::getName)
-                      .toList())
-              .build());
+      var updatedPizza = pizzaServiceFacade.updatePizza(pizzaId, pizzaBaseDto);
+      var response=pizzaToPizzaDtoMapper.apply(updatedPizza);
+      return ResponseEntity.ok(response);
     } else {
       throw new InvalidInputException("Pizza info are invalid " + pizzaBaseDto);
     }

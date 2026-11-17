@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PizzaRepository extends JpaRepository<Pizza, Long> {
 
+  @EntityGraph(attributePaths = "ingredients")
   List<Pizza> findByNameIn(List<String> names);
 
   Optional<Pizza> findByNameIgnoreCase(String name);

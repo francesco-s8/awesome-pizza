@@ -8,6 +8,8 @@ servers:
 tags:
   - name: order
     description: Everything about pizza orders
+  - name: ingredient
+    description: Manage pizza ingredients
 paths:
   /api/awesome-pizza/orders:
     post:
@@ -179,6 +181,53 @@ paths:
                 $ref: '#/components/schemas/PizzaDto'
         '404':
           description: Pizza not found
+        '500':
+          description: Internal error
+  /api/awesome-pizza/ingredients:
+    post:
+      tags:
+        - ingredient
+      summary: Add a new ingredient
+      description: Adds an ingredient that is available for use on pizzas.
+      operationId: addIngredient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientDto'
+        required: true
+      responses:
+        '201':
+          description: Ingredient added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientDto'
+        '400':
+          description: Invalid ingredient data or ingredient already exists
+        '500':
+          description: Internal error
+  /api/awesome-pizza/ingredients/{ingredientName}:
+    delete:
+      tags:
+        - ingredient
+      summary: Disable an ingredient
+      description: Marks an ingredient as unavailable without deleting it.
+      operationId: disableIngredient
+      parameters:
+        - in: path
+          name: ingredientName
+          schema:
+            type: string
+            minLength: 1
+          description: The name of the ingredient to disable
+          example: Basil
+          required: true
+      responses:
+        '204':
+          description: Ingredient disabled successfully
+        '404':
+          description: Ingredient not found or already disabled
         '500':
           description: Internal error
   /api/awesome-pizza/orders/{orderId}/total:
@@ -353,6 +402,18 @@ components:
                 - "Tomato"
                 - "Mozzarella"
                 - "Basil"
+
+    IngredientDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: The name of the ingredient
+          examples:
+            - "Basil"
+      required:
+        - name
 
     PizzaOrderTotalToPay:
       type: object

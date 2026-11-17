@@ -1,13 +1,13 @@
 package it.s8.awesomepizza.service.impl;
 
-import it.s8.awesomepizza.entity.Ingredient;
+import it.s8.awesomepizza.dto.PizzaDtoInfo;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
-import it.s8.awesomepizza.repository.IngredientRepository;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import it.s8.awesomepizza.service.PizzaService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.model.PizzaBaseDto;
 import org.openapitools.model.PizzaDto;
@@ -19,12 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class PizzaServiceImpl implements PizzaService {
 
   private final PizzaRepository pizzaRepository;
-  private final IngredientRepository ingredientRepository;
 
-  public PizzaServiceImpl(
-      PizzaRepository pizzaRepository, IngredientRepository ingredientRepository) {
+  public PizzaServiceImpl(PizzaRepository pizzaRepository) {
     this.pizzaRepository = pizzaRepository;
-    this.ingredientRepository = ingredientRepository;
   }
 
   @Override
@@ -34,8 +31,16 @@ public class PizzaServiceImpl implements PizzaService {
     if (pizzas.size() != pizzaNames.size()) {
       throw new AwesomePizzaException("Some pizzas not found in the menu");
     }
-    if (pizzas.stream().filter(Pizza::getIsAvailable).toList().isEmpty()) {
+    if (pizzas.stream().noneMatch(pizza -> Boolean.TRUE.equals(pizza.getIsAvailable()))) {
       throw new AwesomePizzaException("No pizzas available");
+    }
+    if (pizzas.stream().anyMatch(pizza -> !Boolean.TRUE.equals(pizza.getIsAvailable()))) {
+      throw new AwesomePizzaException("Some pizzas are not available");
+    }
+    if (pizzas.stream()
+        .flatMap(pizza -> pizza.getIngredients().stream())
+        .anyMatch(ingredient -> !Boolean.TRUE.equals(ingredient.getIsAvailable()))) {
+      throw new AwesomePizzaException("Some pizzas have unavailable ingredients");
     }
     return pizzas;
   }
@@ -60,24 +65,8 @@ public class PizzaServiceImpl implements PizzaService {
   }
 
   @Override
-  @Transactional
-  public Pizza addPizza(PizzaDto pizzaDto) {
-
-    var existPizza =
-        pizzaRepository.findByNameIgnoreCase(pizzaDto.getName());
-    if (existPizza.isPresent()) {
-      log.info("Pizza with name {} already exists", pizzaDto.getName());
-      throw new AwesomePizzaException("Pizza with name " + pizzaDto.getName() + " already exists");
-    }
-    var pizza =
-        Pizza.builder()
-            .name(pizzaDto.getName())
-            .description(pizzaDto.getDescription())
-            .price(pizzaDto.getPrice())
-            .ingredients(resolveIngredients(pizzaDto.getIngredients()))
-            .isAvailable(Boolean.TRUE)
-            .build();
-    return pizzaRepository.save(pizza);
+  public Optional<Pizza> checkIfPizzaExists(PizzaDto pizzaDto) {
+    return pizzaRepository.findByNameIgnoreCase(pizzaDto.getName());
   }
 
   @Override
@@ -97,7 +86,6 @@ public class PizzaServiceImpl implements PizzaService {
       log.warn("No changes for pizza {}, nothing to update", pizza);
       return pizza;
     }
-
     if (descriptionChanged) {
       pizza.setDescription(pizzaBaseDto.getDescription());
     }
@@ -108,17 +96,17 @@ public class PizzaServiceImpl implements PizzaService {
     return pizzaRepository.save(pizza);
   }
 
-  private List<Ingredient> resolveIngredients(List<String> ingredientNames) {
-    var uniqueNames = ingredientNames.stream().distinct().toList();
-    var foundIngredients = ingredientRepository.findByNameIn(uniqueNames);
-    if (foundIngredients.isEmpty() || foundIngredients.size() != uniqueNames.size()) {
-      log.info(
-          " Expected ingredients {}  mismatched with one in the database {}",
-          uniqueNames,
-          foundIngredients);
-      throw new AwesomePizzaException("Some ingredients " + uniqueNames + "not found");
-    }
-    return foundIngredients;
+  @Override
+  public Pizza savePizza(PizzaDtoInfo pizzaDtoInfo) {
+    var pizza =
+        Pizza.builder()
+            .name(pizzaDtoInfo.pizzaDto().getName())
+            .description(pizzaDtoInfo.pizzaDto().getDescription())
+            .price(pizzaDtoInfo.pizzaDto().getPrice())
+            .ingredients(pizzaDtoInfo.ingredients())
+            .isAvailable(Boolean.TRUE)
+            .build();
+    return pizzaRepository.save(pizza);
   }
 
   @Override

@@ -20,11 +20,11 @@ public class PizzaToPizzaDtoMapper implements Function<Pizza, PizzaDto> {
     if (StringUtils.isBlank(pizza.getDescription())) {
       throw new IllegalArgumentException("Description cannot be blank");
     }
-    return PizzaDto.builder()
-        .price(pizza.getPrice())
-        .description(pizza.getDescription())
-        .name(pizza.getName())
-        .ingredients(pizza.getIngredients().stream().map(Ingredient::getName).toList())
-        .build();
+      return PizzaDto.builder()
+          .price(pizza.getPrice())
+          .description(pizza.getDescription())
+          .name(pizza.getName())
+          .ingredients(pizza.getIngredients().stream().map(Ingredient::getName).toList())
+          .build();
   }
 }

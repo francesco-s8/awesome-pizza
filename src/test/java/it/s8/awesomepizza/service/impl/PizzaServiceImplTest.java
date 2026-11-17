@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import it.s8.awesomepizza.dto.PizzaDtoInfo;
 import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.entity.Pizza;
 import it.s8.awesomepizza.exception.AwesomePizzaException;
 import it.s8.awesomepizza.helper.TestHelper;
-import it.s8.awesomepizza.repository.IngredientRepository;
 import it.s8.awesomepizza.repository.PizzaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -37,10 +37,8 @@ class PizzaServiceImplTest {
   @InjectMocks PizzaServiceImpl pizzaService;
 
   @Mock PizzaRepository pizzaRepository;
-  @Mock IngredientRepository ingredientRepository;
 
   @Captor private ArgumentCaptor<Pizza> pizzaArgumentCaptor;
-  @Captor private ArgumentCaptor<Iterable<Ingredient>> ingredientArgumentCaptor;
 
   @BeforeAll
   static void setUp() {
@@ -49,8 +47,9 @@ class PizzaServiceImplTest {
 
   @Test
   void givenAListOfPizzasShouldReturnSuccessfully() {
-
-    when(pizzaRepository.findByNameIn(input)).thenReturn(TestHelper.getPizzaListStub());
+    var pizzas = TestHelper.getPizzaListStub();
+    pizzas.forEach(pizza -> pizza.setIsAvailable(Boolean.TRUE));
+    when(pizzaRepository.findByNameIn(input)).thenReturn(pizzas);
 
     var actual = pizzaService.getPizzas(input);
     assertThat(actual).isNotEmpty().hasSize(3);
@@ -69,6 +68,28 @@ class PizzaServiceImplTest {
   }
 
   @Test
+  void givenAPizzaWithAnUnavailableIngredientShouldRejectTheOrder() {
+    var pizzaNames = List.of("Margherita");
+    var pizzas = TestHelper.getPizzaListStub().subList(0, 1);
+    pizzas.getFirst().getIngredients().getFirst().setIsAvailable(Boolean.FALSE);
+    when(pizzaRepository.findByNameIn(pizzaNames)).thenReturn(pizzas);
+
+    assertThatThrownBy(() -> pizzaService.getPizzas(pizzaNames))
+        .isExactlyInstanceOf(AwesomePizzaException.class)
+        .hasMessageContaining("unavailable ingredients");
+  }
+
+  @Test
+  void givenAnOrderContainingAnUnavailablePizzaShouldRejectTheOrder() {
+    var pizzas = TestHelper.getPizzaListStub();
+    when(pizzaRepository.findByNameIn(input)).thenReturn(pizzas);
+
+    assertThatThrownBy(() -> pizzaService.getPizzas(input))
+        .isExactlyInstanceOf(AwesomePizzaException.class)
+        .hasMessageContaining("Some pizzas are not available");
+  }
+
+  @Test
   void givenANotExistingPizzaShouldRaiseAnException() {
 
     var orderPizzaList = List.of("Speciale");
@@ -82,22 +103,21 @@ class PizzaServiceImplTest {
   void addPizzaReusesIngredientsAlreadyInTheCatalog() {
 
     var ingredientsStub =
-            List.of(
-                    Ingredient.builder().id(1L).name("Tomato").build(),
-                    Ingredient.builder().id(2L).name("Olives").build(),
-                    Ingredient.builder().id(3L).name("Mushrooms").build());
+        List.of(
+            Ingredient.builder().id(1L).name("Tomato").build(),
+            Ingredient.builder().id(2L).name("Olives").build(),
+            Ingredient.builder().id(3L).name("Mushrooms").build());
     var pizzaDto =
-            PizzaDto.builder()
-                    .name("Olive pizza")
-                    .price(BigDecimal.ONE)
-                    .description("Tomato, olives and mushrooms")
-                    .ingredients(List.of("Tomato", "Mushrooms", "Olives"))
-                    .build();
+        PizzaDto.builder()
+            .name("Olive pizza")
+            .price(BigDecimal.ONE)
+            .description("Tomato, olives and mushrooms")
+            .ingredients(List.of("Tomato", "Mushrooms", "Olives"))
+            .build();
 
-    when(ingredientRepository.findByNameIn(List.of("Tomato", "Mushrooms", "Olives"))).thenReturn(ingredientsStub);
     when(pizzaRepository.save(any(Pizza.class))).thenAnswer(i -> i.getArgument(0));
 
-    var actual = pizzaService.addPizza(pizzaDto);
+    var actual = pizzaService.savePizza(new PizzaDtoInfo(pizzaDto, ingredientsStub));
     assertThat(actual).isNotNull();
     assertThat(actual.getName()).isNotEmpty().isEqualTo("Olive pizza");
     assertThat(actual.getIngredients()).isNotEmpty().hasSize(3);
@@ -105,28 +125,8 @@ class PizzaServiceImplTest {
     verify(pizzaRepository).save(pizzaArgumentCaptor.capture());
 
     assertThat(pizzaArgumentCaptor.getValue().getIngredients())
-            .extracting(Ingredient::getName)
-            .containsExactlyInAnyOrder("Tomato", "Mushrooms", "Olives");
-
-
-
-
-  }
-
-  @Test
-  void addPizzaButItsalrealdyPresent() {
-    var pizzaDto =
-            PizzaDto.builder()
-                    .name("Olive pizza")
-                    .price(BigDecimal.ONE)
-                    .description("Tomato, olives and mushrooms")
-                    .ingredients(List.of("Tomato", "Mushrooms", "Olives"))
-                    .build();
-    when(pizzaRepository.findByNameIgnoreCase(pizzaDto.getName())).thenReturn(Optional.of(Pizza.builder().name("Olive pizza").build()));
-
-    assertThatThrownBy(() -> pizzaService.addPizza(pizzaDto))
-            .isExactlyInstanceOf(AwesomePizzaException.class)
-            .hasMessageContaining("already exists");
+        .extracting(Ingredient::getName)
+        .containsExactlyInAnyOrder("Tomato", "Mushrooms", "Olives");
   }
 
   @Test
