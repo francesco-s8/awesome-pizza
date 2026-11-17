@@ -56,4 +56,11 @@ class PizzaRepositoryTest {
     assertThat(availablePizza).isNotEmpty().hasSize(2);
     assertThat(availablePizza.getFirst()).extracting("name").isEqualTo("Margherita");
   }
+
+  @Test
+  void findAvailablePizzasContainingIngredient() {
+    var pizzas = pizzaRepository.findByIngredients_NameAndIsAvailableTrue("Basil");
+
+    assertThat(pizzas).extracting("name").containsExactly("Margherita");
+  }
 }

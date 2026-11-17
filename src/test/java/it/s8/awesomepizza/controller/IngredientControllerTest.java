@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import it.s8.awesomepizza.entity.Ingredient;
 import it.s8.awesomepizza.exception.InvalidInputException;
+import it.s8.awesomepizza.service.IngredientFacade;
 import it.s8.awesomepizza.service.IngredientService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,8 @@ class IngredientControllerTest {
   @Autowired private MockMvc mockMvc;
 
   @MockitoBean IngredientService ingredientService;
+  @MockitoBean
+  IngredientFacade ingredientFacade;
 
   private final JsonMapper jsonMapper = new JsonMapper();
 
@@ -44,8 +47,7 @@ class IngredientControllerTest {
             .andReturn()
             .getResponse();
 
-    assertThat(response.getHeader("Location"))
-        .isEqualTo("/api/awesome-pizza/ingredients/Truffle");
+    assertThat(response.getHeader("Location")).isEqualTo("/api/awesome-pizza/ingredients/Truffle");
     assertThat(jsonMapper.readValue(response.getContentAsString(), IngredientDto.class).getName())
         .isEqualTo("Truffle");
   }
@@ -98,7 +100,7 @@ class IngredientControllerTest {
   @Test
   void disableMissingIngredientReturnsNotFound() throws Exception {
     doThrow(new EntityNotFoundException("Ingredient not found"))
-        .when(ingredientService)
+        .when(ingredientFacade)
         .disableIngredient("Unknown");
 
     mockMvc

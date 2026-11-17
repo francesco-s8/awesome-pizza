@@ -18,6 +18,8 @@ public interface PizzaService {
 
   List<Pizza> getAvailablePizzas() throws EntityNotFoundException, AwesomePizzaException;
 
+  List<Pizza> getAvailablePizzasWithIngredient(String ingredientName);
+
   Optional<Pizza> checkIfPizzaExists(PizzaDto pizzaDto);
 
   Pizza updatePizza(Long pizzaId, PizzaBaseDto pizzaBaseDto) throws EntityNotFoundException;

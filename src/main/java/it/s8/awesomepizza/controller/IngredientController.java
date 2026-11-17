@@ -1,6 +1,7 @@
 package it.s8.awesomepizza.controller;
 
 import it.s8.awesomepizza.exception.InvalidInputException;
+import it.s8.awesomepizza.service.IngredientFacade;
 import it.s8.awesomepizza.service.IngredientService;
 import java.net.URI;
 import org.openapitools.model.IngredientDto;
@@ -12,9 +13,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class IngredientController implements IngredientApi {
 
   private final IngredientService ingredientService;
+  private final IngredientFacade ingredientFacade;
 
-  public IngredientController(IngredientService ingredientService) {
+  public IngredientController(
+      IngredientService ingredientService, IngredientFacade ingredientFacade) {
     this.ingredientService = ingredientService;
+    this.ingredientFacade = ingredientFacade;
   }
 
   @Override
@@ -27,7 +31,7 @@ public class IngredientController implements IngredientApi {
 
     var ingredient = ingredientService.addIngredient(ingredientDto.getName().trim());
     URI location =
-        UriComponentsBuilder.fromPath(PATH_ADD_INGREDIENT+"/{ingredientName}")
+        UriComponentsBuilder.fromPath(PATH_ADD_INGREDIENT + "/{ingredientName}")
             .buildAndExpand(ingredient.getName())
             .encode()
             .toUri();
@@ -37,7 +41,7 @@ public class IngredientController implements IngredientApi {
 
   @Override
   public ResponseEntity<Void> _disableIngredient(String ingredientName) {
-    ingredientService.disableIngredient(ingredientName);
+    ingredientFacade.disableIngredient(ingredientName);
     return ResponseEntity.noContent().build();
   }
 }

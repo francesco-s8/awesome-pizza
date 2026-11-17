@@ -65,6 +65,11 @@ public class PizzaServiceImpl implements PizzaService {
   }
 
   @Override
+  public List<Pizza> getAvailablePizzasWithIngredient(String ingredientName) {
+    return pizzaRepository.findByIngredients_NameAndIsAvailableTrue(ingredientName);
+  }
+
+  @Override
   public Optional<Pizza> checkIfPizzaExists(PizzaDto pizzaDto) {
     return pizzaRepository.findByNameIgnoreCase(pizzaDto.getName());
   }
