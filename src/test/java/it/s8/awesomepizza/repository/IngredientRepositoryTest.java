@@ -38,6 +38,18 @@ class IngredientRepositoryTest {
   }
 
   @Test
+  void findAvailableIngredientsByName() {
+    var basil = ingredientRepository.findByName("Basil").orElseThrow();
+    basil.setIsAvailable(false);
+    ingredientRepository.save(basil);
+
+    var found = ingredientRepository.findByNameInAndIsAvailableTrue(
+        List.of("Tomato", "Basil", "Cinnamon"));
+
+    assertThat(found).extracting("name").containsExactly("Tomato");
+  }
+
+  @Test
   void givenANonInListIngredientShouldBeReturnEmptyList() {
     assertThat(ingredientRepository.findByName("Cinnamon")).isEmpty();
   }

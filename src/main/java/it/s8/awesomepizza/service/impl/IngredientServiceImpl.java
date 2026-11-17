@@ -25,6 +25,11 @@ public class IngredientServiceImpl implements IngredientService {
   }
 
   @Override
+  public List<Ingredient> retrieveAvailableIngredients(List<String> names) {
+    return ingredientRepository.findByNameInAndIsAvailableTrue(names);
+  }
+
+  @Override
   public Ingredient addIngredient(String name) {
     if (ingredientRepository.findByName(name).isPresent()) {
       throw new InvalidInputException("Ingredient " + name + " already exists");

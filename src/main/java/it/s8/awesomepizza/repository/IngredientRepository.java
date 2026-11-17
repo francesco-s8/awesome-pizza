@@ -12,14 +12,12 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 
   List<Ingredient> findByNameIn(List<String> names);
 
+  List<Ingredient> findByNameInAndIsAvailableTrue(List<String> names);
+
   Optional<Ingredient> findByName(String name);
 
   List<Ingredient> findByIsAvailableTrue();
 
-    @Query("select i from Ingredient i where i.name = ?1 and i.isAvailable = true")
-    Optional<Ingredient> findByNameAndIsAvailableTrue(String name);
-
-
-
-
+  @Query("select i from Ingredient i where i.name = ?1 and i.isAvailable = true")
+  Optional<Ingredient> findByNameAndIsAvailableTrue(String name);
 }

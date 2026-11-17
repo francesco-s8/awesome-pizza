@@ -7,6 +7,8 @@ public interface IngredientService {
 
   List<Ingredient> retrieveAllAvailableIngredients();
 
+  List<Ingredient> retrieveAvailableIngredients(List<String> names);
+
   Ingredient addIngredient(String name);
 
   void disableIngredient(String name);

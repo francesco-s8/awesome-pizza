@@ -12,6 +12,7 @@ import it.s8.awesomepizza.exception.InvalidInputException;
 import it.s8.awesomepizza.helper.TestHelper;
 import it.s8.awesomepizza.repository.IngredientRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,6 +61,17 @@ class IngredientServiceImplTest {
         .thenReturn(TestHelper.getIngredientListStub());
     assertThat(ingredientService.retrieveAllAvailableIngredients())
         .hasSameSizeAs(TestHelper.getIngredientListStub());
+  }
+
+  @Test
+  void retrieveAvailableIngredientsByNames() {
+    var names = List.of("Tomato", "Basil");
+    var availableIngredients = List.of(TestHelper.getIngredientByName("Tomato").orElseThrow());
+    when(ingredientRepository.findByNameInAndIsAvailableTrue(names))
+        .thenReturn(availableIngredients);
+
+    assertThat(ingredientService.retrieveAvailableIngredients(names))
+        .containsExactlyElementsOf(availableIngredients);
   }
 
   @Test

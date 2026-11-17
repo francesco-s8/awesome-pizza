@@ -37,7 +37,7 @@ public class Ingredient extends EntityInfo {
   @Column(name = "version")
   private Integer version;
 
-  @Column(name = "is_available")
+  @Column(name = "available")
   @Builder.Default private Boolean isAvailable = true;
 
   @Override

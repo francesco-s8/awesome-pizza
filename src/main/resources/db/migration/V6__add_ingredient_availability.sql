@@ -1,2 +1,2 @@
 ALTER TABLE ingredients
-    ADD "is_available" BOOLEAN NOT NULL DEFAULT TRUE;
+    ADD "available" BOOLEAN NOT NULL DEFAULT TRUE;
