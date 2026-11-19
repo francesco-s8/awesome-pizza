@@ -61,6 +61,6 @@ class PizzaRepositoryTest {
   void findAvailablePizzasContainingIngredient() {
     var pizzas = pizzaRepository.findByIngredients_NameAndIsAvailableTrue("Basil");
 
-    assertThat(pizzas).extracting("name").containsExactly("Margherita");
+    assertThat(pizzas).isNotEmpty().hasSize(1).extracting("name").containsExactly("Margherita");
   }
 }
