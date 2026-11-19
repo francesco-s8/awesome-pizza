@@ -12,4 +12,6 @@ public interface IngredientService {
   Ingredient addIngredient(String name);
 
   void disableIngredient(String name);
+
+  void enableIngredient(String name);
 }

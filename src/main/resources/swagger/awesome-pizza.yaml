@@ -230,6 +230,28 @@ paths:
           description: Ingredient not found or already disabled
         '500':
           description: Internal error
+    put:
+      tags:
+        - ingredient
+      summary: Enable an ingredient
+      description: Marks an ingredient as available and re-enables related pizzas only when all their ingredients are available.
+      operationId: enableIngredient
+      parameters:
+        - in: path
+          name: ingredientName
+          schema:
+            type: string
+            minLength: 1
+          description: The name of the ingredient to enable
+          example: Basil
+          required: true
+      responses:
+        '204':
+          description: Ingredient enabled successfully
+        '404':
+          description: Ingredient not found or already enabled
+        '500':
+          description: Internal error
   /api/awesome-pizza/orders/{orderId}/total:
     get:
       tags:

@@ -238,4 +238,24 @@ class PizzaServiceImplTest {
     assertThatThrownBy(() -> pizzaService.disablePizza(1L))
         .isExactlyInstanceOf(EntityNotFoundException.class);
   }
+
+  @Test
+  void givenAValidPizzaIdShouldBeSetToBeEnabled() {
+    var pizza = TestHelper.getPizzaListStub().getFirst();
+    pizza.setIsAvailable(Boolean.FALSE);
+    when(pizzaRepository.findById(pizza.getId())).thenReturn(Optional.of(pizza));
+
+    pizzaService.enablePizza(pizza.getId());
+
+    verify(pizzaRepository).save(pizzaArgumentCaptor.capture());
+    assertThat(pizzaArgumentCaptor.getValue().getIsAvailable()).isEqualTo(Boolean.TRUE);
+  }
+
+  @Test
+  void enablingPizzaWithAnInvalidIdShouldThrowNotFound() {
+    when(pizzaRepository.findById(1L)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> pizzaService.enablePizza(1L))
+        .isExactlyInstanceOf(EntityNotFoundException.class);
+  }
 }

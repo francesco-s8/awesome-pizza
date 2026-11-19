@@ -70,6 +70,11 @@ public class PizzaServiceImpl implements PizzaService {
   }
 
   @Override
+  public List<Pizza> getPizzasWithIngredient(String ingredientName) {
+    return pizzaRepository.findByIngredients_Name(ingredientName);
+  }
+
+  @Override
   public Optional<Pizza> checkIfPizzaExists(PizzaDto pizzaDto) {
     return pizzaRepository.findByNameIgnoreCase(pizzaDto.getName());
   }
@@ -122,5 +127,15 @@ public class PizzaServiceImpl implements PizzaService {
             .orElseThrow(() -> new EntityNotFoundException("No pizza with id " + pizzaId));
     pizzaToDisabled.setIsAvailable(Boolean.FALSE);
     pizzaRepository.save(pizzaToDisabled);
+  }
+
+  @Override
+  public void enablePizza(Long pizzaId) {
+    var pizzaToEnable =
+        pizzaRepository
+            .findById(pizzaId)
+            .orElseThrow(() -> new EntityNotFoundException("No pizza with id " + pizzaId));
+    pizzaToEnable.setIsAvailable(Boolean.TRUE);
+    pizzaRepository.save(pizzaToEnable);
   }
 }

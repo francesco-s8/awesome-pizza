@@ -51,4 +51,18 @@ public class IngredientServiceImpl implements IngredientService {
     ingredient.setIsAvailable(false);
     ingredientRepository.save(ingredient);
   }
+
+  @Override
+  public void enableIngredient(String name) {
+    var ingredient =
+        ingredientRepository
+            .findByNameAndIsAvailableFalse(name)
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "Ingredient: " + name + " is not disabled or does not exist"));
+
+    ingredient.setIsAvailable(true);
+    ingredientRepository.save(ingredient);
+  }
 }

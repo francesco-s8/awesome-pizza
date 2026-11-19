@@ -44,4 +44,10 @@ public class IngredientController implements IngredientApi {
     ingredientFacade.disableIngredient(ingredientName);
     return ResponseEntity.noContent().build();
   }
+
+  @Override
+  public ResponseEntity<Void> _enableIngredient(String ingredientName) {
+    ingredientFacade.enableIngredient(ingredientName);
+    return ResponseEntity.noContent().build();
+  }
 }

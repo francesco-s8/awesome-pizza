@@ -93,4 +93,27 @@ class IngredientServiceImplTest {
     assertThatThrownBy(()->ingredientService.disableIngredient("Basil")).isExactlyInstanceOf(EntityNotFoundException.class);
 
   }
+
+  @Test
+  void enableIngredient() {
+    var ingredientName = "Basil";
+    var ingredient = TestHelper.getIngredientByName(ingredientName).orElseThrow();
+    ingredient.setIsAvailable(false);
+    when(ingredientRepository.findByNameAndIsAvailableFalse(ingredientName))
+        .thenReturn(Optional.of(ingredient));
+
+    ingredientService.enableIngredient(ingredientName);
+
+    verify(ingredientRepository).save(ingredientArgumentCaptor.capture());
+    assertThat(ingredientArgumentCaptor.getValue().getIsAvailable()).isTrue();
+  }
+
+  @Test
+  void enableIngredientRejectsMissingOrAlreadyAvailableIngredient() {
+    when(ingredientRepository.findByNameAndIsAvailableFalse("Basil")).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> ingredientService.enableIngredient("Basil"))
+        .isExactlyInstanceOf(EntityNotFoundException.class);
+    verify(ingredientRepository, never()).save(any(Ingredient.class));
+  }
 }

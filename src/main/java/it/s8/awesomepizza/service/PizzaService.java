@@ -20,6 +20,8 @@ public interface PizzaService {
 
   List<Pizza> getAvailablePizzasWithIngredient(String ingredientName);
 
+  List<Pizza> getPizzasWithIngredient(String ingredientName);
+
   Optional<Pizza> checkIfPizzaExists(PizzaDto pizzaDto);
 
   Pizza updatePizza(Long pizzaId, PizzaBaseDto pizzaBaseDto) throws EntityNotFoundException;
@@ -27,4 +29,6 @@ public interface PizzaService {
   Pizza savePizza(PizzaDtoInfo pizzaDtoInfo);
 
   void disablePizza(Long pizzaId);
+
+  void enablePizza(Long pizzaId);
 }

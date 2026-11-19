@@ -23,4 +23,17 @@ public class IngredientFacadeImpl implements IngredientFacade {
     pizzaService.getAvailablePizzasWithIngredient(ingredientName)
         .forEach(pizza -> pizzaService.disablePizza(pizza.getId()));
   }
+
+  @Override
+  @Transactional
+  public void enableIngredient(String ingredientName) {
+    ingredientService.enableIngredient(ingredientName);
+    pizzaService.getPizzasWithIngredient(ingredientName).stream()
+        .filter(pizza -> !Boolean.TRUE.equals(pizza.getIsAvailable()))
+        .filter(
+            pizza ->
+                pizza.getIngredients().stream()
+                    .allMatch(ingredient -> Boolean.TRUE.equals(ingredient.getIsAvailable())))
+        .forEach(pizza -> pizzaService.enablePizza(pizza.getId()));
+  }
 }

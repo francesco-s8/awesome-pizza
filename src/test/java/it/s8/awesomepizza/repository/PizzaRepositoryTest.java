@@ -63,4 +63,16 @@ class PizzaRepositoryTest {
 
     assertThat(pizzas).isNotEmpty().hasSize(1).extracting("name").containsExactly("Margherita");
   }
+
+  @Test
+  void findAllPizzasContainingIngredientIncludingUnavailablePizzas() {
+    var margherita = pizzaRepository.findByNameIgnoreCase("Margherita").orElseThrow();
+    margherita.setIsAvailable(false);
+    pizzaRepository.save(margherita);
+
+    var pizzas = pizzaRepository.findByIngredients_Name("Basil");
+
+    assertThat(pizzas).extracting("name").containsExactly("Margherita");
+    assertThat(pizzas.getFirst().getIngredients()).isNotEmpty();
+  }
 }

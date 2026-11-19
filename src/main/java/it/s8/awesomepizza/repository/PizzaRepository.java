@@ -23,5 +23,8 @@ public interface PizzaRepository extends JpaRepository<Pizza, Long> {
   @EntityGraph(attributePaths = "ingredients")
   List<Pizza> findByIsAvailableTrue();
 
+  @EntityGraph(attributePaths = "ingredients")
+  List<Pizza> findByIngredients_Name(String ingredientName);
+
   List<Pizza> findByIngredients_NameAndIsAvailableTrue(String ingredientName);
 }

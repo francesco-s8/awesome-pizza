@@ -2,6 +2,7 @@ package it.s8.awesomepizza.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -106,6 +107,30 @@ class IngredientControllerTest {
     mockMvc
         .perform(
             MockMvcRequestBuilders.delete("/api/awesome-pizza/ingredients/Unknown")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void enableIngredientReturnsNoContent() throws Exception {
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/awesome-pizza/ingredients/Basil")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent());
+
+    verify(ingredientFacade).enableIngredient("Basil");
+  }
+
+  @Test
+  void enableMissingOrAlreadyEnabledIngredientReturnsNotFound() throws Exception {
+    doThrow(new EntityNotFoundException("Ingredient not found or already enabled"))
+        .when(ingredientFacade)
+        .enableIngredient("Unknown");
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/awesome-pizza/ingredients/Unknown")
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }
