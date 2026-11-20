@@ -19,7 +19,7 @@ Or use the RESTFul endpoints.
 
 ## Execute app
 
-Run command "docker compose up" or via your IDE plugin,from the root of docker-compose.yml to start all docker images.
+Run `docker compose -f docker/docker-compose.yml up` from the repository root, or use your IDE's Docker Compose integration, to start all containers.
 If you want to start only postgresql and rabbitmq as image and the application from your favorite IDE, just start it
 with the env variable IDE setup with the following data:
 
@@ -41,11 +41,33 @@ See [awesome-pizza-swagger.yaml](src/main/resources/swagger/awesome-pizza.yaml)
 
 ### Docker:
 
-docker-compose volumes will be written under VOLUME_PATH see [env](.env)
+Docker Compose bind-mount volumes will be written under `VOLUME_PATH`; see [docker/.env](docker/.env).
 You can change the value according to your needs.
 
+### Java AOT cache:
 
+The Java 25 runtime can cache classes loaded at startup. Create a cache for the current app version and runtime:
 
+1. Start a representative training run:
 
+   ```sh
+   docker compose -f docker/docker-compose.yml run --rm --service-ports -e AOT_MODE=record awesome-pizza
+   ```
+
+   Wait for the app to start, exercise the endpoints you expect to use, then stop it with Ctrl+C so the JVM can finish writing its training configuration.
+
+2. Create the cache:
+
+   ```sh
+   docker compose -f docker/docker-compose.yml run --rm --no-deps -e AOT_MODE=create awesome-pizza
+   ```
+
+3. Start the app normally; the cache is loaded automatically when present:
+
+   ```sh
+   docker compose -f docker/docker-compose.yml up
+   ```
+
+The cache and training configuration are stored in the Compose `aot-cache` volume. Repeat the training and cache-creation steps after changing the application or its dependencies. The app still starts normally if no cache has been created.
 
 

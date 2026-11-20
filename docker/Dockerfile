@@ -8,10 +8,9 @@ RUN --mount=type=cache,target=/root/.m2 mvn -T 2C clean package --errors
 RUN java -Djarmode=tools -jar target/*.jar extract --layers --destination extracted
 
 FROM eclipse-temurin:25.0.4.1_1-jre-noble
-ARG JAR_FILE=application.jar
-ENV JAR_FILE=${JAR_FILE}
 
 RUN addgroup --system app && adduser --system --ingroup app --home /home/app app
+RUN mkdir -p /application/aot-cache && chown -R app:app /application
 
 USER app
 
@@ -21,6 +20,6 @@ COPY --from=builder /builder/extracted/dependencies/ ./
 COPY --from=builder /builder/extracted/spring-boot-loader/ ./
 COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
 COPY --from=builder /builder/extracted/application/ ./
-COPY --from=builder /builder/target/*.jar /application/${JAR_FILE}
+COPY --chmod=755 docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
-ENTRYPOINT ["sh","-c","exec java -XX:+UseZGC -XX:+UseCompactObjectHeaders -XX:+UseStringDeduplication -XX:+UseCompressedOops -XX:+UseCompressedClassPointers -jar \"/application/$JAR_FILE\""]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
