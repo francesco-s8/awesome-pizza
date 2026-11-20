@@ -35,7 +35,6 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   @RabbitListener(
-      ackMode = "MANUAL",
       queues = "orders",
       containerFactory = "pizzaOrderListenerContainerFactory")
   public void processOrder(

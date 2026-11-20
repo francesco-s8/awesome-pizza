@@ -2,6 +2,7 @@ package it.s8.awesomepizza.config;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -59,6 +60,7 @@ public class RabbitConfig {
       ConnectionFactory connectionFactory,
       ExecutorService pizzaOrderListenerVirtualThreadExecutor) {
     var factory = new SimpleRabbitListenerContainerFactory();
+    factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
     configurer.configure(factory, connectionFactory);
     factory.setTaskExecutor(pizzaOrderListenerVirtualThreadExecutor);
     return factory;
