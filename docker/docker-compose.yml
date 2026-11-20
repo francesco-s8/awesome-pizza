@@ -1,7 +1,7 @@
 services:
 
   rabbitmq:
-    image: rabbitmq:4.2.5-management-alpine
+    image: rabbitmq:4.2.6-management-alpine
     container_name: rabbitmq
     ports:
       - "5672:5672"
@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
   postgres:
-    image: postgres:18-alpine3.24
+    image: postgres:18-alpine
     container_name: postgresql-18
     ports:
       - "5432:5432"
