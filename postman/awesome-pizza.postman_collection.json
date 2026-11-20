@@ -1,0 +1,238 @@
+{
+  "info": {
+    "_postman_id": "d98e97a2-ff1f-4e16-a3e3-1d3fd22e5e56",
+    "name": "Awesome Pizza API",
+    "description": "Requests for all Awesome Pizza REST API endpoints. Update the collection variables to match your local server and resource IDs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Get menu",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/menu"
+          }
+        },
+        {
+          "name": "Add pizza to menu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Margherita\",\n  \"description\": \"Tomato, mozzarella, and basil\",\n  \"price\": 8.5,\n  \"ingredients\": [\n    \"Tomato\",\n    \"Mozzarella\",\n    \"Basil\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/awesome-pizza/menu"
+          }
+        },
+        {
+          "name": "Get pizza details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/menu/{{pizzaId}}"
+          }
+        },
+        {
+          "name": "Update pizza",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Tomato, mozzarella, and fresh basil\",\n  \"price\": 9.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/awesome-pizza/menu/{{pizzaId}}"
+          }
+        },
+        {
+          "name": "Disable pizza availability",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/menu/{{pizzaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const response = pm.response.json();",
+                  "  if (response.orderId !== undefined) {",
+                  "    pm.collectionVariables.set('orderId', response.orderId);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"John Doe\",\n  \"pizzas\": [\n    \"Margherita\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/awesome-pizza/orders"
+          }
+        },
+        {
+          "name": "Get order status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/orders/{{orderId}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ingredients",
+      "item": [
+        {
+          "name": "Add ingredient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Basil\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/awesome-pizza/ingredients"
+          }
+        },
+        {
+          "name": "Disable ingredient",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/ingredients/{{ingredientName}}"
+          }
+        },
+        {
+          "name": "Enable ingredient",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/ingredients/{{ingredientName}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Calculate order total",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/orders/{{orderId}}/total"
+          }
+        },
+        {
+          "name": "Mark order as paid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethod\": \"CASH\",\n  \"total\": 8.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/awesome-pizza/orders/{{orderId}}/payment"
+          }
+        },
+        {
+          "name": "Delete payment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/awesome-pizza/orders/{{orderId}}/payment"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "orderId",
+      "value": "1"
+    },
+    {
+      "key": "pizzaId",
+      "value": "1"
+    },
+    {
+      "key": "ingredientName",
+      "value": "Basil"
+    }
+  ]
+}
