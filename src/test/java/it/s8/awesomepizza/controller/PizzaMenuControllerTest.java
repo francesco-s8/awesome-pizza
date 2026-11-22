@@ -259,6 +259,9 @@ class PizzaMenuControllerTest {
 
   @Test
   void _updatePizzaInMenuInvalidInput() throws Exception {
+
+    var responseObject =
+        "{\"detail\":\"Check the request body, some fields are not valid\",\"status\":400,\"title\":\"Bad Request\"}";
     var input =
         PizzaDto.builder()
             .name("Margherita")
@@ -273,8 +276,6 @@ class PizzaMenuControllerTest {
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andReturn();
-    assertThat(actual.getResponse().getContentAsString())
-        .isNotEmpty()
-        .isEqualTo("Check the request body, some fields are not valid");
+    assertThat(actual.getResponse().getContentAsString()).isNotEmpty().isEqualTo(responseObject);
   }
 }
