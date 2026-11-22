@@ -10,8 +10,8 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
-      - "${VOLUME_PATH}/rabbitmq:/var/lib/rabbitmq"
-      - "${VOLUME_PATH}/rabbitmq:/var/log/rabbitmq"
+      - "${VOLUME_PATH}/rabbitmq-data:/var/lib/rabbitmq"
+      - "${VOLUME_PATH}/rabbitmq-log:/var/log/rabbitmq"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -23,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "${VOLUME_PATH}/pg-data:/var/lib/postgresql/18/docker"
+      - "${VOLUME_PATH}/postgres-18-data:/var/lib/postgresql/18/docker"
     environment:
       - POSTGRES_PASSWORD=s8
       - POSTGRES_USER=s8
