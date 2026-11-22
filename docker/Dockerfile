@@ -1,4 +1,4 @@
-FROM maven:3.10.0-eclipse-temurin-25-alpine AS builder
+FROM maven:3.9.11-eclipse-temurin-25-alpine AS builder
 WORKDIR /builder
 
 COPY pom.xml ./
@@ -9,8 +9,10 @@ RUN java -Djarmode=tools -jar target/*.jar extract --layers --destination extrac
 
 FROM eclipse-temurin:25.0.4.1_1-jre-noble
 
-RUN addgroup --system app && adduser --system --ingroup app --home /home/app app
-RUN mkdir -p /application/aot-cache && chown -R app:app /application
+RUN addgroup --system app \
+    && adduser --system --ingroup app --home /home/app app \
+    && mkdir -p /application/aot-cache \
+    && chown -R app:app /application
 
 USER app
 
