@@ -162,6 +162,64 @@ class PizzaServiceImplTest {
   }
 
   @Test
+  void updatePizzaWithNoChangedFieldsShouldNotSave() {
+    var pizza = TestHelper.getPizzaListStub().getFirst();
+    var unchanged =
+        PizzaBaseDto.builder()
+            .description(pizza.getDescription())
+            .price(pizza.getPrice())
+            .build();
+    when(pizzaRepository.findById(1L)).thenReturn(Optional.of(pizza));
+
+    var actual = pizzaService.updatePizza(1L, unchanged);
+
+    assertThat(actual).isSameAs(pizza);
+    verify(pizzaRepository, never()).save(any());
+  }
+
+  @Test
+  void updatePizzaShouldChangeOnlyDescription() {
+    var pizza = Pizza.builder()
+        .id(1L)
+        .name("Margherita")
+        .description("Old")
+        .price(new BigDecimal("10.00"))
+        .build();
+    var update = PizzaBaseDto.builder()
+        .description("New")
+        .price(new BigDecimal("10.00"))
+        .build();
+    when(pizzaRepository.findById(1L)).thenReturn(Optional.of(pizza));
+    when(pizzaRepository.save(any(Pizza.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    var actual = pizzaService.updatePizza(1L, update);
+
+    assertThat(actual.getDescription()).isEqualTo("New");
+    assertThat(actual.getPrice()).isEqualByComparingTo("10.00");
+  }
+
+  @Test
+  void updatePizzaShouldChangeOnlyPrice() {
+    var pizza = Pizza.builder()
+        .id(1L)
+        .name("Margherita")
+        .description("Margherita")
+        .price(new BigDecimal("10.00"))
+        .build();
+    var update = PizzaBaseDto.builder()
+        .description("Margherita")
+        .price(new BigDecimal("12.50"))
+        .build();
+    when(pizzaRepository.findById(1L)).thenReturn(Optional.of(pizza));
+    when(pizzaRepository.save(any(Pizza.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    var actual = pizzaService.updatePizza(1L, update);
+
+    assertThat(actual.getDescription()).isEqualTo("Margherita");
+    assertThat(actual.getPrice()).isEqualByComparingTo("12.50");
+  }
+
+  @Test
   void givenAnInvalidPizzaIdShouldBeThrownAEntityNotFoundException() {
     var pizzaInfo = PizzaBaseDto.builder().description(null).price(BigDecimal.ONE).build();
     when(pizzaRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -221,6 +279,31 @@ class PizzaServiceImplTest {
     assertThatThrownBy(() -> pizzaService.getAvailablePizzas())
         .isExactlyInstanceOf(EntityNotFoundException.class)
         .hasMessageContaining("No pizzas available");
+  }
+
+  @Test
+  void getAvailablePizzasWithIngredientShouldDelegateToRepository() {
+    var pizzas = List.of(TestHelper.getPizzaListStub().getFirst());
+    when(pizzaRepository.findByIngredients_NameAndIsAvailableTrue("Basil")).thenReturn(pizzas);
+
+    assertThat(pizzaService.getAvailablePizzasWithIngredient("Basil")).isSameAs(pizzas);
+  }
+
+  @Test
+  void getPizzasWithIngredientShouldDelegateToRepository() {
+    var pizzas = List.of(TestHelper.getPizzaListStub().getFirst());
+    when(pizzaRepository.findByIngredients_Name("Basil")).thenReturn(pizzas);
+
+    assertThat(pizzaService.getPizzasWithIngredient("Basil")).isSameAs(pizzas);
+  }
+
+  @Test
+  void checkIfPizzaExistsShouldReturnRepositoryResult() {
+    var pizza = TestHelper.getPizzaListStub().getFirst();
+    var pizzaDto = PizzaDto.builder().name("Margherita").build();
+    when(pizzaRepository.findByNameIgnoreCase("Margherita")).thenReturn(Optional.of(pizza));
+
+    assertThat(pizzaService.checkIfPizzaExists(pizzaDto)).contains(pizza);
   }
 
   @Test

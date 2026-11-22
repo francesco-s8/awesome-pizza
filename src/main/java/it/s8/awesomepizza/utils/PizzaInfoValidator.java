@@ -18,21 +18,12 @@ public class PizzaInfoValidator {
   }
 
   public boolean isValidPizzaInfo(PizzaDto pizzaDto) {
-
-    if (pizzaDto.getName() != null && pizzaDto.getName().trim().isEmpty()) {
-      log.error("Pizza name is empty");
-      return false;
-    }
-    if (pizzaDto.getDescription() != null && pizzaDto.getDescription().trim().isEmpty()) {
-      log.error("Pizza description is empty");
-      return false;
-    }
-    if (!isPizzaPriceValid(pizzaDto.getPrice())) {
-      log.error("Pizza price is invalid");
-      return false;
-    }
-    if (pizzaDto.getIngredients() != null && pizzaDto.getIngredients().isEmpty()) {
-      log.error("Pizza ingredients are empty");
+    if (pizzaDto == null
+        || (pizzaDto.getName() != null && pizzaDto.getName().trim().isEmpty())
+        || (pizzaDto.getDescription() != null && pizzaDto.getDescription().trim().isEmpty())
+        || !isPizzaPriceValid(pizzaDto.getPrice())
+        || (pizzaDto.getIngredients() != null && pizzaDto.getIngredients().isEmpty())) {
+      log.error("Pizza info is invalid");
       return false;
     }
     return true;
