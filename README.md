@@ -14,17 +14,16 @@ For brevity all credentials are clearly visible in the code (DO NOT DO THIS IN R
 
 ## Database population
 
-If you wanna add more pizza(s) just modify [this sql file](src/main/resources/db/migration/V5__add_pizzas.sql)and add entries according to the schema.
+If you wanna add more pizza(s) just modify [this sql file](src/main/resources/db/migration/V5__add_pizzas.sql) and add entries according to the schema.
 Or use the RESTFul endpoints.
 
 ## Execute app
 
-Run `docker compose -f docker/docker-compose.yml up` from the repository root, or use your IDE's Docker Compose integration, to start all containers I
+Run `docker compose -f docker/docker-compose.yml up` from the repository root, or use your IDE's Docker Compose integration, to start all containers.
 
 ### Endpoints
 
-See [awesome-pizza-swagger.yaml](src/main/resources/swagger/awesome-pizza.yaml)
-or import the [Postman collection](postman/awesome-pizza.postman_collection.json).
+See [awesome-pizza-swagger.yaml](src/main/resources/swagger/awesome-pizza.yaml)or import the [Postman collection](postman/awesome-pizza.postman_collection.json).
 
 ### Docker:
 

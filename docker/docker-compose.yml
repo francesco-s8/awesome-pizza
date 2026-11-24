@@ -59,6 +59,7 @@ services:
       - RABBITMQ_USER=guest
       - RABBITMQ_PASS=guest
       - LOGGING_FILE_NAME=/app/logs/spring.log
+      - AOT_MODE=use
     volumes:
       - "${VOLUME_PATH}/spring-logs:/app/logs"
       - aot-cache:/application/aot-cache
