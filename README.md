@@ -19,21 +19,7 @@ Or use the RESTFul endpoints.
 
 ## Execute app
 
-Run `docker compose -f docker/docker-compose.yml up` from the repository root, or use your IDE's Docker Compose integration, to start all containers.
-If you want to start only postgresql and rabbitmq as image and the application from your favorite IDE, just start it
-with the env variable IDE setup with the following data:
-
-      - POSTGRES_HOST=localhost
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=awesome_pizza
-      - POSTGRES_USER=s8
-      - POSTGRES_PASS=s8
-      - RABBITMQ_HOST=localhost
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USER=guest
-      - RABBITMQ_PASS=guest
-
-or launch spring application with local profile (preferred option)
+Run `docker compose -f docker/docker-compose.yml up` from the repository root, or use your IDE's Docker Compose integration, to start all containers I
 
 ### Endpoints
 
