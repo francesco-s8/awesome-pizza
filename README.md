@@ -1,4 +1,4 @@
-# AWESOME PIZZA (a simple example)
+# AWESOME PIZZA
 
 A simple Spring Boot to manage a sort of Pizzeria with basic operations
 
