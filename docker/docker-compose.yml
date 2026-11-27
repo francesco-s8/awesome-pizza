@@ -10,6 +10,7 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
+      - "./rabbitmq-enabled-plugins:/etc/rabbitmq/enabled_plugins:ro"
       - "${VOLUME_PATH}/rabbitmq-data:/var/lib/rabbitmq"
       - "${VOLUME_PATH}/rabbitmq-log:/var/log/rabbitmq"
     healthcheck:

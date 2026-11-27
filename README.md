@@ -21,6 +21,9 @@ Or use the RESTFul endpoints.
 
 Run `docker compose -f docker/docker-compose.yml up` from the repository root, or use your IDE's Docker Compose integration, to start all containers.
 
+Order creation publishes the order ID to the `orders-exchange` direct exchanges. Each exchange routes the order to its dedicated `orders` quorum queue (for preparation). 
+The RabbitMQ Stream plugin is enabled by the Compose service.
+
 ### Endpoints
 
 See [awesome-pizza-swagger.yaml](src/main/resources/swagger/awesome-pizza.yaml)or import the [Postman collection](postman/awesome-pizza.postman_collection.json).
@@ -55,4 +58,3 @@ The Java 25 runtime can cache classes loaded at startup. Create a cache for the 
    ```
 
 The cache and training configuration are stored in the Compose `aot-cache` volume. Repeat the training and cache-creation steps after changing the application or its dependencies. The app still starts normally if no cache has been created.
-
