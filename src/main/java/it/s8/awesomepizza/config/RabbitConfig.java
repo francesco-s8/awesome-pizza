@@ -1,8 +1,12 @@
 package it.s8.awesomepizza.config;
 
+import it.s8.awesomepizza.utils.RabbitConstants;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.springframework.amqp.core.AcknowledgeMode;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -20,15 +24,12 @@ import tools.jackson.databind.json.JsonMapper;
 @Configuration
 public class RabbitConfig {
 
-  private static final String DEAD_LETTER_QUEUE = "dl";
-  private static final String ORDERS_QUEUE = "orders";
-
   @Bean
   Queue orders() {
-    return QueueBuilder.durable(ORDERS_QUEUE)
+    return QueueBuilder.durable(RabbitConstants.ORDERS_QUEUE)
         .quorum()
-        .deadLetterExchange("**")
-        .deadLetterRoutingKey(DEAD_LETTER_QUEUE)
+        .deadLetterExchange(RabbitConstants.DEAD_LETTER_EXCHANGE)
+        .deadLetterRoutingKey(RabbitConstants.DEAD_LETTER_QUEUE)
         .build();
   }
 
@@ -46,7 +47,29 @@ public class RabbitConfig {
 
   @Bean
   Queue deadLetterQueue() {
-    return QueueBuilder.durable(DEAD_LETTER_QUEUE).quorum().build();
+    return QueueBuilder.durable(RabbitConstants.DEAD_LETTER_QUEUE).quorum().build();
+  }
+
+  @Bean
+  DirectExchange ordersExchange() {
+    return new DirectExchange(RabbitConstants.ORDERS_EXCHANGE);
+  }
+
+  @Bean
+  DirectExchange deadLetterExchange() {
+    return new DirectExchange(RabbitConstants.DEAD_LETTER_EXCHANGE);
+  }
+
+  @Bean
+  Binding ordersBinding(Queue orders, DirectExchange ordersExchange) {
+    return BindingBuilder.bind(orders).to(ordersExchange).with(RabbitConstants.ORDERS_QUEUE);
+  }
+
+  @Bean
+  Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
+    return BindingBuilder.bind(deadLetterQueue)
+        .to(deadLetterExchange)
+        .with(RabbitConstants.DEAD_LETTER_QUEUE);
   }
 
   @Bean(destroyMethod = "close")

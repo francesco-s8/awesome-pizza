@@ -9,6 +9,7 @@ import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
 import it.s8.awesomepizza.entity.PizzaOrder;
 import it.s8.awesomepizza.service.PizzaOrderService;
+import it.s8.awesomepizza.utils.RabbitConstants;
 import it.s8.awesomepizza.utils.sleeper.Sleeper;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -30,7 +31,7 @@ class PizzaQueueServiceImplTest {
   @Mock Sleeper sleeper;
 
   @Test
-  void sendOrder_sendsMessageAndPersistsOrder_whenValidRequest() {
+  void sendOrder_publishesOrderIdToQueueAndStream_whenValidRequest() {
 
     var orderEntity =
         PizzaOrder.builder()
@@ -41,7 +42,9 @@ class PizzaQueueServiceImplTest {
             .build();
     pizzaQueueService.onOrderCreated(new OrderCreatedEvent(orderEntity, orderEntity.getId()));
 
-    verify(rabbitTemplate, times(1)).convertAndSend("orders", orderEntity.getId());
+    verify(rabbitTemplate, times(1))
+        .convertAndSend(
+            RabbitConstants.ORDERS_EXCHANGE, RabbitConstants.ORDERS_QUEUE, orderEntity.getId());
   }
 
   @Test

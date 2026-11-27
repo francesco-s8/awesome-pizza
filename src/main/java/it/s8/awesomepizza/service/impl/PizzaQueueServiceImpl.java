@@ -4,6 +4,7 @@ import com.rabbitmq.client.Channel;
 import it.s8.awesomepizza.dto.event.OrderCreatedEvent;
 import it.s8.awesomepizza.service.PizzaOrderService;
 import it.s8.awesomepizza.service.PizzaQueueService;
+import it.s8.awesomepizza.utils.RabbitConstants;
 import it.s8.awesomepizza.utils.sleeper.Sleeper;
 import java.io.IOException;
 import java.time.Duration;
@@ -35,7 +36,7 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
   @Override
   @Transactional(rollbackFor = Exception.class)
   @RabbitListener(
-      queues = "orders",
+      queues = RabbitConstants.ORDERS_QUEUE,
       containerFactory = "pizzaOrderListenerContainerFactory")
   public void processOrder(
       Long pizzaOrder, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag)
@@ -51,7 +52,9 @@ public class PizzaQueueServiceImpl implements PizzaQueueService {
   @Override
   @TransactionalEventListener
   public void onOrderCreated(OrderCreatedEvent event) throws AmqpException {
-    log.info("Order {} created event received, sending to queue", event.getOrderId());
-    rabbitTemplate.convertAndSend("orders", event.getOrderId());
+    log.info(
+        "Order {} created event received, publishing to queue and stream", event.getOrderId());
+    rabbitTemplate.convertAndSend(
+        RabbitConstants.ORDERS_EXCHANGE, RabbitConstants.ORDERS_QUEUE, event.getOrderId());
   }
 }
